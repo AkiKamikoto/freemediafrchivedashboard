@@ -236,7 +236,9 @@
       <div id="steamStatus" class="import-hint"></div>
       <div class="import-hint">Нужно, чтобы в приватности Steam пункт «Сведения об играх» был Public (Изменить профиль → Настройки приватности) — иначе данные недоступны никаким способом.</div>
       <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="enrichSteamGames(document.getElementById('steamStatus'))">🔍 Обогатить метаданные (разработчик, жанр, описание)</button>
-      <div class="import-hint">Тянет данные по каждой игре из Steam Store API — сначала проверяет офлайн-базу репозитория, новые данные сохраняются в неё же автоматически. Может занять время для большой библиотеки.</div>
+      <div class="import-hint">Тянет данные по каждой игре из Steam Store API — сначала проверяет офлайн-базу (<code>data/steam-games-db.json</code>), новые данные применяются к записям и попадают в базу локально. Может занять время для большой библиотеки.</div>
+      <button class="btn-ghost" style="width:100%" onclick="downloadSteamDb()">⬇ Скачать базу данных (JSON)</button>
+      <div class="import-hint">Скачивает всю накопленную офлайн-базу — пришли этот файл, чтобы сохранить в репозиторий и не собирать те же данные заново на других устройствах.</div>
     </div>
 
     <div class="modal-actions">

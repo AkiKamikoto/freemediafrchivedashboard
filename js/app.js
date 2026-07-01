@@ -38,7 +38,6 @@ let statsMode = false;
 let uiPrefs = {theme:'dark', view:'cards'};
 
 let steamGamesDb = {};
-let steamDbPendingQueue = {};
 async function load(){
   try{
     const res = await window.storage.get('archive-entries');
@@ -52,33 +51,18 @@ async function load(){
     const dbRes = await fetch('data/steam-games-db.json');
     if(dbRes.ok) steamGamesDb = await dbRes.json();
   }catch(e){ /* offline cache unavailable, enrichment will fetch live */ }
-  try{
-    const pq = await window.storage.get('archive-steam-db-pending');
-    if(pq) steamDbPendingQueue = JSON.parse(pq.value);
-  }catch(e){ /* nothing queued */ }
   applyUiPrefs();
   render();
 }
-async function persistPendingQueue(){
-  try{ await window.storage.set('archive-steam-db-pending', JSON.stringify(steamDbPendingQueue)); }
-  catch(e){ /* ignore */ }
-}
-async function pushPendingToRepo(statusEl, prefix){
-  if(!Object.keys(steamDbPendingQueue).length) return prefix;
-  try{
-    const res = await fetch('/api/steam-db', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(steamDbPendingQueue)});
-    if(res.ok){
-      const n = Object.keys(steamDbPendingQueue).length;
-      steamDbPendingQueue = {};
-      await persistPendingQueue();
-      return `${prefix} — сохранено в базу репозитория (${n})`;
-    }
-    await persistPendingQueue();
-    return `${prefix} — не удалось сохранить в базу репозитория (${res.status}), попробуется снова при следующем запуске`;
-  }catch(e){
-    await persistPendingQueue();
-    return `${prefix} — не удалось сохранить в базу репозитория (нет сети), попробуется снова при следующем запуске`;
-  }
+function downloadSteamDb(){
+  if(!Object.keys(steamGamesDb).length){ showToast('База пуста — сначала нажми «Обогатить метаданные»'); return; }
+  const blob = new Blob([JSON.stringify(steamGamesDb, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'steam-games-db.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(`Скачано записей: ${Object.keys(steamGamesDb).length}`);
 }
 async function persist(){
   try{ await window.storage.set('archive-entries', JSON.stringify(entries)); }
@@ -1209,17 +1193,13 @@ function backfillSteamDetFromEntry(e){
 }
 
 async function enrichSteamGames(statusEl){
-  // Восстанавливаем уже обогащённые локально записи, которые ещё не попали
-  // в offline-базу (например, из-за прошлого неудачного сохранения в репозиторий).
+  // Восстанавливаем уже обогащённые локально записи, которых ещё нет в offline-базе
+  // (например, обогащённые до того, как появилась сама база).
   const alreadyEnriched = entries.filter(e=>e.category==='games' && e.data && e.data.platform==='Steam' && e.data.appid && e.data.developer && !steamGamesDb[e.data.appid]);
-  alreadyEnriched.forEach(e=>{
-    const det = backfillSteamDetFromEntry(e);
-    steamGamesDb[e.data.appid] = det;
-    steamDbPendingQueue[e.data.appid] = det;
-  });
+  alreadyEnriched.forEach(e=>{ steamGamesDb[e.data.appid] = backfillSteamDetFromEntry(e); });
 
   const targets = entries.filter(e=>e.category==='games' && e.data && e.data.platform==='Steam' && e.data.appid && !e.data.developer);
-  if(!targets.length && !alreadyEnriched.length && !Object.keys(steamDbPendingQueue).length){
+  if(!targets.length && !alreadyEnriched.length){
     statusEl.textContent = 'Все игры уже обогащены (или нет appid для старых записей)';
     return;
   }
@@ -1241,7 +1221,6 @@ async function enrichSteamGames(statusEl){
       }
       if(det){
         steamGamesDb[appid] = det;
-        steamDbPendingQueue[appid] = det;
         fetched++;
       } else {
         failed++;
@@ -1254,10 +1233,9 @@ async function enrichSteamGames(statusEl){
   await persist();
   render();
 
-  let msg = `Готово — обогащено: из кэша ${fromCache}, загружено ${fetched}${failed?`, не найдено ${failed}`:''}`;
-  msg = await pushPendingToRepo(statusEl, msg);
+  const msg = `Готово — обогащено: из кэша ${fromCache}, загружено ${fetched}${failed?`, не найдено ${failed}`:''}. Нажми «Скачать базу данных», чтобы прислать файл для сохранения в репозитории.`;
   statusEl.textContent = msg;
-  showToast(msg);
+  showToast(`Обогащено: ${fromCache+fetched}`);
 }
 
 function buildSteamProfileBase(input){
