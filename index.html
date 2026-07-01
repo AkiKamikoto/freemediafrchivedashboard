@@ -187,6 +187,10 @@
         <button class="btn-primary" onclick="exportData('json')">⬇ Скачать JSON</button>
         <button class="btn-primary" onclick="exportData('csv')">⬇ Скачать CSV</button>
       </div>
+      <div class="import-hint">Если из-за повторного импорта появились дубли (одна и та же запись несколько раз) — можно почистить одной кнопкой. Совпадения ищутся по названию и категории; при склейке сохраняются обложка, оценка и заметки из любой копии.</div>
+      <div class="modal-actions">
+        <button class="btn-ghost" style="width:100%" onclick="dedupeEntries()">🧹 Удалить дубликаты</button>
+      </div>
     </div>
 
     <div class="import-panel" id="panelFile">

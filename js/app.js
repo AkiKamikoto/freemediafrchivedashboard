@@ -196,13 +196,24 @@ function progressLine(e){
   return '';
 }
 
+function onCoverError(img, initials, extraHtml){
+  extraHtml = extraHtml || '';
+  const m = img.src.match(/steamstatic\.com\/steam\/apps\/(\d+)\/library_600x900\.jpg(\?.*)?$/);
+  if(m && img.dataset.steamFallback !== '1'){
+    img.dataset.steamFallback = '1';
+    img.src = `https://cdn.cloudflare.steamstatic.com/steam/apps/${m[1]}/header.jpg`;
+    return;
+  }
+  img.parentElement.innerHTML = `${extraHtml}<div class="fallback">${initials}</div>`;
+}
+
 function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   return `<div class="card" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
     <div class="cover">
       <div class="catbar"></div>
-      ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="this.parentElement.innerHTML='<div class=&quot;catbar&quot;></div><div class=&quot;fallback&quot;>${initials}</div>'">` : `<div class="fallback">${initials}</div>`}
+      ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
     </div>
     <div class="card-body">
       <div class="card-top">
@@ -533,7 +544,7 @@ function openView(id){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   document.getElementById('viewCover').innerHTML = e.cover
-    ? `<img src="${escapeHtml(e.cover)}" onerror="this.parentElement.innerHTML='<div class=&quot;fallback&quot;>${initials}</div>'">`
+    ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">`
     : `<div class="fallback">${initials}</div>`;
   document.getElementById('viewTitle').textContent = e.title;
   document.getElementById('viewStamp').textContent = statusLabel(e);
@@ -834,6 +845,39 @@ function renderStats(){
   }
 }
 
+async function dedupeEntries(){
+  const groups = {};
+  entries.forEach(e=>{
+    const key = e.category+'::'+e.title.trim().toLowerCase();
+    (groups[key] = groups[key] || []).push(e);
+  });
+  const dupGroups = Object.values(groups).filter(g=>g.length>1);
+  const removedCount = dupGroups.reduce((sum,g)=>sum+g.length-1, 0);
+  if(!removedCount){ showToast('Дубликатов не найдено'); return; }
+  if(!confirm(`Найдено ${removedCount} дублирующих записей (по названию и категории). Склеить и удалить лишние?`)) return;
+
+  const score = x => (x.rating?2:0) + (x.cover?1:0);
+  const kept = [];
+  dupGroups.forEach(group=>{
+    group.sort((a,b)=> score(b)-score(a) || b.updated-a.updated);
+    const primary = group[0];
+    group.slice(1).forEach(dup=>{
+      if(!primary.cover && dup.cover) primary.cover = dup.cover;
+      if(!primary.rating && dup.rating) primary.rating = dup.rating;
+      if(!primary.notes && dup.notes) primary.notes = dup.notes;
+      if(!primary.watchDate && dup.watchDate) primary.watchDate = dup.watchDate;
+      if(!primary.year && dup.year) primary.year = dup.year;
+      if(dup.data && dup.data.hours && !(primary.data && primary.data.hours)) primary.data = {...primary.data, hours: dup.data.hours};
+    });
+    kept.push(primary);
+  });
+  const dupIds = new Set(dupGroups.flatMap(g=>g.slice(1).map(x=>x.id)));
+  entries = entries.filter(e=>!dupIds.has(e.id));
+  await persist();
+  render();
+  showToast(`Удалено дубликатов: ${removedCount}`);
+}
+
 function exportData(format){
   if(entries.length===0){ showToast('Архив пуст'); return; }
   let blob, filename;
@@ -1040,27 +1084,43 @@ function parseSteamGames(raw){
   return games.map(g=>({
     name: g.name,
     hours: g.playtime_forever ? g.playtime_forever/60 : 0,
-    logo: g.appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/library_600x900.jpg` : ''
+    logo: g.appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/library_600x900.jpg` : '',
+    lastPlayed: g.rtime_last_played ? new Date(g.rtime_last_played*1000).toISOString().slice(0,10) : ''
   })).filter(g=>g.name);
 }
 
 async function commitSteamGames(games, statusEl){
-  let added = 0;
+  let added = 0, updated = 0;
   games.forEach(g=>{
-    entries.push({
-      id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
-      title: g.name, category: 'games',
-      status: g.hours>0 ? 'progress' : 'planning',
-      rating: null, year: null, cover: g.logo||'', notes:'',
-      data:{ hours: g.hours ? Math.round(g.hours*10)/10 : '', platform:'Steam' },
-      updated: Date.now()
-    });
-    added++;
+    const hours = g.hours ? Math.round(g.hours*10)/10 : '';
+    const existing = entries.find(x=>x.category==='games' && x.data && x.data.platform==='Steam' && x.title.toLowerCase()===g.name.toLowerCase());
+    if(existing){
+      if(g.logo) existing.cover = g.logo;
+      existing.data = {...existing.data, hours};
+      if(g.lastPlayed) existing.watchDate = g.lastPlayed;
+      if(g.hours>0 && existing.status==='planning') existing.status = 'progress';
+      existing.updated = Date.now();
+      updated++;
+    } else {
+      entries.push({
+        id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
+        title: g.name, category: 'games',
+        status: g.hours>0 ? 'progress' : 'planning',
+        rating: null, year: null, cover: g.logo||'', notes:'',
+        watchDate: g.lastPlayed || null,
+        data:{ hours, platform:'Steam' },
+        updated: Date.now()
+      });
+      added++;
+    }
   });
   await persist();
   render();
-  statusEl.textContent = `Готово — импортировано ${added} игр`;
-  showToast(`Импортировано: ${added}`);
+  const msg = added && updated ? `Готово — добавлено ${added}, обновлено ${updated}`
+    : updated ? `Готово — обновлено ${updated} игр`
+    : `Готово — импортировано ${added} игр`;
+  statusEl.textContent = msg;
+  showToast(msg);
 }
 
 function buildSteamProfileBase(input){
