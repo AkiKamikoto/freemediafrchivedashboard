@@ -13,7 +13,12 @@
   <div class="rail-divider"></div>
   <div class="rail-bottom">
     <button class="rail-btn" onclick="pickForMe()">🎲 Выбери за меня</button>
-    <button class="rail-btn" onclick="toggleView()" id="viewBtn">🖼 Стена постеров</button>
+    <select class="rail-btn" id="viewSelect" onchange="setViewMode(this.value)">
+      <option value="cards">📇 Карточки</option>
+      <option value="posters">🖼 Стена постеров</option>
+      <option value="list">📋 Список</option>
+      <option value="compact">☰ Компактный список</option>
+    </select>
     <button class="rail-btn" onclick="toggleTheme()" id="themeBtn">☀ Светлая тема</button>
     <button class="rail-btn" onclick="openImportModal()">📦 Импорт / Экспорт</button>
     <button class="rail-btn" id="statsBtn" onclick="toggleStats()">📊 Статистика</button>
@@ -36,6 +41,11 @@
         <option value="updated">По обновлению</option>
         <option value="title">По названию</option>
         <option value="rating">По оценке</option>
+      </select>
+      <select class="filter" id="groupBy" onchange="setGroupBy(this.value)">
+        <option value="none">Без группировки</option>
+        <option value="year">Группировать по году</option>
+        <option value="status">Группировать по статусу</option>
       </select>
       <button class="btn-ghost" onclick="toggleFiltersPanel()">⚙ Фильтры</button>
       <button class="btn-add" onclick="openModal()">+ Добавить</button>
