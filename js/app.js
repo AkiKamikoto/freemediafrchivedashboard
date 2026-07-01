@@ -1007,6 +1007,19 @@ function parseSteamGames(raw){
   return games.filter(g=>g.name);
 }
 
+function extractRgGames(html){
+  const m = html.match(/var rgGames\s*=\s*(\[[\s\S]*?\])\s*;/);
+  if(!m) return [];
+  try{
+    const arr = JSON.parse(m[1]);
+    return arr.map(g=>({
+      name: g.name,
+      hours: g.hours_forever ? parseFloat(String(g.hours_forever).replace(',','')) : 0,
+      logo: g.logo || ''
+    })).filter(g=>g.name);
+  }catch(e){ return []; }
+}
+
 async function commitSteamGames(games, statusEl){
   let added = 0;
   games.forEach(g=>{
@@ -1026,14 +1039,18 @@ async function commitSteamGames(games, statusEl){
   showToast(`Импортировано: ${added}`);
 }
 
-function buildSteamXmlUrl(input){
+function buildSteamProfileBase(input){
   let v = input.trim().replace(/^https?:\/\//,'').replace(/\/$/,'');
   const idMatch = v.match(/steamcommunity\.com\/id\/([^\/\?]+)/);
   const profMatch = v.match(/steamcommunity\.com\/profiles\/(\d+)/);
-  if(idMatch) return `https://steamcommunity.com/id/${idMatch[1]}/games/?tab=all&xml=1`;
-  if(profMatch) return `https://steamcommunity.com/profiles/${profMatch[1]}/games/?tab=all&xml=1`;
-  if(/^\d{17}$/.test(v)) return `https://steamcommunity.com/profiles/${v}/games/?tab=all&xml=1`;
-  return `https://steamcommunity.com/id/${v}/games/?tab=all&xml=1`;
+  if(idMatch) return `https://steamcommunity.com/id/${idMatch[1]}`;
+  if(profMatch) return `https://steamcommunity.com/profiles/${profMatch[1]}`;
+  if(/^\d{17}$/.test(v)) return `https://steamcommunity.com/profiles/${v}`;
+  return `https://steamcommunity.com/id/${v}`;
+}
+
+function buildSteamXmlUrl(input){
+  return `${buildSteamProfileBase(input)}/games/?tab=all&xml=1`;
 }
 
 async function autoImportSteam(){
@@ -1041,27 +1058,36 @@ async function autoImportSteam(){
   const statusEl = document.getElementById('steamStatus');
   const fallback = document.getElementById('steamFallback');
   if(!input){ statusEl.textContent = 'Вставь ссылку на профиль или ник'; return; }
-  const targetUrl = buildSteamXmlUrl(input);
+  const base = buildSteamProfileBase(input);
+  const targets = [
+    { url: `${base}/games/?tab=all&xml=1`, extract: parseSteamGames },
+    { url: `${base}/games/?tab=all`, extract: extractRgGames },
+  ];
   statusEl.textContent = 'пробую забрать автоматически...';
   fallback.style.display = 'none';
 
+  // corsproxy.io без API-ключа работает только с dev-окружений (localhost) —
+  // оставлен последним как редкий случай, а не основной способ.
   const proxies = [
-    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
     u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
   ];
-  for(const buildProxy of proxies){
-    try{
-      const res = await fetch(buildProxy(targetUrl), {signal: AbortSignal.timeout(9000)});
-      if(!res.ok) continue;
-      const raw = await res.text();
-      const games = parseSteamGames(raw);
-      if(games.length){
-        await commitSteamGames(games, statusEl);
-        return;
-      }
-    }catch(e){ /* try next proxy */ }
+  for(const target of targets){
+    for(const buildProxy of proxies){
+      try{
+        const res = await fetch(buildProxy(target.url), {signal: AbortSignal.timeout(9000)});
+        if(!res.ok) continue;
+        const raw = await res.text();
+        const games = target.extract(raw);
+        if(games.length){
+          await commitSteamGames(games, statusEl);
+          return;
+        }
+      }catch(e){ /* try next proxy */ }
+    }
   }
+  const targetUrl = targets[0].url;
   statusEl.textContent = 'Автоматически не получилось — попробуй вручную ниже';
   document.getElementById('steamManualLink').href = targetUrl;
   document.getElementById('steamManualLink').textContent = targetUrl;
@@ -1072,7 +1098,7 @@ async function importSteamPaste(){
   const raw = document.getElementById('steamPaste').value.trim();
   const statusEl = document.getElementById('steamStatus');
   if(!raw){ statusEl.textContent = 'Вставь содержимое страницы сначала'; return; }
-  const games = parseSteamGames(raw);
+  const games = parseSteamGames(raw).length ? parseSteamGames(raw) : extractRgGames(raw);
   if(!games.length){ statusEl.textContent = 'Игры не найдены — профиль приватный, «Сведения об играх» не Public, или скопирован не весь текст'; return; }
   await commitSteamGames(games, statusEl);
 }
