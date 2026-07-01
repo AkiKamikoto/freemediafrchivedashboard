@@ -35,7 +35,7 @@ function statusLabel(e){
 let entries = [];
 let activeCat = 'all';
 let statsMode = false;
-let uiPrefs = {theme:'dark', view:'cards'};
+let uiPrefs = {theme:'dark', view:'cards', groupBy:'none'};
 
 let steamGamesDb = {};
 async function load(){
@@ -75,8 +75,8 @@ async function persistUiPrefs(){
 function applyUiPrefs(){
   document.body.classList.toggle('theme-light', uiPrefs.theme==='light');
   document.getElementById('themeBtn').textContent = uiPrefs.theme==='light' ? '🌙 Тёмная тема' : '☀ Светлая тема';
-  document.getElementById('viewBtn').textContent = uiPrefs.view==='posters' ? '📇 Карточки' : '🖼 Стена постеров';
-  document.getElementById('viewBtn').classList.toggle('active', uiPrefs.view==='posters');
+  document.getElementById('viewSelect').value = uiPrefs.view;
+  document.getElementById('groupBy').value = uiPrefs.groupBy || 'none';
   if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
 }
 function saveSteamApiKey(v){
@@ -87,9 +87,13 @@ function toggleTheme(){
   uiPrefs.theme = uiPrefs.theme==='light' ? 'dark' : 'light';
   applyUiPrefs(); persistUiPrefs();
 }
-function toggleView(){
-  uiPrefs.view = uiPrefs.view==='posters' ? 'cards' : 'posters';
-  applyUiPrefs(); persistUiPrefs(); render();
+function setViewMode(v){
+  uiPrefs.view = v;
+  persistUiPrefs(); render();
+}
+function setGroupBy(v){
+  uiPrefs.groupBy = v;
+  persistUiPrefs(); render();
 }
 
 function buildTabs(){
@@ -165,8 +169,40 @@ function render(){
     content.innerHTML = `<div class="empty"><div class="big">Пока пусто</div>Добавь первую запись в архив, или попробуй сбросить фильтры</div>`;
     return;
   }
-  const modeClass = uiPrefs.view==='posters' ? ' poster-mode' : '';
-  content.innerHTML = `<div class="grid${modeClass}">${list.map(cardHtml).join('')}</div>`;
+
+  const mode = uiPrefs.view;
+  const renderItem = mode==='list' ? rowHtml : mode==='compact' ? compactHtml : cardHtml;
+  const wrapClass = mode==='posters' ? 'grid poster-mode' : mode==='list' ? 'list-view' : mode==='compact' ? 'compact-view' : 'grid';
+  const wrap = items => `<div class="${wrapClass}">${items.map(renderItem).join('')}</div>`;
+
+  if(uiPrefs.groupBy && uiPrefs.groupBy!=='none'){
+    const groups = groupEntries(list, uiPrefs.groupBy);
+    content.innerHTML = groups.map(([label, items])=>`<div class="group-header">${escapeHtml(label)} <span class="group-count">${items.length}</span></div>${wrap(items)}`).join('');
+  } else {
+    content.innerHTML = wrap(list);
+  }
+}
+
+function groupEntries(list, by){
+  const map = new Map();
+  if(by==='year'){
+    list.forEach(e=>{
+      const key = e.year ? String(e.year) : 'Без года';
+      if(!map.has(key)) map.set(key, []);
+      map.get(key).push(e);
+    });
+    return Array.from(map.entries()).sort((a,b)=>{
+      if(a[0]==='Без года') return 1;
+      if(b[0]==='Без года') return -1;
+      return Number(b[0])-Number(a[0]);
+    });
+  }
+  list.forEach(e=>{
+    if(!map.has(e.status)) map.set(e.status, []);
+    map.get(e.status).push(e);
+  });
+  const order = ['progress','planning','hold','completed','dropped'];
+  return order.filter(s=>map.has(s)).map(s=>[STATUS_LABEL[s], map.get(s)]);
 }
 
 function pickForMe(){
@@ -265,6 +301,36 @@ function cardHtml(e){
     </div>
   </div>`;
 }
+function rowHtml(e){
+  const cat = CATS[e.category] || CATS.movies;
+  const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
+  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+    <span class="row-dot"></span>
+    <span class="row-title">${escapeHtml(e.title)}</span>
+    <span class="row-cat">${cat.label}</span>
+    <span class="row-year">${e.year||'—'}</span>
+    <select class="stamp stamp-select row-status ${STATUS_CLASS[e.status]}" onclick="event.stopPropagation()" onchange="quickSetStatus(event,'${e.id}',this.value)">${statusOpts}</select>
+    <input class="quick-rating row-rating" type="number" min="0" max="10" placeholder="—" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
+  </div>`;
+}
+
+function compactHtml(e){
+  const cat = CATS[e.category] || CATS.movies;
+  const initials = e.title.slice(0,2).toUpperCase();
+  const metaBits = [cat.label, e.year, subLine(e), progressLine(e)].filter(Boolean);
+  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+    <div class="compact-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
+    <div class="compact-body">
+      <div class="compact-top">
+        <span class="compact-title">${escapeHtml(e.title)}</span>
+        <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+      </div>
+      <div class="compact-meta">${metaBits.map(escapeHtml).join(' · ')}</div>
+    </div>
+    <span class="rating">${e.rating? e.rating+'/10' : '—'}</span>
+  </div>`;
+}
+
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function formatDate(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}.${m}.${y}`; }
 
