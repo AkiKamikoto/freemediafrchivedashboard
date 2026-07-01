@@ -138,6 +138,10 @@
     <div id="extraFields"></div>
 
     <div class="field">
+      <label>Описание</label>
+      <textarea id="fDescription" placeholder="Синопсис/описание (обычно подтягивается автоматически при импорте)"></textarea>
+    </div>
+    <div class="field">
       <label>Заметки</label>
       <textarea id="fNotes" placeholder="Впечатления, где остановился..."></textarea>
     </div>
@@ -158,8 +162,11 @@
       <span class="stamp" id="viewStamp"></span>
       <span id="viewMeta" class="card-meta"></span>
     </div>
-    <div class="view-row" id="viewSubRow"></div>
-    <div class="view-row" id="viewProgressRow"></div>
+    <div id="viewFields"></div>
+    <div id="viewDescriptionWrap" style="margin-top:10px;">
+      <label>Описание</label>
+      <div id="viewDescription" class="import-hint" style="margin-top:4px;"></div>
+    </div>
     <div id="viewNotesWrap" style="margin-top:10px;">
       <label>Заметки</label>
       <div id="viewNotes" class="import-hint" style="margin-top:4px;"></div>
@@ -236,7 +243,9 @@
       <div id="steamStatus" class="import-hint"></div>
       <div class="import-hint">Нужно, чтобы в приватности Steam пункт «Сведения об играх» был Public (Изменить профиль → Настройки приватности) — иначе данные недоступны никаким способом.</div>
       <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="enrichSteamGames(document.getElementById('steamStatus'))">🔍 Обогатить метаданные (разработчик, жанр, описание)</button>
-      <div class="import-hint">Тянет данные по каждой игре из Steam Store API — сначала проверяет офлайн-базу репозитория, новые данные сохраняются в неё же автоматически. Может занять время для большой библиотеки.</div>
+      <div class="import-hint">Тянет данные по каждой игре из Steam Store API — сначала проверяет офлайн-базу (<code>data/steam-games-db.json</code>), новые данные применяются к записям и попадают в базу локально. Может занять время для большой библиотеки.</div>
+      <button class="btn-ghost" style="width:100%" onclick="downloadSteamDb()">⬇ Скачать базу данных (JSON)</button>
+      <div class="import-hint">Скачивает всю накопленную офлайн-базу — пришли этот файл, чтобы сохранить в репозиторий и не собирать те же данные заново на других устройствах.</div>
     </div>
 
     <div class="modal-actions">
