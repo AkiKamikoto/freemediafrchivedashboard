@@ -1,1 +1,7978 @@
-{}
+{
+  "10": {
+    "appid": 10,
+    "name": "Counter-Strike",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2000",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "80": {
+    "appid": 80,
+    "name": "Counter-Strike: Condition Zero",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2004",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "100": {
+    "appid": 100,
+    "name": "Counter-Strike: Condition Zero Deleted Scenes",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2004",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "240": {
+    "appid": 240,
+    "name": "Counter-Strike: Source",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2004",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "300": {
+    "appid": 300,
+    "name": "Day of Defeat: Source",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "320": {
+    "appid": 320,
+    "name": "Half-Life 2: Deathmatch",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2004",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "400": {
+    "appid": 400,
+    "name": "Portal",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2007",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "440": {
+    "appid": 440,
+    "name": "Team Fortress 2",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2007",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "500": {
+    "appid": 500,
+    "name": "Left 4 Dead",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "550": {
+    "appid": 550,
+    "name": "Left 4 Dead 2",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "570": {
+    "appid": 570,
+    "name": "Dota 2",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "620": {
+    "appid": 620,
+    "name": "Portal 2",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "730": {
+    "appid": 730,
+    "name": "Counter-Strike 2",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "4000": {
+    "appid": 4000,
+    "name": "Garry's Mod",
+    "developers": [
+      "Facepunch Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2006",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "6000": {
+    "appid": 6000,
+    "name": "STAR WARS™ Republic Commando",
+    "developers": [
+      "LucasArts"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "6020": {
+    "appid": 6020,
+    "name": "STAR WARS™ Jedi Knight: Jedi Academy™",
+    "developers": [
+      "Raven Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "6030": {
+    "appid": 6030,
+    "name": "STAR WARS™ Jedi Knight II: Jedi Outcast™",
+    "developers": [
+      "Raven Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "6060": {
+    "appid": 6060,
+    "name": "Star Wars: Battlefront 2 (Classic, 2005)",
+    "developers": [
+      "Pandemic Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "8190": {
+    "appid": 8190,
+    "name": "Just Cause 2",
+    "developers": [
+      "Avalanche Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "8870": {
+    "appid": 8870,
+    "name": "BioShock Infinite",
+    "developers": [
+      "Irrational Games",
+      "Virtual Programming (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "8930": {
+    "appid": 8930,
+    "name": "Sid Meier's Civilization V",
+    "developers": [
+      "Firaxis Games",
+      "Aspyr (Mac)",
+      "Aspyr (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "12900": {
+    "appid": 12900,
+    "name": "Audiosurf",
+    "developers": [
+      "Dylan Fitterer"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "13540": {
+    "appid": 13540,
+    "name": "Tom Clancy's Rainbow Six: Vegas",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "15100": {
+    "appid": 15100,
+    "name": "Assassin's Creed",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "15120": {
+    "appid": 15120,
+    "name": "Tom Clancy's Rainbow Six: Vegas 2",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "15700": {
+    "appid": 15700,
+    "name": "Oddworld: Abe's Oddysee",
+    "developers": [
+      "Oddworld Inhabitants"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "16450": {
+    "appid": 16450,
+    "name": "F.E.A.R. 2: Project Origin",
+    "developers": [
+      "Monolith"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "17390": {
+    "appid": 17390,
+    "name": "Spore",
+    "developers": [
+      "Maxis™"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Ролевые игры",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "17440": {
+    "appid": 17440,
+    "name": "Spore: Creepy & Cute Parts Pack",
+    "developers": [
+      "Maxis™"
+    ],
+    "publishers": [],
+    "genres": [
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "20900": {
+    "appid": 20900,
+    "name": "The Witcher: Enhanced Edition",
+    "developers": [
+      "CD PROJEKT RED"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "20920": {
+    "appid": 20920,
+    "name": "The Witcher 2: Assassins of Kings Enhanced Edition",
+    "developers": [
+      "CD PROJEKT RED"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "21000": {
+    "appid": 21000,
+    "name": "LEGO® Batman™: The Videogame",
+    "developers": [
+      "Traveller's Tales"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2008",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "22230": {
+    "appid": 22230,
+    "name": "Rock of Ages",
+    "developers": [
+      "ACE Team"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Гонки",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "24240": {
+    "appid": 24240,
+    "name": "PAYDAY: The Heist",
+    "developers": [
+      "OVERKILL - a Starbreeze Studio."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32350": {
+    "appid": 32350,
+    "name": "STAR WARS™ Starfighter™",
+    "developers": [
+      "LucasArts"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32370": {
+    "appid": 32370,
+    "name": "STAR WARS™ Knights of the Old Republic™",
+    "developers": [
+      "BioWare",
+      "Aspyr (Mac)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32380": {
+    "appid": 32380,
+    "name": "STAR WARS™ Jedi Knight: Dark Forces II",
+    "developers": [
+      "LucasArts"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32390": {
+    "appid": 32390,
+    "name": "STAR WARS™ Jedi Knight: Mysteries of the Sith™",
+    "developers": [
+      "LucasArts"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32400": {
+    "appid": 32400,
+    "name": "STAR WARS™: Dark Forces",
+    "developers": [
+      "LucasArts"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32420": {
+    "appid": 32420,
+    "name": "STAR WARS™: The Clone Wars - Republic Heroes™",
+    "developers": [
+      "Krome Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32430": {
+    "appid": 32430,
+    "name": "STAR WARS™: The Force Unleashed™ Ultimate Sith Edition",
+    "developers": [
+      "LucasArts"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32470": {
+    "appid": 32470,
+    "name": "STAR WARS™ Empire at War: Gold Pack",
+    "developers": [
+      "Petroglyph"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "32500": {
+    "appid": 32500,
+    "name": "STAR WARS™: The Force Unleashed™ II",
+    "developers": [
+      "Aspyr Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "33230": {
+    "appid": 33230,
+    "name": "Assassin's Creed II",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "34270": {
+    "appid": 34270,
+    "name": "SEGA Mega Drive & Genesis Classics",
+    "developers": [
+      "D3T Limited"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "34420": {
+    "appid": 34420,
+    "name": "XIII Century",
+    "developers": [
+      "Unicorn Games Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "34870": {
+    "appid": 34870,
+    "name": "Sniper Ghost Warrior 2",
+    "developers": [
+      "City Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "35140": {
+    "appid": 35140,
+    "name": "Batman: Arkham Asylum GOTY Edition",
+    "developers": [
+      "Rocksteady Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "35700": {
+    "appid": 35700,
+    "name": "Trine",
+    "developers": [
+      "Frozenbyte"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "38210": {
+    "appid": 38210,
+    "name": "Roogoo",
+    "developers": [
+      "Spidermonk Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2009",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "38740": {
+    "appid": 38740,
+    "name": "EDGE",
+    "developers": [
+      "Two Tribes"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "40800": {
+    "appid": 40800,
+    "name": "Super Meat Boy",
+    "developers": [
+      "Team Meat"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "40990": {
+    "appid": 40990,
+    "name": "Mafia",
+    "developers": [
+      "Illusion Softworks"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2002",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "42680": {
+    "appid": 42680,
+    "name": "Call of Duty®: Modern Warfare® 3 (2011)",
+    "developers": [
+      "Infinity Ward",
+      "Sledgehammer Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "42910": {
+    "appid": 42910,
+    "name": "Magicka",
+    "developers": [
+      "Arrowhead Game Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "43110": {
+    "appid": 43110,
+    "name": "Metro 2033",
+    "developers": [
+      "4A Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "43500": {
+    "appid": 43500,
+    "name": "M.U.D. TV",
+    "developers": [
+      "Realmforge Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "44350": {
+    "appid": 44350,
+    "name": "GRID 2",
+    "developers": [
+      "Codemasters Racing"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "46410": {
+    "appid": 46410,
+    "name": "Avencast",
+    "developers": [
+      "ClockStone"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "46440": {
+    "appid": 46440,
+    "name": "Future Wars",
+    "developers": [
+      "Radon Labs"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "47410": {
+    "appid": 47410,
+    "name": "Stronghold Kingdoms",
+    "developers": [
+      "Firefly Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Многопользовательские игры",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "48000": {
+    "appid": 48000,
+    "name": "LIMBO",
+    "developers": [
+      "Playdead"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "48190": {
+    "appid": 48190,
+    "name": "Assassin's Creed Brotherhood",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "48700": {
+    "appid": 48700,
+    "name": "Mount & Blade: Warband",
+    "developers": [
+      "TaleWorlds Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "49520": {
+    "appid": 49520,
+    "name": "Borderlands 2",
+    "developers": [
+      "Gearbox Software",
+      "Aspyr (Mac)",
+      "Aspyr (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "50620": {
+    "appid": 50620,
+    "name": "Darksiders",
+    "developers": [
+      "Vigil Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "55230": {
+    "appid": 55230,
+    "name": "Saints Row: The Third",
+    "developers": [
+      "Volition"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "63710": {
+    "appid": 63710,
+    "name": "BIT.TRIP RUNNER",
+    "developers": [
+      "Gaijin Games",
+      "Choice Provisions"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "70000": {
+    "appid": 70000,
+    "name": "Dino D-Day",
+    "developers": [
+      "800 North and Digital Ranch"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "70300": {
+    "appid": 70300,
+    "name": "VVVVVV",
+    "developers": [
+      "Terry Cavanagh"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2010",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "72850": {
+    "appid": 72850,
+    "name": "The Elder Scrolls V: Skyrim",
+    "developers": [
+      "Bethesda Game Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "91200": {
+    "appid": 91200,
+    "name": "Anomaly Warzone Earth",
+    "developers": [
+      "11 bit studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "105600": {
+    "appid": 105600,
+    "name": "Terraria",
+    "developers": [
+      "Re-Logic"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "107100": {
+    "appid": 107100,
+    "name": "Bastion",
+    "developers": [
+      "Supergiant Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "108600": {
+    "appid": 108600,
+    "name": "Project Zomboid",
+    "developers": [
+      "The Indie Stone"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Симуляторы",
+      "Ранний доступ"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "108710": {
+    "appid": 108710,
+    "name": "Alan Wake",
+    "developers": [
+      "Remedy Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "109500": {
+    "appid": 109500,
+    "name": "Fowl Space",
+    "developers": [
+      "Pixelante Game Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "110800": {
+    "appid": 110800,
+    "name": "L.A. Noire",
+    "developers": [
+      "Team Bondi",
+      "Rockstar Leeds"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "113020": {
+    "appid": 113020,
+    "name": "Monaco",
+    "developers": [
+      "Pocketwatch Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "113200": {
+    "appid": 113200,
+    "name": "The Binding of Isaac",
+    "developers": [
+      "Edmund McMillen",
+      "Florian Himsl"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2011",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "200260": {
+    "appid": 200260,
+    "name": "Batman: Arkham City GOTY",
+    "developers": [
+      "Rocksteady Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "200510": {
+    "appid": 200510,
+    "name": "XCOM: Enemy Unknown",
+    "developers": [
+      "Firaxis Games",
+      "Feral Interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "202750": {
+    "appid": 202750,
+    "name": "Alan Wake's American Nightmare",
+    "developers": [
+      "Remedy Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "203160": {
+    "appid": 203160,
+    "name": "Tomb Raider",
+    "developers": [
+      "Crystal Dynamics",
+      "Eidos-Montréal",
+      "Feral Interactive (Mac)",
+      "Nixxes"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "203630": {
+    "appid": 203630,
+    "name": "Warlock - Master of the Arcane",
+    "developers": [
+      "Ino-Co Plus"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "204100": {
+    "appid": 204100,
+    "name": "Max Payne 3",
+    "developers": [
+      "Rockstar Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "204360": {
+    "appid": 204360,
+    "name": "Castle Crashers",
+    "developers": [
+      "The Behemoth"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "204450": {
+    "appid": 204450,
+    "name": "Call of Juarez Gunslinger",
+    "developers": [
+      "Techland"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "204630": {
+    "appid": 204630,
+    "name": "Retro City Rampage™ DX",
+    "developers": [
+      "Vblank Entertainment",
+      "Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "204880": {
+    "appid": 204880,
+    "name": "Sins of a Solar Empire: Rebellion",
+    "developers": [
+      "Ironclad Games Corporation",
+      "Stardock Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "206420": {
+    "appid": 206420,
+    "name": "Saints Row IV",
+    "developers": [
+      "Deep Silver Volition"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "206690": {
+    "appid": 206690,
+    "name": "iBomber Defense Pacific",
+    "developers": [
+      "Cobra Mobile"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "207610": {
+    "appid": 207610,
+    "name": "The Walking Dead",
+    "developers": [
+      "Telltale Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "208140": {
+    "appid": 208140,
+    "name": "ENDLESS Space™ - Definitive Edition",
+    "developers": [
+      "AMPLITUDE Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "208580": {
+    "appid": 208580,
+    "name": "STAR WARS™ Knights of the Old Republic™ II: The Sith Lords™",
+    "developers": [
+      "Obsidian Entertainment",
+      "Aspyr (Mac",
+      "Linux",
+      "& Windows Update)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "208650": {
+    "appid": 208650,
+    "name": "Batman™: Arkham Knight",
+    "developers": [
+      "Rocksteady Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "209670": {
+    "appid": 209670,
+    "name": "Cortex Command",
+    "developers": [
+      "Data Realms"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "211600": {
+    "appid": 211600,
+    "name": "Thief Gold",
+    "developers": [
+      "Looking Glass Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "211820": {
+    "appid": 211820,
+    "name": "Starbound",
+    "developers": [
+      "Chucklefish"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "212630": {
+    "appid": 212630,
+    "name": "Tom Clancy's Ghost Recon Future Soldier",
+    "developers": [
+      "Ubisoft Paris",
+      "Red Storm Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "212680": {
+    "appid": 212680,
+    "name": "FTL: Faster Than Light",
+    "developers": [
+      "Subset Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "213330": {
+    "appid": 213330,
+    "name": "LEGO® Batman™ 2: DC Super Heroes",
+    "developers": [
+      "TT Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "214340": {
+    "appid": 214340,
+    "name": "Deponia",
+    "developers": [
+      "Daedalic Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "214510": {
+    "appid": 214510,
+    "name": "LEGO® The Lord of the Rings™",
+    "developers": [
+      "Traveller's Tales"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "215930": {
+    "appid": 215930,
+    "name": "Jagged Alliance 2 - Wildfire ",
+    "developers": [
+      "I-deal Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "218410": {
+    "appid": 218410,
+    "name": "Defender's Quest: Valley of the Forgotten",
+    "developers": [
+      "Level Up Labs",
+      "LLC"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "218620": {
+    "appid": 218620,
+    "name": "PAYDAY 2",
+    "developers": [
+      "OVERKILL - a Starbreeze Studio."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "218640": {
+    "appid": 218640,
+    "name": "Lucius",
+    "developers": [
+      "Shiver Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "218740": {
+    "appid": 218740,
+    "name": "Pid ",
+    "developers": [
+      "Might and Delight"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "219150": {
+    "appid": 219150,
+    "name": "Hotline Miami",
+    "developers": [
+      "Dennaton Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "219640": {
+    "appid": 219640,
+    "name": "Chivalry: Medieval Warfare",
+    "developers": [
+      "Torn Banner Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "219740": {
+    "appid": 219740,
+    "name": "Don't Starve",
+    "developers": [
+      "Klei Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "220240": {
+    "appid": 220240,
+    "name": "Far Cry® 3",
+    "developers": [
+      "Ubisoft Montreal",
+      "Massive Entertainment",
+      "and Ubisoft Shanghai"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "220740": {
+    "appid": 220740,
+    "name": "Chaos on Deponia",
+    "developers": [
+      "Daedalic Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "220820": {
+    "appid": 220820,
+    "name": "Zombie Driver HD",
+    "developers": [
+      "Exor Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "221640": {
+    "appid": 221640,
+    "name": "Super Hexagon",
+    "developers": [
+      "Terry Cavanagh"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "222880": {
+    "appid": 222880,
+    "name": "Insurgency",
+    "developers": [
+      "New World Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "222900": {
+    "appid": 222900,
+    "name": "Dead Island: Epidemic",
+    "developers": [
+      "Stunlock Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные",
+      "Ранний доступ"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "223470": {
+    "appid": 223470,
+    "name": "POSTAL 2",
+    "developers": [
+      "Running With Scissors"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "224480": {
+    "appid": 224480,
+    "name": "Octodad: Dadliest Catch",
+    "developers": [
+      "Young Horses"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "224540": {
+    "appid": 224540,
+    "name": "Ace of Spades",
+    "developers": [
+      "Jagex Limited"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "224820": {
+    "appid": 224820,
+    "name": "Super House of Dead Ninjas",
+    "developers": [
+      "Megadev"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "225080": {
+    "appid": 225080,
+    "name": "Brothers - A Tale of Two Sons",
+    "developers": [
+      "Starbreeze Studios AB"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "227280": {
+    "appid": 227280,
+    "name": "No Time to Explain",
+    "developers": [
+      "tinyBuild"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "227300": {
+    "appid": 227300,
+    "name": "Euro Truck Simulator 2",
+    "developers": [
+      "SCS Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2012",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "227580": {
+    "appid": 227580,
+    "name": "10,000,000",
+    "developers": [
+      "EightyEightGames"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Казуальные игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "227940": {
+    "appid": 227940,
+    "name": "Heroes & Generals",
+    "developers": [
+      "TLM Partners"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные",
+      "Инди",
+      "Многопользовательские игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "228380": {
+    "appid": 228380,
+    "name": "Wreckfest",
+    "developers": [
+      "Bugbear"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Гонки",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "230050": {
+    "appid": 230050,
+    "name": "DLC Quest",
+    "developers": [
+      "Going Loud Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "230230": {
+    "appid": 230230,
+    "name": "Divinity: Original Sin (Classic)",
+    "developers": [
+      "Larian Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "230410": {
+    "appid": 230410,
+    "name": "Warframe",
+    "developers": [
+      "Digital Extremes"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "233290": {
+    "appid": 233290,
+    "name": "MURDERED: SOUL SUSPECT™",
+    "developers": [
+      "Airtight Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "233450": {
+    "appid": 233450,
+    "name": "Prison Architect",
+    "developers": [
+      "Introversion Software",
+      "Double Eleven"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "233720": {
+    "appid": 233720,
+    "name": "Surgeon Simulator",
+    "developers": [
+      "Bossa Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "234140": {
+    "appid": 234140,
+    "name": "Mad Max",
+    "developers": [
+      "Avalanche Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "234270": {
+    "appid": 234270,
+    "name": "Ken Follett's The Pillars of the Earth",
+    "developers": [
+      "Daedalic Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "234390": {
+    "appid": 234390,
+    "name": "Teleglitch: Die More Edition",
+    "developers": [
+      "Test3 Projects"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "234490": {
+    "appid": 234490,
+    "name": "Rush Bros",
+    "developers": [
+      "XYLA Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "234710": {
+    "appid": 234710,
+    "name": "Poker Night 2",
+    "developers": [
+      "Telltale Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "235250": {
+    "appid": 235250,
+    "name": "Super Sanctum TD",
+    "developers": [
+      "Coffee Stain Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "236090": {
+    "appid": 236090,
+    "name": "Dust: An Elysian Tail",
+    "developers": [
+      "Humble Hearts LLC"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "236150": {
+    "appid": 236150,
+    "name": "Starpoint Gemini 2",
+    "developers": [
+      "Little Green Men Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "237930": {
+    "appid": 237930,
+    "name": "Transistor",
+    "developers": [
+      "Supergiant Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "238010": {
+    "appid": 238010,
+    "name": "Deus Ex: Human Revolution - Director's Cut",
+    "developers": [
+      "Eidos Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "238370": {
+    "appid": 238370,
+    "name": "Magicka 2",
+    "developers": [
+      "Pieces Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "238460": {
+    "appid": 238460,
+    "name": "BattleBlock Theater",
+    "developers": [
+      "The Behemoth"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "238960": {
+    "appid": 238960,
+    "name": "Path of Exile",
+    "developers": [
+      "Grinding Gear Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Многопользовательские игры",
+      "Ролевые игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "239140": {
+    "appid": 239140,
+    "name": "Dying Light",
+    "developers": [
+      "Techland"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "239160": {
+    "appid": 239160,
+    "name": "Thief",
+    "developers": [
+      "Eidos-Montréal",
+      "Feral Interactive (Mac)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "239820": {
+    "appid": 239820,
+    "name": "Game Dev Tycoon",
+    "developers": [
+      "Greenheart Games 💚"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "241540": {
+    "appid": 241540,
+    "name": "State of Decay",
+    "developers": [
+      "Undead Labs"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "241910": {
+    "appid": 241910,
+    "name": "Goodbye Deponia",
+    "developers": [
+      "Daedalic Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "241930": {
+    "appid": 241930,
+    "name": "Middle-earth™: Shadow of Mordor™",
+    "developers": [
+      "Monolith Productions"
+    ],
+    "publishers": [],
+    "genres": [],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "242680": {
+    "appid": 242680,
+    "name": "Nuclear Throne",
+    "developers": [
+      "Vlambeer"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "242920": {
+    "appid": 242920,
+    "name": "Banished",
+    "developers": [
+      "Shining Rock Software LLC"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "244710": {
+    "appid": 244710,
+    "name": "Shelter 1",
+    "developers": [
+      "Might and Delight"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "244810": {
+    "appid": 244810,
+    "name": "Foul Play",
+    "developers": [
+      "Mediatonic"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "248290": {
+    "appid": 248290,
+    "name": "Reach for the Sun",
+    "developers": [
+      "Filament Classic"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "248820": {
+    "appid": 248820,
+    "name": "Risk of Rain (2013)",
+    "developers": [
+      "Hopoo Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "249050": {
+    "appid": 249050,
+    "name": "Dungeon of the ENDLESS™",
+    "developers": [
+      "AMPLITUDE Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "249330": {
+    "appid": 249330,
+    "name": "Unholy Heights",
+    "developers": [
+      "Petit Depotto"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "250400": {
+    "appid": 250400,
+    "name": "How to Survive",
+    "developers": [
+      "Eko Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "250900": {
+    "appid": 250900,
+    "name": "The Binding of Isaac: Rebirth",
+    "developers": [
+      "Nicalis",
+      "Inc.",
+      "Edmund McMillen"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "252150": {
+    "appid": 252150,
+    "name": "Grimm",
+    "developers": [
+      "Spicyhorse Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "253030": {
+    "appid": 253030,
+    "name": "Race The Sun",
+    "developers": [
+      "Flippfly LLC"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "253410": {
+    "appid": 253410,
+    "name": "Ravensword: Shadowlands",
+    "developers": [
+      "Crescent Moon Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "253900": {
+    "appid": 253900,
+    "name": "Knights and Merchants",
+    "developers": [
+      "Topware Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "256330": {
+    "appid": 256330,
+    "name": "WRC 4 FIA WORLD RALLY CHAMPIONSHIP",
+    "developers": [
+      "Milestone S.r.l."
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "261030": {
+    "appid": 261030,
+    "name": "The Walking Dead: Season Two",
+    "developers": [
+      "Telltale Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2013",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "262060": {
+    "appid": 262060,
+    "name": "Darkest Dungeon®",
+    "developers": [
+      "Red Hook Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "263760": {
+    "appid": 263760,
+    "name": "Turbo Dismount",
+    "developers": [
+      "Secret Exit Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "264730": {
+    "appid": 264730,
+    "name": "Deadly 30",
+    "developers": [
+      "Ignatus Zuk and Gonzalo Villagomez"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "266310": {
+    "appid": 266310,
+    "name": "GameGuru Classic",
+    "developers": [
+      "DarkBasicSoftwareLimited"
+    ],
+    "publishers": [],
+    "genres": [
+      "Анимация и моделирование",
+      "Дизайн и иллюстрация",
+      "Образование",
+      "Обучение работе с ПО",
+      "Утилиты",
+      "Разработка игр"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "267960": {
+    "appid": 267960,
+    "name": "Hyper Fighters",
+    "developers": [
+      "Team 6 Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "268500": {
+    "appid": 268500,
+    "name": "XCOM 2",
+    "developers": [
+      "Firaxis Games",
+      "Feral Interactive (Mac)",
+      "Feral Interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "269210": {
+    "appid": 269210,
+    "name": "Hero Siege",
+    "developers": [
+      "Panic Art Studios Ltd"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Многопользовательские игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "269270": {
+    "appid": 269270,
+    "name": "LOVE",
+    "developers": [
+      "Fred Wood"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "271640": {
+    "appid": 271640,
+    "name": "Humanity Asset",
+    "developers": [
+      "Browny Application"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "272860": {
+    "appid": 272860,
+    "name": "Wreckfest Throw-A-Santa + Sneak Peek 2.0",
+    "developers": [
+      "Bugbear"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Гонки",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "273350": {
+    "appid": 273350,
+    "name": "Evolve Stage 2",
+    "developers": [
+      "Turtle Rock Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "274170": {
+    "appid": 274170,
+    "name": "Hotline Miami 2: Wrong Number",
+    "developers": [
+      "Dennaton Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "275080": {
+    "appid": 275080,
+    "name": "Post Master ",
+    "developers": [
+      "Excalibur"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "275390": {
+    "appid": 275390,
+    "name": "Guacamelee! Super Turbo Championship Edition",
+    "developers": [
+      "Drinkbox Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "275850": {
+    "appid": 275850,
+    "name": "No Man's Sky",
+    "developers": [
+      "Hello Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "278360": {
+    "appid": 278360,
+    "name": "A Story About My Uncle",
+    "developers": [
+      "Gone North Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "281820": {
+    "appid": 281820,
+    "name": "Explodemon",
+    "developers": [
+      "Curve Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "283290": {
+    "appid": 283290,
+    "name": "Nosferatu: The Wrath of Malachi",
+    "developers": [
+      "Idol FX"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "283430": {
+    "appid": 283430,
+    "name": "Litil Divil",
+    "developers": [
+      "Gremlin Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "284850": {
+    "appid": 284850,
+    "name": "Grim Legends: The Forsaken Bride",
+    "developers": [
+      "Artifex Mundi"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "285160": {
+    "appid": 285160,
+    "name": "LEGO® The Hobbit™",
+    "developers": [
+      "Traveller's Tales",
+      "Feral Interactive (Mac)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "285800": {
+    "appid": 285800,
+    "name": "Braveland",
+    "developers": [
+      "Tortuga Team"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "285840": {
+    "appid": 285840,
+    "name": "Enemy Mind",
+    "developers": [
+      "Schell Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "286440": {
+    "appid": 286440,
+    "name": "Rover Rescue",
+    "developers": [
+      "Pointscape"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "286570": {
+    "appid": 286570,
+    "name": "F1 2015",
+    "developers": [
+      "Codemasters",
+      "Feral Interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "286690": {
+    "appid": 286690,
+    "name": "Metro 2033 Redux",
+    "developers": [
+      "4A Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "289070": {
+    "appid": 289070,
+    "name": "Sid Meier's Civilization VI",
+    "developers": [
+      "Firaxis Games",
+      "Aspyr (Mac)",
+      "Aspyr (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "291050": {
+    "appid": 291050,
+    "name": "Planet Stronghold",
+    "developers": [
+      "Winter Wolves"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "292030": {
+    "appid": 292030,
+    "name": "The Witcher 3: Wild Hunt",
+    "developers": [
+      "CD PROJEKT RED"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "292390": {
+    "appid": 292390,
+    "name": "Realms of the Haunting",
+    "developers": [
+      "Gremlin Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "292910": {
+    "appid": 292910,
+    "name": "Deponia: The Complete Journey",
+    "developers": [
+      "Daedalic Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "293180": {
+    "appid": 293180,
+    "name": "Overcast - Walden and the Werewolf",
+    "developers": [
+      "Microblast Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "294100": {
+    "appid": 294100,
+    "name": "RimWorld",
+    "developers": [
+      "Ludeon Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "298110": {
+    "appid": 298110,
+    "name": "Far Cry 4",
+    "developers": [
+      "Ubisoft Montreal",
+      "Red Storm",
+      "Shanghai",
+      "Toronto",
+      "Kiev"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "299260": {
+    "appid": 299260,
+    "name": "Commando Jack",
+    "developers": [
+      "Colossal Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "299460": {
+    "appid": 299460,
+    "name": "Woodle Tree Adventures",
+    "developers": [
+      "Fabio Ferrara"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "302190": {
+    "appid": 302190,
+    "name": "Amerzone: The Explorer’s Legacy (1999)",
+    "developers": [
+      "Microids"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "302510": {
+    "appid": 302510,
+    "name": "Ryse: Son of Rome",
+    "developers": [
+      "Crytek"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "304050": {
+    "appid": 304050,
+    "name": "Trove",
+    "developers": [
+      "gamigo US Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Многопользовательские игры",
+      "Ролевые игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "304390": {
+    "appid": 304390,
+    "name": "FOR HONOR",
+    "developers": [
+      "Ubisoft Montreal",
+      "Ubisoft Quebec",
+      "Ubisoft Toronto",
+      "Blue Byte"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "304930": {
+    "appid": 304930,
+    "name": "Unturned",
+    "developers": [
+      "Smartly Dressed Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "305620": {
+    "appid": 305620,
+    "name": "The Long Dark",
+    "developers": [
+      "Hinterland Studio Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "307350": {
+    "appid": 307350,
+    "name": "Nux",
+    "developers": [
+      "Idigicon"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "307690": {
+    "appid": 307690,
+    "name": "Sleeping Dogs: Definitive Edition",
+    "developers": [
+      "United Front Games",
+      "Feral Interactive (Mac)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "310560": {
+    "appid": 310560,
+    "name": "DiRT Rally",
+    "developers": [
+      "Codemasters",
+      "Feral Interactive (Linux)",
+      "Feral Interactive (Mac)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "311250": {
+    "appid": 311250,
+    "name": "Doorways: The Underworld",
+    "developers": [
+      "Saibot Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "311480": {
+    "appid": 311480,
+    "name": "Vertical Drop Heroes HD",
+    "developers": [
+      "Nerdook Productions"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "313120": {
+    "appid": 313120,
+    "name": "Stranded Deep",
+    "developers": [
+      "Beam Team Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "313690": {
+    "appid": 313690,
+    "name": "LEGO® Batman™ 3: Beyond Gotham",
+    "developers": [
+      "TT Games Ltd"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "315260": {
+    "appid": 315260,
+    "name": "Space Hack",
+    "developers": [],
+    "publishers": [
+      "Meridian4"
+    ],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [
+      "Для одного игрока",
+      "Семейный доступ"
+    ],
+    "is_free": false,
+    "short_description": "Это работа одного человека. Только у лучших из лучших будет какая-то надежда. У Надежды есть новое имя - Space Hack.",
+    "release_date": "5 авг. 2014 г.",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/315260/header.jpg?t=1766083341",
+    "metacritic_score": 63,
+    "recommendations_total": 239,
+    "fetched_at": "2026-07-01"
+  },
+  "319180": {
+    "appid": 319180,
+    "name": "Platypus II",
+    "developers": [
+      "Idigicon"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "319630": {
+    "appid": 319630,
+    "name": "Life is Strange™",
+    "developers": [
+      "DONTNOD Entertainment",
+      "Feral Interactive (Mac)",
+      "Feral Interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "322330": {
+    "appid": 322330,
+    "name": "Don't Starve Together",
+    "developers": [
+      "Klei Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "325180": {
+    "appid": 325180,
+    "name": "AppGameKit Classic",
+    "developers": [
+      "TheGameCreators"
+    ],
+    "publishers": [],
+    "genres": [
+      "Анимация и моделирование",
+      "Дизайн и иллюстрация",
+      "Образование",
+      "Обучение работе с ПО",
+      "Утилиты",
+      "Веб-разработка"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2014",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "327890": {
+    "appid": 327890,
+    "name": "I Am Bread",
+    "developers": [
+      "Bossa Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "329380": {
+    "appid": 329380,
+    "name": "Stealth Inc 2",
+    "developers": [
+      "Carbon"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "329430": {
+    "appid": 329430,
+    "name": "State of Decay: Year-One",
+    "developers": [
+      "Undead Labs"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "338050": {
+    "appid": 338050,
+    "name": "Anoxemia",
+    "developers": [
+      "BSK Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "340200": {
+    "appid": 340200,
+    "name": "Bloop",
+    "developers": [
+      "2SD"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "343100": {
+    "appid": 343100,
+    "name": "Overture",
+    "developers": [
+      "Black Shell Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "343360": {
+    "appid": 343360,
+    "name": "Particula",
+    "developers": [
+      "Microblast Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "343710": {
+    "appid": 343710,
+    "name": "KHOLAT",
+    "developers": [
+      "IMGN.PRO"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "351940": {
+    "appid": 351940,
+    "name": "The Descendant",
+    "developers": [
+      "Gaming Corps AB"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "354160": {
+    "appid": 354160,
+    "name": "WRC 5",
+    "developers": [
+      "KT Racing"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "356190": {
+    "appid": 356190,
+    "name": "Middle-earth™: Shadow of War™",
+    "developers": [
+      "Monolith Productions"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "361420": {
+    "appid": 361420,
+    "name": "ASTRONEER",
+    "developers": [
+      "System Era Softworks"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "362890": {
+    "appid": 362890,
+    "name": "Black Mesa",
+    "developers": [
+      "Crowbar Collective"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "364690": {
+    "appid": 364690,
+    "name": "SUPER DISTRO",
+    "developers": [
+      "KITATUS STUDIOS"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "365450": {
+    "appid": 365450,
+    "name": "Hacknet",
+    "developers": [
+      "Team Fractal Alligator"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "365590": {
+    "appid": 365590,
+    "name": "Tom Clancy's The Division",
+    "developers": [
+      "Massive Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "365670": {
+    "appid": 365670,
+    "name": "Blender",
+    "developers": [
+      "Blender Foundation"
+    ],
+    "publishers": [],
+    "genres": [
+      "Анимация и моделирование",
+      "Дизайн и иллюстрация",
+      "Создание видео"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "367520": {
+    "appid": 367520,
+    "name": "Hollow Knight",
+    "developers": [
+      "Team Cherry"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "368230": {
+    "appid": 368230,
+    "name": "Kingdom: Classic",
+    "developers": [
+      "Noio",
+      "Licorice"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "368730": {
+    "appid": 368730,
+    "name": "No Time To Explain Remastered",
+    "developers": [
+      "tinyBuild"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "368990": {
+    "appid": 368990,
+    "name": "Despair",
+    "developers": [
+      "AGC"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "369990": {
+    "appid": 369990,
+    "name": "Gremlins, Inc.",
+    "developers": [
+      "Charlie Oscar Lima Tango Interactive Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "373420": {
+    "appid": 373420,
+    "name": "Divinity: Original Sin Enhanced Edition",
+    "developers": [
+      "Larian Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "376300": {
+    "appid": 376300,
+    "name": "GUILTY GEAR Xrd -SIGN-",
+    "developers": [
+      "Arc System Works"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "377160": {
+    "appid": 377160,
+    "name": "Fallout 4",
+    "developers": [
+      "Bethesda Game Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "379720": {
+    "appid": 379720,
+    "name": "DOOM",
+    "developers": [
+      "id Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "381120": {
+    "appid": 381120,
+    "name": "Shoppe Keep",
+    "developers": [
+      "Strange Fire"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "382490": {
+    "appid": 382490,
+    "name": "Relic Hunters Zero: Remix",
+    "developers": [
+      "Rogue Snail"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "383150": {
+    "appid": 383150,
+    "name": "Dead Island Definitive Edition",
+    "developers": [
+      "Techland"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "383180": {
+    "appid": 383180,
+    "name": "Dead Island Riptide Definitive Edition",
+    "developers": [
+      "Techland"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "384150": {
+    "appid": 384150,
+    "name": "TeraBlaster",
+    "developers": [
+      "Black Shell Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "385830": {
+    "appid": 385830,
+    "name": "Burgers",
+    "developers": [
+      "storm_sharks"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "388410": {
+    "appid": 388410,
+    "name": "Darksiders II Deathinitive Edition",
+    "developers": [
+      "Gunfire Games",
+      "Vigil Games",
+      "THQ Nordic"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "389730": {
+    "appid": 389730,
+    "name": "TEKKEN 7",
+    "developers": [
+      "BANDAI NAMCO Studios Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "391220": {
+    "appid": 391220,
+    "name": "Rise of the Tomb Raider",
+    "developers": [
+      "Crystal Dynamics",
+      "Eidos-Montréal",
+      "Feral Interactive (Mac)",
+      "Feral Interactive (Linux)",
+      "Nixxes"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "391540": {
+    "appid": 391540,
+    "name": "Undertale",
+    "developers": [
+      "tobyfox"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2015",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "391720": {
+    "appid": 391720,
+    "name": "Layers of Fear (2016)",
+    "developers": [
+      "Bloober Team SA"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "396750": {
+    "appid": 396750,
+    "name": "EVERSPACE™",
+    "developers": [
+      "ROCKFISH Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "413150": {
+    "appid": 413150,
+    "name": "Stardew Valley",
+    "developers": [
+      "ConcernedApe"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "429660": {
+    "appid": 429660,
+    "name": "Tales of Berseria",
+    "developers": [
+      "BANDAI NAMCO Studios Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "431960": {
+    "appid": 431960,
+    "name": "Wallpaper Engine",
+    "developers": [
+      "Wallpaper Engine Team"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Анимация и моделирование",
+      "Дизайн и иллюстрация",
+      "Обработка фото",
+      "Утилиты"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "435150": {
+    "appid": 435150,
+    "name": "Divinity: Original Sin 2",
+    "developers": [
+      "Larian Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "437630": {
+    "appid": 437630,
+    "name": "State of Mind",
+    "developers": [
+      "Daedalic Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "441380": {
+    "appid": 441380,
+    "name": "PAC-MAN™ CHAMPIONSHIP EDITION 2",
+    "developers": [
+      "BANDAI NAMCO Studios Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "442070": {
+    "appid": 442070,
+    "name": "Drawful 2",
+    "developers": [
+      "Jackbox Games",
+      "Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "443810": {
+    "appid": 443810,
+    "name": "This Is the Police",
+    "developers": [
+      "Weappy Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "447040": {
+    "appid": 447040,
+    "name": "Watch_Dogs 2",
+    "developers": [
+      "Ubisoft"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "458770": {
+    "appid": 458770,
+    "name": "WRC 6",
+    "developers": [
+      "KT Racing"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "462780": {
+    "appid": 462780,
+    "name": "Darksiders Warmastered Edition",
+    "developers": [
+      "KAIKO",
+      "Vigil Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "475550": {
+    "appid": 475550,
+    "name": "Beholder",
+    "developers": [
+      "Alawar Stargaze (Warm Lamp Games)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "489520": {
+    "appid": 489520,
+    "name": "Minion Masters",
+    "developers": [
+      "BetaDwarf"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "489630": {
+    "appid": 489630,
+    "name": "Warhammer 40,000: Gladius - Relics of War",
+    "developers": [
+      "Proxy Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "501300": {
+    "appid": 501300,
+    "name": "What Remains of Edith Finch",
+    "developers": [
+      "Giant Sparrow"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "504370": {
+    "appid": 504370,
+    "name": "Battlerite",
+    "developers": [
+      "Stunlock Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "505230": {
+    "appid": 505230,
+    "name": "Pathologic 2",
+    "developers": [
+      "Ice-Pick Lodge"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "531920": {
+    "appid": 531920,
+    "name": "Carton",
+    "developers": [
+      "Calepin Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "532210": {
+    "appid": 532210,
+    "name": "Life is Strange 2",
+    "developers": [
+      "DONTNOD Entertainment",
+      "Feral Interactive (Mac)",
+      "Feral Interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "545110": {
+    "appid": 545110,
+    "name": "Driver Booster 4 for Steam ",
+    "developers": [
+      "IObit"
+    ],
+    "publishers": [],
+    "genres": [
+      "Утилиты"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2016",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "548430": {
+    "appid": 548430,
+    "name": "Deep Rock Galactic",
+    "developers": [
+      "Ghost Ship Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "552500": {
+    "appid": 552500,
+    "name": "Warhammer: Vermintide 2",
+    "developers": [
+      "Fatshark"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "552520": {
+    "appid": 552520,
+    "name": "Far Cry 5",
+    "developers": [
+      "Ubisoft Montreal",
+      "Red Storm",
+      "Ubisoft Shanghai",
+      "Ubisoft Toronto",
+      "Ubisoft Kiev"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "554620": {
+    "appid": 554620,
+    "name": "Life is Strange: Before the Storm",
+    "developers": [
+      "Deck Nine",
+      "Feral Interactive (Mac)",
+      "Feral Interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "582010": {
+    "appid": 582010,
+    "name": "Monster Hunter: World",
+    "developers": [
+      "CAPCOM Co.",
+      "Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "582160": {
+    "appid": 582160,
+    "name": "Assassin's Creed Origins",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "582890": {
+    "appid": 582890,
+    "name": "Estranged: The Departure",
+    "developers": [
+      "Alan Edwardes"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "583470": {
+    "appid": 583470,
+    "name": "The End Is Nigh",
+    "developers": [
+      "Edmund McMillen",
+      "Tyler Glaiel"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "588650": {
+    "appid": 588650,
+    "name": "Dead Cells",
+    "developers": [
+      "Motion Twin"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "599140": {
+    "appid": 599140,
+    "name": "Graveyard Keeper",
+    "developers": [
+      "Lazy Bear Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "602960": {
+    "appid": 602960,
+    "name": "Barotrauma",
+    "developers": [
+      "FakeFish",
+      "Undertow Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "609320": {
+    "appid": 609320,
+    "name": "FAR: Lone Sails",
+    "developers": [
+      "Okomotive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "611500": {
+    "appid": 611500,
+    "name": "Quake Champions",
+    "developers": [
+      "id Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "613100": {
+    "appid": 613100,
+    "name": "House Flipper",
+    "developers": [
+      "Empyrean"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Многопользовательские игры",
+      "Симуляторы",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "621830": {
+    "appid": 621830,
+    "name": "WRC 7",
+    "developers": [
+      "KT Racing"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "632360": {
+    "appid": 632360,
+    "name": "Risk of Rain 2",
+    "developers": [
+      "Hopoo Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "632470": {
+    "appid": 632470,
+    "name": "Disco Elysium",
+    "developers": [
+      "ZA/UM"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "637650": {
+    "appid": 637650,
+    "name": "FINAL FANTASY XV WINDOWS EDITION",
+    "developers": [
+      "Square Enix"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "640700": {
+    "appid": 640700,
+    "name": "Narvas",
+    "developers": [
+      "Stranga Games",
+      "TommahGames"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "640890": {
+    "appid": 640890,
+    "name": "Will Glow the Wisp",
+    "developers": [
+      "PartTimeIndie"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "641990": {
+    "appid": 641990,
+    "name": "The Escapists 2",
+    "developers": [
+      "Team17",
+      "Mouldy Toof Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "645630": {
+    "appid": 645630,
+    "name": "Car Mechanic Simulator 2018",
+    "developers": [
+      "Red Dot Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "648800": {
+    "appid": 648800,
+    "name": "Raft",
+    "developers": [
+      "Redbeet Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "656350": {
+    "appid": 656350,
+    "name": "UnderMine",
+    "developers": [
+      "Thorium"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "658850": {
+    "appid": 658850,
+    "name": "Do Not Feed the Monkeys",
+    "developers": [
+      "Fictiorama Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "684680": {
+    "appid": 684680,
+    "name": "Polygoneer",
+    "developers": [
+      "NukGames"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2017",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "699920": {
+    "appid": 699920,
+    "name": "Despotism 3k",
+    "developers": [
+      "Konfa Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "728880": {
+    "appid": 728880,
+    "name": "Overcooked! 2",
+    "developers": [
+      "Ghost Town Games Ltd.",
+      "Team17"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "737800": {
+    "appid": 737800,
+    "name": "F1 2018",
+    "developers": [
+      "Codemasters"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "739630": {
+    "appid": 739630,
+    "name": "Phasmophobia",
+    "developers": [
+      "Kinetic Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ранний доступ"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "750920": {
+    "appid": 750920,
+    "name": "Shadow of the Tomb Raider",
+    "developers": [
+      "Eidos-Montréal",
+      "Crystal Dynamics",
+      "Nixxes",
+      "Feral Interactive (Mac)",
+      "Feral interactive (Linux)"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "751780": {
+    "appid": 751780,
+    "name": "Forager",
+    "developers": [
+      "HopFrog"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "753660": {
+    "appid": 753660,
+    "name": "AtmaSphere",
+    "developers": [
+      "Mazen Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "782330": {
+    "appid": 782330,
+    "name": "DOOM Eternal",
+    "developers": [
+      "id Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "812140": {
+    "appid": 812140,
+    "name": "Assassin's Creed Odyssey",
+    "developers": [
+      "Ubisoft Quebec",
+      "Ubisoft Montreal",
+      "Ubisoft Bucharest",
+      "Ubisoft Singapore",
+      "Ubisoft Montpellier",
+      "Ubisoft Kiev",
+      "Ubisoft Shanghai"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "815370": {
+    "appid": 815370,
+    "name": "Green Hell",
+    "developers": [
+      "Creepy Jar"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "845070": {
+    "appid": 845070,
+    "name": "The Awesome Adventures of Captain Spirit",
+    "developers": [
+      "DONTNOD Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "847370": {
+    "appid": 847370,
+    "name": "Sunset Overdrive",
+    "developers": [
+      "Insomniac Games",
+      "Blind Squirrel Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "858820": {
+    "appid": 858820,
+    "name": "Tribes of Midgard",
+    "developers": [
+      "Norsfell"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "861540": {
+    "appid": 861540,
+    "name": "Dicey Dungeons",
+    "developers": [
+      "Terry Cavanagh"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "863550": {
+    "appid": 863550,
+    "name": "HITMAN™ 2",
+    "developers": [
+      "IO Interactive A/S"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "879160": {
+    "appid": 879160,
+    "name": "Battlerite Royale",
+    "developers": [
+      "Stunlock Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные",
+      "Многопользовательские игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "883710": {
+    "appid": 883710,
+    "name": "Resident Evil 2",
+    "developers": [
+      "CAPCOM Co.",
+      "Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "887060": {
+    "appid": 887060,
+    "name": "Asterix & Obelix XXL 2",
+    "developers": [
+      "OSome Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2018",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "939960": {
+    "appid": 939960,
+    "name": "Far Cry New Dawn",
+    "developers": [
+      "Ubisoft Montreal",
+      "Ubisoft Kiev",
+      "Ubisoft Shanghai"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "952060": {
+    "appid": 952060,
+    "name": "Resident Evil 3",
+    "developers": [
+      "CAPCOM Co.",
+      "Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "952070": {
+    "appid": 952070,
+    "name": "RESIDENT EVIL RESISTANCE",
+    "developers": [
+      "CAPCOM Co.",
+      "Ltd.",
+      "NeoBards Entertainment Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "960990": {
+    "appid": 960990,
+    "name": "Beyond: Two Souls",
+    "developers": [
+      "Quantic Dream"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "978520": {
+    "appid": 978520,
+    "name": "Legend of Keepers",
+    "developers": [
+      "Goblinz Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "990080": {
+    "appid": 990080,
+    "name": "Hogwarts Legacy",
+    "developers": [
+      "Avalanche Software"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "998740": {
+    "appid": 998740,
+    "name": "Ring of Pain",
+    "developers": [
+      "Simon Boxer",
+      "Twice Different"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1003890": {
+    "appid": 1003890,
+    "name": "Blacksad: Under the Skin",
+    "developers": [
+      "Pendulo Studios",
+      "YS Interactive"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1004750": {
+    "appid": 1004750,
+    "name": "WRC 8 FIA World Rally Championship",
+    "developers": [
+      "KT Racing"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1022310": {
+    "appid": 1022310,
+    "name": "Warhammer Underworlds - Shadespire Edition",
+    "developers": [
+      "Steel Sky Productions",
+      "Tin Man Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1025440": {
+    "appid": 1025440,
+    "name": "Fantasy General II",
+    "developers": [
+      "Owned by Gravity"
+    ],
+    "publishers": [],
+    "genres": [
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1046930": {
+    "appid": 1046930,
+    "name": "Dota Underlords",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1087760": {
+    "appid": 1087760,
+    "name": "The Gunk",
+    "developers": [
+      "Image & Form Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1091500": {
+    "appid": 1091500,
+    "name": "Cyberpunk 2077",
+    "developers": [
+      "CD PROJEKT RED"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1109690": {
+    "appid": 1109690,
+    "name": "Asterix & Obelix XXL 3  - The Crystal Menhir",
+    "developers": [
+      "OSome Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1119730": {
+    "appid": 1119730,
+    "name": "Ranch Simulator",
+    "developers": [
+      "Toxic Dog"
+    ],
+    "publishers": [],
+    "genres": [
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1145360": {
+    "appid": 1145360,
+    "name": "Hades",
+    "developers": [
+      "Supergiant Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1166580": {
+    "appid": 1166580,
+    "name": "Best Plumber",
+    "developers": [
+      "Hograung Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2019",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1172470": {
+    "appid": 1172470,
+    "name": "Apex Legends",
+    "developers": [
+      "Respawn"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1172620": {
+    "appid": 1172620,
+    "name": "Sea of Thieves",
+    "developers": [
+      "Rare Ltd"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1176710": {
+    "appid": 1176710,
+    "name": "Space Crew: Legendary Edition",
+    "developers": [
+      "Runner Duck"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1180660": {
+    "appid": 1180660,
+    "name": "Tell Me Why",
+    "developers": [
+      "DONTNOD Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1203220": {
+    "appid": 1203220,
+    "name": "NARAKA: BLADEPOINT",
+    "developers": [
+      "24 Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Многопользовательские игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1203620": {
+    "appid": 1203620,
+    "name": "Enshrouded",
+    "developers": [
+      "Keen Games GmbH"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Ранний доступ"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2024",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1206430": {
+    "appid": 1206430,
+    "name": "The Unfinished Swan",
+    "developers": [
+      "Giant Sparrow"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1222140": {
+    "appid": 1222140,
+    "name": "Detroit: Become Human",
+    "developers": [
+      "Quantic Dream"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1222680": {
+    "appid": 1222680,
+    "name": "Need for Speed™ Heat ",
+    "developers": [
+      "Ghost Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Гонки",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1237970": {
+    "appid": 1237970,
+    "name": "Titanfall® 2",
+    "developers": [
+      "Respawn Entertainment"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1240440": {
+    "appid": 1240440,
+    "name": "Halo Infinite",
+    "developers": [
+      "343 Industries"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1261520": {
+    "appid": 1261520,
+    "name": "Asterix & Obelix XXL",
+    "developers": [
+      "OSome Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1262060": {
+    "appid": 1262060,
+    "name": "Battle Ram",
+    "developers": [
+      "Runic Rise Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1267540": {
+    "appid": 1267540,
+    "name": "WRC 9 FIA World Rally Championship",
+    "developers": [
+      "KT Racing"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки",
+      "Симуляторы",
+      "Спорт"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1282730": {
+    "appid": 1282730,
+    "name": "Loop Hero",
+    "developers": [
+      "Four Quarters"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1284410": {
+    "appid": 1284410,
+    "name": "GWENT: The Witcher Card Game",
+    "developers": [
+      "CD PROJEKT RED"
+    ],
+    "publishers": [],
+    "genres": [
+      "Ролевые игры",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2020",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1293830": {
+    "appid": 1293830,
+    "name": "Forza Horizon 4",
+    "developers": [
+      "Playground Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Гонки"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1368870": {
+    "appid": 1368870,
+    "name": "Field of Glory II: Medieval",
+    "developers": [
+      "Byzantine Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1422450": {
+    "appid": 1422450,
+    "name": "Deadlock",
+    "developers": [
+      "Valve"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1426210": {
+    "appid": 1426210,
+    "name": "It Takes Two",
+    "developers": [
+      "Hazelight Studios"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1446780": {
+    "appid": 1446780,
+    "name": "MONSTER HUNTER RISE",
+    "developers": [
+      "CAPCOM Co.",
+      "Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1456200": {
+    "appid": 1456200,
+    "name": "Initial Drift Online",
+    "developers": [
+      "RewindApp"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Инди",
+      "Многопользовательские игры",
+      "Гонки",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1515950": {
+    "appid": 1515950,
+    "name": "Capcom Arcade Stadium",
+    "developers": [
+      "CAPCOM Co.",
+      "Ltd."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1546990": {
+    "appid": 1546990,
+    "name": "Grand Theft Auto: Vice City - The Definitive Edition",
+    "developers": [
+      "Rockstar Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1547000": {
+    "appid": 1547000,
+    "name": "Grand Theft Auto: San Andreas - The Definitive Edition",
+    "developers": [
+      "Rockstar Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1568590": {
+    "appid": 1568590,
+    "name": "Goose Goose Duck",
+    "developers": [
+      "Gaggle Studios",
+      "Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Многопользовательские игры",
+      "Стратегии",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2021",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1608450": {
+    "appid": 1608450,
+    "name": "Hellslave",
+    "developers": [
+      "Ars Goetia"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Инди",
+      "Ролевые игры",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1634080": {
+    "appid": 1634080,
+    "name": "Nocturnal",
+    "developers": [
+      "Sunnyside Games"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1868140": {
+    "appid": 1868140,
+    "name": "DAVE THE DIVER",
+    "developers": [
+      "MINTROCKET"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Ролевые игры",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1942280": {
+    "appid": 1942280,
+    "name": "Brotato",
+    "developers": [
+      "Blobfish"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Казуальные игры",
+      "Инди",
+      "Ролевые игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "1966720": {
+    "appid": 1966720,
+    "name": "Lethal Company",
+    "developers": [
+      "Zeekerss"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди",
+      "Ранний доступ"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2208920": {
+    "appid": 2208920,
+    "name": "Assassin's Creed Valhalla",
+    "developers": [
+      "Ubisoft Montreal"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2022",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2357570": {
+    "appid": 2357570,
+    "name": "Overwatch®",
+    "developers": [
+      "Blizzard Entertainment",
+      "Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2023",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2591280": {
+    "appid": 2591280,
+    "name": "F1® Manager 2024",
+    "developers": [
+      "Frontier Developments"
+    ],
+    "publishers": [],
+    "genres": [
+      "Симуляторы",
+      "Стратегии"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2024",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2747770": {
+    "appid": 2747770,
+    "name": "Wednesdays",
+    "developers": [
+      "Pierre Corbinais",
+      "The Pixel Hunt",
+      "exaheva",
+      "Christophe Galati"
+    ],
+    "publishers": [],
+    "genres": [
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2025",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2828500": {
+    "appid": 2828500,
+    "name": "The Jackbox Megapicker",
+    "developers": [
+      "Jackbox Games",
+      "Inc."
+    ],
+    "publishers": [],
+    "genres": [
+      "Бесплатные",
+      "Утилиты"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2024",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2835590": {
+    "appid": 2835590,
+    "name": "8AM",
+    "developers": [
+      "David Gallardo"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2024",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "2955840": {
+    "appid": 2955840,
+    "name": "Kitchen Wars",
+    "developers": [
+      "Silent Owl"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2025",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "3017580": {
+    "appid": 3017580,
+    "name": "Paragnosia",
+    "developers": [
+      "Sine Coda"
+    ],
+    "publishers": [],
+    "genres": [
+      "Приключенческие игры",
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2024",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "3028500": {
+    "appid": 3028500,
+    "name": "Cakey's Twisted Bakery",
+    "developers": [
+      "TinyMindz"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Инди"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2024",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "3564740": {
+    "appid": 3564740,
+    "name": "Where Winds Meet",
+    "developers": [
+      "Everstone Studio"
+    ],
+    "publishers": [],
+    "genres": [
+      "Экшены",
+      "Приключенческие игры",
+      "Ролевые игры",
+      "Бесплатные"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2025",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  },
+  "3565100": {
+    "appid": 3565100,
+    "name": "Unboxathon",
+    "developers": [
+      "Skye <3"
+    ],
+    "publishers": [],
+    "genres": [
+      "Казуальные игры",
+      "Инди",
+      "Симуляторы"
+    ],
+    "categories": [],
+    "is_free": false,
+    "short_description": "",
+    "release_date": "2025",
+    "header_image": "",
+    "metacritic_score": null,
+    "recommendations_total": null,
+    "fetched_at": "2026-07-01"
+  }
+}
