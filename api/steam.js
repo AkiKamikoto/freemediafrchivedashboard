@@ -1,4 +1,4 @@
-const ALLOWED_HOSTS = ['api.steampowered.com', 'steamcommunity.com'];
+const ALLOWED_HOSTS = ['api.steampowered.com', 'steamcommunity.com', 'store.steampowered.com'];
 
 module.exports = async function handler(req, res) {
   const target = req.query.url;
