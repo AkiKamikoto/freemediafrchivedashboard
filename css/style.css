@@ -76,6 +76,7 @@ body.theme-light .card::before{opacity:.85;}
 .stamp{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 7px;border-radius:3px;border:1px solid currentColor;transform:rotate(-3deg);white-space:nowrap;font-weight:600;flex-shrink:0;}
 .st-planning{color:#8B93A1;} .st-progress{color:#5B9CD9;} .st-completed{color:#6EB56E;} .st-hold{color:#D9A25B;} .st-dropped{color:#C0554F;}
 .card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.view-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
 .rating{font-family:'IBM Plex Mono',monospace;color:var(--brass);font-size:13px;font-weight:600;}
 .progress-txt{font-size:11px;color:var(--muted);}
 
