@@ -45,6 +45,11 @@ function applyUiPrefs(){
   document.getElementById('themeBtn').textContent = uiPrefs.theme==='light' ? '🌙 Тёмная тема' : '☀ Светлая тема';
   document.getElementById('viewBtn').textContent = uiPrefs.view==='posters' ? '📇 Карточки' : '🖼 Стена постеров';
   document.getElementById('viewBtn').classList.toggle('active', uiPrefs.view==='posters');
+  if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
+}
+function saveSteamApiKey(v){
+  uiPrefs.steamApiKey = v.trim();
+  persistUiPrefs();
 }
 function toggleTheme(){
   uiPrefs.theme = uiPrefs.theme==='light' ? 'dark' : 'light';
@@ -1053,28 +1058,75 @@ function buildSteamXmlUrl(input){
   return `${buildSteamProfileBase(input)}/games/?tab=all&xml=1`;
 }
 
+// corsproxy.io без API-ключа работает только с dev-окружений (localhost) —
+// оставлен последним как редкий случай, а не основной способ.
+const STEAM_PROXIES = [
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+];
+
+async function fetchViaProxies(url, proxies){
+  for(const buildProxy of proxies){
+    try{
+      const res = await fetch(buildProxy(url), {signal: AbortSignal.timeout(9000)});
+      if(res.ok) return await res.text();
+    }catch(e){ /* try next proxy */ }
+  }
+  return null;
+}
+
+async function resolveSteamId64(base, apiKey, proxies){
+  const profMatch = base.match(/steamcommunity\.com\/profiles\/(\d+)/);
+  if(profMatch) return profMatch[1];
+  const idMatch = base.match(/steamcommunity\.com\/id\/([^\/]+)/);
+  const vanity = idMatch ? idMatch[1] : base;
+  const url = `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${encodeURIComponent(apiKey)}&vanityurl=${encodeURIComponent(vanity)}`;
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return null;
+  try{
+    const data = JSON.parse(raw);
+    if(data.response && data.response.success === 1) return data.response.steamid;
+  }catch(e){ /* ignore */ }
+  return null;
+}
+
+async function fetchOwnedGamesViaApi(steamId64, apiKey, proxies){
+  const url = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${encodeURIComponent(apiKey)}&steamid=${steamId64}&include_appinfo=1&include_played_free_games=1&format=json`;
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return [];
+  return parseSteamGames(raw);
+}
+
 async function autoImportSteam(){
   const input = document.getElementById('steamLink').value.trim();
+  const apiKey = document.getElementById('steamApiKey').value.trim();
   const statusEl = document.getElementById('steamStatus');
   const fallback = document.getElementById('steamFallback');
   if(!input){ statusEl.textContent = 'Вставь ссылку на профиль или ник'; return; }
   const base = buildSteamProfileBase(input);
+  statusEl.textContent = 'пробую забрать автоматически...';
+  fallback.style.display = 'none';
+
+  if(apiKey){
+    try{
+      const steamId64 = await resolveSteamId64(base, apiKey, STEAM_PROXIES);
+      if(steamId64){
+        const games = await fetchOwnedGamesViaApi(steamId64, apiKey, STEAM_PROXIES);
+        if(games.length){
+          await commitSteamGames(games, statusEl);
+          return;
+        }
+      }
+    }catch(e){ /* fall through to legacy method */ }
+  }
+
   const targets = [
     { url: `${base}/games/?tab=all&xml=1`, extract: parseSteamGames },
     { url: `${base}/games/?tab=all`, extract: extractRgGames },
   ];
-  statusEl.textContent = 'пробую забрать автоматически...';
-  fallback.style.display = 'none';
-
-  // corsproxy.io без API-ключа работает только с dev-окружений (localhost) —
-  // оставлен последним как редкий случай, а не основной способ.
-  const proxies = [
-    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
-  ];
   for(const target of targets){
-    for(const buildProxy of proxies){
+    for(const buildProxy of STEAM_PROXIES){
       try{
         const res = await fetch(buildProxy(target.url), {signal: AbortSignal.timeout(9000)});
         if(!res.ok) continue;
