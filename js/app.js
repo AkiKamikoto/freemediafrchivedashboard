@@ -138,7 +138,7 @@ function getFiltered(){
   let list = entries.filter(e=>{
     if(activeCat!=='all' && e.category!==activeCat) return false;
     if(st && e.status!==st) return false;
-    if(q && !e.title.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q)) return false;
+    if(q && !e.title.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q) && !(e.description||'').toLowerCase().includes(q)) return false;
     if(yFrom && (!e.year || e.year<yFrom)) return false;
     if(yTo && (!e.year || e.year>yTo)) return false;
     if(rFrom!==null && (!e.rating || e.rating<rFrom)) return false;
@@ -222,9 +222,30 @@ function onCoverError(img, initials, extraHtml){
   img.parentElement.innerHTML = `${extraHtml}<div class="fallback">${initials}</div>`;
 }
 
+const STATUS_OPTIONS = [['planning','план'],['progress','в процессе'],['completed','завершено'],['hold','отложено'],['dropped','брошено']];
+function quickSetStatus(ev, id, status){
+  ev.stopPropagation();
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  e.status = status;
+  if(status==='completed' && !e.watchDate) e.watchDate = new Date().toISOString().slice(0,10);
+  e.updated = Date.now();
+  persist(); render();
+}
+function quickSetRating(ev, id, value){
+  ev.stopPropagation();
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  const v = parseInt(value);
+  e.rating = (isNaN(v) || v<=0) ? null : Math.min(10, v);
+  e.updated = Date.now();
+  persist(); render();
+}
+
 function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
+  const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
   return `<div class="card" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
     <div class="cover">
       <div class="catbar"></div>
@@ -233,12 +254,12 @@ function cardHtml(e){
     <div class="card-body">
       <div class="card-top">
         <div class="card-title">${escapeHtml(e.title)}</div>
-        <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+        <select class="stamp stamp-select ${STATUS_CLASS[e.status]}" onclick="event.stopPropagation()" onchange="quickSetStatus(event,'${e.id}',this.value)">${statusOpts}</select>
       </div>
       <div class="card-meta">${cat.label}${e.year?' · '+e.year:''}${e.country?' · '+escapeHtml(e.country):''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</div>
       ${subLine(e) ? `<div class="card-sub">${escapeHtml(subLine(e))}</div>` : ''}
       <div class="card-foot">
-        <span class="rating">${e.rating? e.rating+'/10' : '—'}</span>
+        <input class="quick-rating" type="number" min="0" max="10" placeholder="—" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
         <span class="progress-txt">${escapeHtml(progressLine(e))}</span>
       </div>
     </div>
@@ -293,7 +314,7 @@ function applyResult(i){
   document.getElementById('fYear').value = r.year || '';
   document.getElementById('fCover').value = r.cover || '';
   updateCoverPreview();
-  if(r.notes && !document.getElementById('fNotes').value) document.getElementById('fNotes').value = r.notes;
+  if(r.description && !document.getElementById('fDescription').value) document.getElementById('fDescription').value = r.description;
   const extra = r.extra || {};
   Object.keys(extra).forEach(k=>{
     const el = document.getElementById('ex_'+k);
@@ -320,7 +341,7 @@ async function searchTVmaze(q){
     title: x.show.name,
     year: x.show.premiered ? x.show.premiered.slice(0,4) : '',
     cover: x.show.image ? x.show.image.medium : '',
-    notes: x.show.summary ? x.show.summary.replace(/<[^>]+>/g,'').slice(0,300) : '',
+    description: x.show.summary ? x.show.summary.replace(/<[^>]+>/g,'').slice(0,500) : '',
     extra:{ creator: (x.show.network&&x.show.network.name)||(x.show.webChannel&&x.show.webChannel.name)||'' }
   }));
 }
@@ -526,6 +547,7 @@ function openModal(id){
     document.getElementById('fCountry').value = e.country||'';
     document.getElementById('fWatchDate').value = e.watchDate||'';
     document.getElementById('fTimesWatched').value = e.timesWatched||'';
+    document.getElementById('fDescription').value = e.description||'';
     document.getElementById('fNotes').value = e.notes||'';
     document.getElementById('fCover').value = e.cover||'';
     updateCoverPreview();
@@ -535,7 +557,7 @@ function openModal(id){
     document.getElementById('saveMoreBtn').style.display = 'none';
   } else {
     document.getElementById('modalTitle').textContent = 'Новая запись';
-    ['fTitle','fYear','fCountry','fNotes','fCover','fWatchDate','fTimesWatched'].forEach(fid=>document.getElementById(fid).value='');
+    ['fTitle','fYear','fCountry','fDescription','fNotes','fCover','fWatchDate','fTimesWatched'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('fRating').value = 0;
     document.getElementById('fCategory').value = (activeCat!=='all'&&CATS[activeCat])?activeCat:'movies';
     syncStatusPill('planning');
@@ -565,10 +587,17 @@ function openView(id){
   document.getElementById('viewStamp').textContent = statusLabel(e);
   document.getElementById('viewStamp').className = `stamp ${STATUS_CLASS[e.status]}`;
   document.getElementById('viewMeta').textContent = `${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.country?' · '+e.country:''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}`;
-  document.getElementById('viewSubRow').textContent = subLine(e);
-  document.getElementById('viewSubRow').style.display = subLine(e) ? '' : 'none';
-  document.getElementById('viewProgressRow').textContent = progressLine(e);
-  document.getElementById('viewProgressRow').style.display = progressLine(e) ? '' : 'none';
+
+  const f = e.data||{};
+  document.getElementById('viewFields').innerHTML = cat.fields
+    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
+    .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
+    .join('');
+
+  const descWrap = document.getElementById('viewDescriptionWrap');
+  if(e.description){ descWrap.style.display=''; document.getElementById('viewDescription').textContent = e.description; }
+  else descWrap.style.display = 'none';
+
   document.getElementById('viewNotes').textContent = e.notes || 'без заметок';
   document.getElementById('viewOverlay').classList.add('show');
 }
@@ -599,6 +628,7 @@ async function saveEntry(keepOpen){
     watchDate: document.getElementById('fWatchDate').value || null,
     timesWatched: parseInt(document.getElementById('fTimesWatched').value)||null,
     cover: document.getElementById('fCover').value.trim(),
+    description: document.getElementById('fDescription').value.trim(),
     notes: document.getElementById('fNotes').value.trim(),
     data: extraData,
     updated: Date.now()
@@ -614,7 +644,7 @@ async function saveEntry(keepOpen){
   showToast('Сохранено');
   if(keepOpen && !id){
     const keepCategory = category;
-    ['fTitle','fYear','fCountry','fNotes','fCover','fWatchDate','fTimesWatched'].forEach(fid=>document.getElementById(fid).value='');
+    ['fTitle','fYear','fCountry','fDescription','fNotes','fCover','fWatchDate','fTimesWatched'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('fRating').value = 0;
     document.getElementById('fCategory').value = keepCategory;
     syncStatusPill('planning');
@@ -880,6 +910,7 @@ async function dedupeEntries(){
       if(!primary.cover && dup.cover) primary.cover = dup.cover;
       if(!primary.rating && dup.rating) primary.rating = dup.rating;
       if(!primary.notes && dup.notes) primary.notes = dup.notes;
+      if(!primary.description && dup.description) primary.description = dup.description;
       if(!primary.watchDate && dup.watchDate) primary.watchDate = dup.watchDate;
       if(!primary.year && dup.year) primary.year = dup.year;
       if(dup.data && dup.data.hours && !(primary.data && primary.data.hours)) primary.data = {...primary.data, hours: dup.data.hours};
@@ -900,7 +931,7 @@ function exportData(format){
     blob = new Blob([JSON.stringify(entries,null,2)], {type:'application/json'});
     filename = 'archive-export.json';
   } else {
-    const headers = ['title','category','status','rating','year','country','watchDate','timesWatched','cover','notes'];
+    const headers = ['title','category','status','rating','year','country','watchDate','timesWatched','cover','description','notes'];
     const rows = entries.map(e=>{
       const base = headers.map(h=>`"${(e[h]??'').toString().replace(/"/g,'""')}"`);
       const extra = `"${JSON.stringify(e.data||{}).replace(/"/g,'""')}"`;
@@ -987,6 +1018,7 @@ const TARGET_FIELDS = [
   {k:'year', l:'Год'},
   {k:'rating', l:'Оценка'},
   {k:'status', l:'Статус'},
+  {k:'description', l:'Описание'},
   {k:'notes', l:'Заметки'},
 ];
 function guessMap(h){
@@ -996,6 +1028,7 @@ function guessMap(h){
   if(/year|год/.test(s)) return 'year';
   if(/rating|score|оцен/.test(s)) return 'rating';
   if(/status|статус/.test(s)) return 'status';
+  if(/description|synopsis|опис/.test(s)) return 'description';
   if(/note|comment|заметк/.test(s)) return 'notes';
   return '';
 }
@@ -1036,6 +1069,7 @@ async function commitImport(){
       rating: mapping.rating ? parseFloat(row[mapping.rating])||null : null,
       year: mapping.year ? parseInt(row[mapping.year])||null : null,
       cover: mapping.cover ? row[mapping.cover] : '',
+      description: mapping.description ? row[mapping.description] : '',
       notes: mapping.notes ? row[mapping.notes] : '',
       data:{}, updated: Date.now()
     });
@@ -1167,7 +1201,7 @@ function applyGameDetails(entry, det){
     developer: det.developers.join(', ') || entry.data.developer || '',
     genre: det.genres.join(', ') || entry.data.genre || ''
   };
-  if(!entry.notes && det.short_description) entry.notes = det.short_description;
+  if(!entry.description && det.short_description) entry.description = det.short_description;
   if(!entry.year && det.release_date){
     const m = det.release_date.match(/(\d{4})/);
     if(m) entry.year = parseInt(m[1]);
@@ -1183,7 +1217,7 @@ function backfillSteamDetFromEntry(e){
     genres: e.data.genre ? e.data.genre.split(', ') : [],
     categories: [],
     is_free: false,
-    short_description: e.notes || '',
+    short_description: e.description || '',
     release_date: e.year ? String(e.year) : '',
     header_image: '',
     metacritic_score: null,

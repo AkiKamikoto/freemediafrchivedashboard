@@ -138,6 +138,10 @@
     <div id="extraFields"></div>
 
     <div class="field">
+      <label>Описание</label>
+      <textarea id="fDescription" placeholder="Синопсис/описание (обычно подтягивается автоматически при импорте)"></textarea>
+    </div>
+    <div class="field">
       <label>Заметки</label>
       <textarea id="fNotes" placeholder="Впечатления, где остановился..."></textarea>
     </div>
@@ -158,8 +162,11 @@
       <span class="stamp" id="viewStamp"></span>
       <span id="viewMeta" class="card-meta"></span>
     </div>
-    <div class="view-row" id="viewSubRow"></div>
-    <div class="view-row" id="viewProgressRow"></div>
+    <div id="viewFields"></div>
+    <div id="viewDescriptionWrap" style="margin-top:10px;">
+      <label>Описание</label>
+      <div id="viewDescription" class="import-hint" style="margin-top:4px;"></div>
+    </div>
     <div id="viewNotesWrap" style="margin-top:10px;">
       <label>Заметки</label>
       <div id="viewNotes" class="import-hint" style="margin-top:4px;"></div>

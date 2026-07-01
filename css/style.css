@@ -77,7 +77,15 @@ body.theme-light .card::before{opacity:.85;}
 .st-planning{color:#8B93A1;} .st-progress{color:#5B9CD9;} .st-completed{color:#6EB56E;} .st-hold{color:#D9A25B;} .st-dropped{color:#C0554F;}
 .card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
 .view-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.view-field{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.view-field:last-child{border-bottom:none;}
+.view-field-label{color:var(--muted);}
+.view-field-value{color:var(--text);text-align:right;}
 .rating{font-family:'IBM Plex Mono',monospace;color:var(--brass);font-size:13px;font-weight:600;}
+.stamp-select{background:var(--surface-alt);cursor:pointer;appearance:none;-webkit-appearance:none;}
+.stamp-select:focus{outline:1px solid var(--brass);}
+.quick-rating{width:38px;font-family:'IBM Plex Mono',monospace;color:var(--brass);font-size:13px;font-weight:600;background:transparent;border:1px solid var(--line);border-radius:4px;padding:2px 4px;}
+.quick-rating:focus{outline:1px solid var(--brass);border-color:var(--brass);}
 .progress-txt{font-size:11px;color:var(--muted);}
 
 /* stats */
