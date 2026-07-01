@@ -37,6 +37,7 @@ let activeCat = 'all';
 let statsMode = false;
 let uiPrefs = {theme:'dark', view:'cards'};
 
+let steamGamesDb = {};
 async function load(){
   try{
     const res = await window.storage.get('archive-entries');
@@ -46,6 +47,10 @@ async function load(){
     const p = await window.storage.get('archive-ui-prefs');
     if(p) uiPrefs = JSON.parse(p.value);
   }catch(e){ /* defaults */ }
+  try{
+    const dbRes = await fetch('data/steam-games-db.json');
+    if(dbRes.ok) steamGamesDb = await dbRes.json();
+  }catch(e){ /* offline cache unavailable, enrichment will fetch live */ }
   applyUiPrefs();
   render();
 }
@@ -1082,6 +1087,7 @@ function parseSteamGames(raw){
   const data = JSON.parse(raw);
   const games = data.games || (data.response && data.response.games) || [];
   return games.map(g=>({
+    appid: g.appid,
     name: g.name,
     hours: g.playtime_forever ? g.playtime_forever/60 : 0,
     logo: g.appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/library_600x900.jpg` : '',
@@ -1096,7 +1102,7 @@ async function commitSteamGames(games, statusEl){
     const existing = entries.find(x=>x.category==='games' && x.data && x.data.platform==='Steam' && x.title.toLowerCase()===g.name.toLowerCase());
     if(existing){
       if(g.logo) existing.cover = g.logo;
-      existing.data = {...existing.data, hours};
+      existing.data = {...existing.data, hours, appid: g.appid};
       if(g.lastPlayed) existing.watchDate = g.lastPlayed;
       if(g.hours>0 && existing.status==='planning') existing.status = 'progress';
       existing.updated = Date.now();
@@ -1108,7 +1114,7 @@ async function commitSteamGames(games, statusEl){
         status: g.hours>0 ? 'progress' : 'planning',
         rating: null, year: null, cover: g.logo||'', notes:'',
         watchDate: g.lastPlayed || null,
-        data:{ hours, platform:'Steam' },
+        data:{ hours, platform:'Steam', appid: g.appid },
         updated: Date.now()
       });
       added++;
@@ -1119,6 +1125,89 @@ async function commitSteamGames(games, statusEl){
   const msg = added && updated ? `Готово — добавлено ${added}, обновлено ${updated}`
     : updated ? `Готово — обновлено ${updated} игр`
     : `Готово — импортировано ${added} игр`;
+  statusEl.textContent = msg;
+  showToast(msg);
+}
+
+function parseAppDetails(appid, raw){
+  const data = JSON.parse(raw);
+  const entry = data[String(appid)];
+  if(!entry || !entry.success || !entry.data) return null;
+  const d = entry.data;
+  return {
+    appid: Number(appid),
+    name: d.name || '',
+    developers: d.developers || [],
+    publishers: d.publishers || [],
+    genres: (d.genres||[]).map(g=>g.description),
+    categories: (d.categories||[]).map(c=>c.description),
+    is_free: !!d.is_free,
+    short_description: d.short_description || '',
+    release_date: d.release_date ? d.release_date.date : '',
+    header_image: d.header_image || '',
+    metacritic_score: d.metacritic ? d.metacritic.score : null,
+    recommendations_total: d.recommendations ? d.recommendations.total : null,
+    fetched_at: new Date().toISOString().slice(0,10)
+  };
+}
+
+function applyGameDetails(entry, det){
+  entry.data = {
+    ...entry.data,
+    developer: det.developers.join(', ') || entry.data.developer || '',
+    genre: det.genres.join(', ') || entry.data.genre || ''
+  };
+  if(!entry.notes && det.short_description) entry.notes = det.short_description;
+  if(!entry.year && det.release_date){
+    const m = det.release_date.match(/(\d{4})/);
+    if(m) entry.year = parseInt(m[1]);
+  }
+  entry.updated = Date.now();
+}
+
+async function enrichSteamGames(statusEl){
+  const targets = entries.filter(e=>e.category==='games' && e.data && e.data.platform==='Steam' && e.data.appid && !e.data.developer);
+  if(!targets.length){ statusEl.textContent = 'Все игры уже обогащены (или нет appid для старых записей)'; return; }
+
+  const pending = {};
+  let fromCache = 0, fetched = 0, failed = 0;
+  for(let i=0;i<targets.length;i++){
+    const entry = targets[i];
+    const appid = entry.data.appid;
+    statusEl.textContent = `Обогащение метаданных: ${i+1}/${targets.length}...`;
+
+    let det = steamGamesDb[appid];
+    if(det){
+      fromCache++;
+    } else {
+      const url = `https://store.steampowered.com/api/appdetails?appids=${appid}&l=russian`;
+      const raw = await fetchViaProxies(url, STEAM_PROXIES);
+      if(raw){
+        try{ det = parseAppDetails(appid, raw); }catch(e){ det = null; }
+      }
+      if(det){
+        steamGamesDb[appid] = det;
+        pending[appid] = det;
+        fetched++;
+      } else {
+        failed++;
+      }
+      await new Promise(r=>setTimeout(r, 400));
+    }
+    if(det) applyGameDetails(entry, det);
+  }
+
+  await persist();
+  render();
+
+  let msg = `Готово — обогащено: из кэша ${fromCache}, загружено ${fetched}${failed?`, не найдено ${failed}`:''}`;
+  if(Object.keys(pending).length){
+    try{
+      const res = await fetch('/api/steam-db', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(pending)});
+      if(res.ok) msg += ` — сохранено в базу репозитория`;
+      else msg += ` — не удалось сохранить в базу репозитория (${res.status})`;
+    }catch(e){ msg += ` — не удалось сохранить в базу репозитория`; }
+  }
   statusEl.textContent = msg;
   showToast(msg);
 }
