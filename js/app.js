@@ -1,3 +1,15 @@
+if(!window.storage){
+  window.storage = {
+    async get(key){
+      const v = localStorage.getItem(key);
+      return v === null ? null : { value: v };
+    },
+    async set(key, value){
+      localStorage.setItem(key, value);
+    }
+  };
+}
+
 const CATS = {
   movies:{label:'Фильмы', color:'var(--c-movies)', hex:'#5B7FA6',
     fields:[{k:'director',l:'Режиссёр'},{k:'cast',l:'В ролях (через запятую)'},{k:'runtime',l:'Длительность (мин)',type:'number'}]},
@@ -1074,6 +1086,7 @@ async function autoImportSteam(){
   const statusEl = document.getElementById('steamStatus');
   if(!input){ statusEl.textContent = 'Вставь ссылку на профиль или ник'; return; }
   if(!apiKey){ statusEl.textContent = 'Вставь Steam Web API ключ (получить: steamcommunity.com/dev/apikey)'; return; }
+  saveSteamApiKey(apiKey);
   const base = buildSteamProfileBase(input);
   statusEl.textContent = 'пробую забрать автоматически...';
 
