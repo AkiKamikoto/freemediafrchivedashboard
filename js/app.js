@@ -25,7 +25,12 @@ const CATS = {
     fields:[{k:'developer',l:'Разработчик'},{k:'platform',l:'Платформа',ph:'Xbox Series S'},{k:'hours',l:'Часов наиграно',type:'number'},{k:'genre',l:'Жанр'}]},
 };
 const STATUS_LABEL = {planning:'план',progress:'смотрю',completed:'завершено',hold:'отложено',dropped:'брошено'};
+const PROGRESS_LABEL_BY_CAT = {books:'читаю',manga:'читаю',games:'играю'};
 const STATUS_CLASS = {planning:'st-planning',progress:'st-progress',completed:'st-completed',hold:'st-hold',dropped:'st-dropped'};
+function statusLabel(e){
+  if(e.status==='progress') return PROGRESS_LABEL_BY_CAT[e.category] || STATUS_LABEL.progress;
+  return STATUS_LABEL[e.status];
+}
 
 let entries = [];
 let activeCat = 'all';
@@ -194,7 +199,7 @@ function progressLine(e){
 function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
-  return `<div class="card" style="--cat-color:${cat.color}" onclick="openModal('${e.id}')">
+  return `<div class="card" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
     <div class="cover">
       <div class="catbar"></div>
       ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="this.parentElement.innerHTML='<div class=&quot;catbar&quot;></div><div class=&quot;fallback&quot;>${initials}</div>'">` : `<div class="fallback">${initials}</div>`}
@@ -202,7 +207,7 @@ function cardHtml(e){
     <div class="card-body">
       <div class="card-top">
         <div class="card-title">${escapeHtml(e.title)}</div>
-        <span class="stamp ${STATUS_CLASS[e.status]}">${STATUS_LABEL[e.status]}</span>
+        <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
       </div>
       <div class="card-meta">${cat.label}${e.year?' · '+e.year:''}${e.country?' · '+escapeHtml(e.country):''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</div>
       ${subLine(e) ? `<div class="card-sub">${escapeHtml(subLine(e))}</div>` : ''}
@@ -519,6 +524,34 @@ function openModal(id){
   setTimeout(()=>document.getElementById('fSearchQuery').focus(), 50);
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+
+let viewingId = null;
+function openView(id){
+  viewingId = id;
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  const cat = CATS[e.category] || CATS.movies;
+  const initials = e.title.slice(0,2).toUpperCase();
+  document.getElementById('viewCover').innerHTML = e.cover
+    ? `<img src="${escapeHtml(e.cover)}" onerror="this.parentElement.innerHTML='<div class=&quot;fallback&quot;>${initials}</div>'">`
+    : `<div class="fallback">${initials}</div>`;
+  document.getElementById('viewTitle').textContent = e.title;
+  document.getElementById('viewStamp').textContent = statusLabel(e);
+  document.getElementById('viewStamp').className = `stamp ${STATUS_CLASS[e.status]}`;
+  document.getElementById('viewMeta').textContent = `${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.country?' · '+e.country:''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}`;
+  document.getElementById('viewSubRow').textContent = subLine(e);
+  document.getElementById('viewSubRow').style.display = subLine(e) ? '' : 'none';
+  document.getElementById('viewProgressRow').textContent = progressLine(e);
+  document.getElementById('viewProgressRow').style.display = progressLine(e) ? '' : 'none';
+  document.getElementById('viewNotes').textContent = e.notes || 'без заметок';
+  document.getElementById('viewOverlay').classList.add('show');
+}
+function closeView(){ document.getElementById('viewOverlay').classList.remove('show'); viewingId = null; }
+function editFromView(){
+  const id = viewingId;
+  closeView();
+  openModal(id);
+}
 
 async function saveEntry(keepOpen){
   const title = document.getElementById('fTitle').value.trim();
@@ -1007,7 +1040,7 @@ function parseSteamGames(raw){
   return games.map(g=>({
     name: g.name,
     hours: g.playtime_forever ? g.playtime_forever/60 : 0,
-    logo: g.img_logo_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${g.appid}/${g.img_logo_url}.jpg` : ''
+    logo: g.appid ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/library_600x900.jpg` : ''
   })).filter(g=>g.name);
 }
 
@@ -1120,6 +1153,7 @@ document.getElementById('sortBy').addEventListener('change', render);
 document.getElementById('fltCountry').addEventListener('change', render);
 document.getElementById('pickOverlay').addEventListener('click', e=>{ if(e.target.id==='pickOverlay') closePickModal(); });
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
+document.getElementById('viewOverlay').addEventListener('click', e=>{ if(e.target.id==='viewOverlay') closeView(); });
 document.addEventListener('click', e=>{
   if(!e.target.closest('.search-wrap')){
     document.getElementById('searchResults').classList.remove('show');

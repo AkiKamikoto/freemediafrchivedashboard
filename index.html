@@ -150,6 +150,27 @@
   </div>
 </div>
 
+<div class="overlay" id="viewOverlay">
+  <div class="modal">
+    <div class="cover-preview" id="viewCover" style="height:240px;"></div>
+    <h2 id="viewTitle"></h2>
+    <div class="view-row">
+      <span class="stamp" id="viewStamp"></span>
+      <span id="viewMeta" class="card-meta"></span>
+    </div>
+    <div class="view-row" id="viewSubRow"></div>
+    <div class="view-row" id="viewProgressRow"></div>
+    <div id="viewNotesWrap" style="margin-top:10px;">
+      <label>Заметки</label>
+      <div id="viewNotes" class="import-hint" style="margin-top:4px;"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeView()">Закрыть</button>
+      <button class="btn-primary" onclick="editFromView()">Редактировать</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="importOverlay">
   <div class="modal">
     <h2>Импорт данных</h2>
