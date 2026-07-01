@@ -203,23 +203,12 @@
         <input id="steamLink" placeholder="steamcommunity.com/id/твой_ник">
       </div>
       <div class="field">
-        <label>Steam Web API ключ (необязательно, но надёжнее)</label>
+        <label>Steam Web API ключ</label>
         <input id="steamApiKey" placeholder="вставь ключ" type="password" onchange="saveSteamApiKey(this.value)">
-        <div class="import-hint" style="margin-top:4px;">Бесплатный ключ за 30 секунд: <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color:var(--brass);">steamcommunity.com/dev/apikey</a>. Без ключа импорт попробует устаревший способ — он менее надёжен.</div>
+        <div class="import-hint" style="margin-top:4px;">Бесплатный ключ за 30 секунд: <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color:var(--brass);">steamcommunity.com/dev/apikey</a>.</div>
       </div>
       <button class="btn-primary" style="width:100%" onclick="autoImportSteam()">Импортировать</button>
       <div id="steamStatus" class="import-hint"></div>
-
-      <div id="steamFallback" style="display:none;margin-top:14px;">
-        <div class="import-hint" style="margin-top:0;">
-          Автоматически не получилось забрать данные. Открой ссылку ниже, выдели всё (Ctrl+A), скопируй (Ctrl+C) и вставь сюда:
-        </div>
-        <div class="import-hint" style="margin-top:6px;"><a id="steamManualLink" href="#" target="_blank" style="color:var(--brass);word-break:break-all;"></a></div>
-        <div class="field" style="margin-top:10px;">
-          <textarea id="steamPaste" style="min-height:120px;font-family:'IBM Plex Mono',monospace;font-size:11px;" placeholder="<gamesList>...</gamesList>"></textarea>
-        </div>
-        <button class="btn-primary" style="width:100%" onclick="importSteamPaste()">Разобрать вставленный текст</button>
-      </div>
       <div class="import-hint">Нужно, чтобы в приватности Steam пункт «Сведения об играх» был Public (Изменить профиль → Настройки приватности) — иначе данные недоступны никаким способом.</div>
     </div>
 

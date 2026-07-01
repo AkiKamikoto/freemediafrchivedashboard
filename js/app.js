@@ -990,39 +990,13 @@ async function importShikimori(type){
 }
 
 function parseSteamGames(raw){
-  let games = [];
-  try{
-    const data = JSON.parse(raw);
-    games = data.games || (data.response && data.response.games) || [];
-    games = games.map(g=>({
-      name: g.name || g.gameName,
-      hours: g.playtime_forever ? (g.playtime_forever/60) : (g.hoursOnRecord?parseFloat(g.hoursOnRecord):0),
-      logo: g.img_logo_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${g.appid}/${g.img_logo_url}.jpg` : (g.logo||'')
-    }));
-  }catch(e){
-    const doc = new DOMParser().parseFromString(raw, 'text/xml');
-    const nodes = doc.querySelectorAll('game');
-    if(!nodes.length) return [];
-    games = Array.from(nodes).map(n=>({
-      name: n.querySelector('name') ? n.querySelector('name').textContent : '',
-      hours: n.querySelector('hoursOnRecord') ? parseFloat(n.querySelector('hoursOnRecord').textContent.replace(',','')) : 0,
-      logo: n.querySelector('logo') ? n.querySelector('logo').textContent : ''
-    }));
-  }
-  return games.filter(g=>g.name);
-}
-
-function extractRgGames(html){
-  const m = html.match(/var rgGames\s*=\s*(\[[\s\S]*?\])\s*;/);
-  if(!m) return [];
-  try{
-    const arr = JSON.parse(m[1]);
-    return arr.map(g=>({
-      name: g.name,
-      hours: g.hours_forever ? parseFloat(String(g.hours_forever).replace(',','')) : 0,
-      logo: g.logo || ''
-    })).filter(g=>g.name);
-  }catch(e){ return []; }
+  const data = JSON.parse(raw);
+  const games = data.games || (data.response && data.response.games) || [];
+  return games.map(g=>({
+    name: g.name,
+    hours: g.playtime_forever ? g.playtime_forever/60 : 0,
+    logo: g.img_logo_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${g.appid}/${g.img_logo_url}.jpg` : ''
+  })).filter(g=>g.name);
 }
 
 async function commitSteamGames(games, statusEl){
@@ -1052,10 +1026,6 @@ function buildSteamProfileBase(input){
   if(profMatch) return `https://steamcommunity.com/profiles/${profMatch[1]}`;
   if(/^\d{17}$/.test(v)) return `https://steamcommunity.com/profiles/${v}`;
   return `https://steamcommunity.com/id/${v}`;
-}
-
-function buildSteamXmlUrl(input){
-  return `${buildSteamProfileBase(input)}/games/?tab=all&xml=1`;
 }
 
 // corsproxy.io без API-ключа работает только с dev-окружений (localhost) —
@@ -1102,57 +1072,22 @@ async function autoImportSteam(){
   const input = document.getElementById('steamLink').value.trim();
   const apiKey = document.getElementById('steamApiKey').value.trim();
   const statusEl = document.getElementById('steamStatus');
-  const fallback = document.getElementById('steamFallback');
   if(!input){ statusEl.textContent = 'Вставь ссылку на профиль или ник'; return; }
+  if(!apiKey){ statusEl.textContent = 'Вставь Steam Web API ключ (получить: steamcommunity.com/dev/apikey)'; return; }
   const base = buildSteamProfileBase(input);
   statusEl.textContent = 'пробую забрать автоматически...';
-  fallback.style.display = 'none';
 
-  if(apiKey){
-    try{
-      const steamId64 = await resolveSteamId64(base, apiKey, STEAM_PROXIES);
-      if(steamId64){
-        const games = await fetchOwnedGamesViaApi(steamId64, apiKey, STEAM_PROXIES);
-        if(games.length){
-          await commitSteamGames(games, statusEl);
-          return;
-        }
+  try{
+    const steamId64 = await resolveSteamId64(base, apiKey, STEAM_PROXIES);
+    if(steamId64){
+      const games = await fetchOwnedGamesViaApi(steamId64, apiKey, STEAM_PROXIES);
+      if(games.length){
+        await commitSteamGames(games, statusEl);
+        return;
       }
-    }catch(e){ /* fall through to legacy method */ }
-  }
-
-  const targets = [
-    { url: `${base}/games/?tab=all&xml=1`, extract: parseSteamGames },
-    { url: `${base}/games/?tab=all`, extract: extractRgGames },
-  ];
-  for(const target of targets){
-    for(const buildProxy of STEAM_PROXIES){
-      try{
-        const res = await fetch(buildProxy(target.url), {signal: AbortSignal.timeout(9000)});
-        if(!res.ok) continue;
-        const raw = await res.text();
-        const games = target.extract(raw);
-        if(games.length){
-          await commitSteamGames(games, statusEl);
-          return;
-        }
-      }catch(e){ /* try next proxy */ }
     }
-  }
-  const targetUrl = targets[0].url;
-  statusEl.textContent = 'Автоматически не получилось — попробуй вручную ниже';
-  document.getElementById('steamManualLink').href = targetUrl;
-  document.getElementById('steamManualLink').textContent = targetUrl;
-  fallback.style.display = 'block';
-}
-
-async function importSteamPaste(){
-  const raw = document.getElementById('steamPaste').value.trim();
-  const statusEl = document.getElementById('steamStatus');
-  if(!raw){ statusEl.textContent = 'Вставь содержимое страницы сначала'; return; }
-  const games = parseSteamGames(raw).length ? parseSteamGames(raw) : extractRgGames(raw);
-  if(!games.length){ statusEl.textContent = 'Игры не найдены — профиль приватный, «Сведения об играх» не Public, или скопирован не весь текст'; return; }
-  await commitSteamGames(games, statusEl);
+  }catch(e){ /* handled below */ }
+  statusEl.textContent = 'Не получилось импортировать — проверь ключ, ник профиля и что «Сведения об играх» установлены в Public';
 }
 document.getElementById('dropzone').addEventListener('dragover', e=>{e.preventDefault(); e.currentTarget.classList.add('drag');});
 document.getElementById('dropzone').addEventListener('dragleave', e=>{e.currentTarget.classList.remove('drag');});
