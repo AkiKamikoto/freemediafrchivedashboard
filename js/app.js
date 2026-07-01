@@ -1040,9 +1040,12 @@ function buildSteamProfileBase(input){
   return `https://steamcommunity.com/id/${v}`;
 }
 
-// corsproxy.io без API-ключа работает только с dev-окружений (localhost) —
-// оставлен последним как редкий случай, а не основной способ.
+// Собственная serverless-функция (api/steam.js) — надёжный вариант, когда сайт
+// открыт с https-хостинга (Vercel). Внешние публичные CORS-прокси оставлены
+// как запасной путь для случая, когда файл открыт локально и /api недоступен;
+// corsproxy.io без платного ключа принимает запросы только с dev-окружений.
 const STEAM_PROXIES = [
+  u => `/api/steam?url=${encodeURIComponent(u)}`,
   u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
   u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
