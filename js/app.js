@@ -108,8 +108,8 @@ function buildTabs(){
   });
   document.getElementById('tabs').innerHTML = html;
 }
-function setCat(c){ activeCat = c; statsMode=false; render(); }
-function toggleStats(){ statsMode = !statsMode; render(); }
+function setCat(c){ activeCat = c; statsMode=false; gameMapPageId=null; render(); }
+function toggleStats(){ statsMode = !statsMode; gameMapPageId=null; render(); }
 
 function toggleFiltersPanel(){
   const p = document.getElementById('filtersPanel');
@@ -159,8 +159,10 @@ function getFiltered(){
 function render(){
   buildTabs();
   document.getElementById('statsBtn').classList.toggle('active', statsMode);
-  document.getElementById('libraryView').style.display = statsMode ? 'none' : 'block';
+  document.getElementById('libraryView').style.display = (statsMode || gameMapPageId) ? 'none' : 'block';
   document.getElementById('statsView').style.display = statsMode ? 'block' : 'none';
+  document.getElementById('gameMapView').style.display = gameMapPageId ? 'block' : 'none';
+  if(gameMapPageId){ renderGameMapPage(); return; }
   if(statsMode){ renderStats(); return; }
 
   const list = getFiltered();
@@ -282,7 +284,7 @@ function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="card" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="card" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <div class="cover">
       <div class="catbar"></div>
       ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
@@ -304,7 +306,7 @@ function cardHtml(e){
 function rowHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <span class="row-dot"></span>
     <span class="row-title">${escapeHtml(e.title)}</span>
     <span class="row-cat">${cat.label}</span>
@@ -318,7 +320,7 @@ function compactHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   const metaBits = [cat.label, e.year, subLine(e), progressLine(e)].filter(Boolean);
-  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <div class="compact-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
     <div class="compact-body">
       <div class="compact-top">
@@ -674,6 +676,324 @@ function editFromView(){
   openModal(id);
 }
 
+function openEntry(id){
+  const e = entries.find(x=>x.id===id);
+  if(e && e.category==='games'){ openGameMapPage(id); return; }
+  openView(id);
+}
+
+/* ---------- GAME MAP PAGE (grind spots + collectibles) ---------- */
+let gameMapPageId = null;
+let mapFilter = 'all';
+let editingMarkerId = null;
+let pendingMarkerCoords = null;
+let pendingMarkerType = 'grind';
+let markerFormOpen = false;
+
+function gameMapStats(markers){
+  markers = markers || [];
+  const collectibles = markers.filter(m=>m.type==='collectible');
+  const grind = markers.filter(m=>m.type==='grind');
+  return {
+    collectibles: collectibles.length,
+    done: collectibles.filter(m=>m.done).length,
+    grindSpots: grind.length,
+    grindTotal: grind.reduce((s,m)=>s+(m.count||0),0)
+  };
+}
+
+function openGameMapPage(id){
+  const entry = entries.find(x=>x.id===id);
+  if(!entry) return;
+  if(!entry.gameMap) entry.gameMap = {image:'', markers:[]};
+  gameMapPageId = id;
+  mapFilter = 'all';
+  closeMarkerForm(false);
+  render();
+}
+function closeGameMapPage(){
+  gameMapPageId = null;
+  closeMarkerForm(false);
+  render();
+}
+function setMapFilterPill(el){
+  mapFilter = el.dataset.v;
+  render();
+}
+function saveGameMapImage(){
+  const entry = entries.find(x=>x.id===gameMapPageId);
+  if(!entry) return;
+  entry.gameMap.image = document.getElementById('gmapImageUrl').value.trim();
+  entry.updated = Date.now();
+  persist();
+  render();
+  showToast('Картинка карты сохранена');
+}
+function downloadGameMapImage(){
+  const entry = entries.find(x=>x.id===gameMapPageId);
+  if(!entry || !entry.gameMap.image){ showToast('Сначала добавь картинку карты'); return; }
+  const slug = entry.title.toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'') || 'map';
+  const isDataUrl = entry.gameMap.image.startsWith('data:');
+  const ext = isDataUrl ? (entry.gameMap.image.match(/^data:image\/(\w+)/)||[,'png'])[1] : (entry.gameMap.image.split('.').pop().split(/[?#]/)[0] || 'png');
+  const a = document.createElement('a');
+  a.href = entry.gameMap.image;
+  a.download = `${slug}-map.${ext}`;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  if(!isDataUrl) showToast('Если файл не скачался сам — сохрани картинку правым кликом (кросс-доменные ссылки браузер не всегда даёт скачать напрямую)');
+}
+function handleGameMapImageFile(file){
+  if(!file) return;
+  const entry = entries.find(x=>x.id===gameMapPageId);
+  if(!entry) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    entry.gameMap.image = reader.result;
+    entry.updated = Date.now();
+    persist();
+    render();
+    showToast('Картинка карты загружена');
+  };
+  reader.onerror = () => showToast('Не удалось прочитать файл');
+  reader.readAsDataURL(file);
+}
+function onMapStageClick(ev){
+  const rect = ev.currentTarget.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) / rect.width;
+  const y = (ev.clientY - rect.top) / rect.height;
+  openMarkerForm(null, x, y);
+}
+function bumpMarkerCount(id){
+  const entry = entries.find(x=>x.id===gameMapPageId);
+  const m = entry.gameMap.markers.find(mm=>mm.id===id);
+  if(!m) return;
+  m.count = (m.count||0) + 1;
+  entry.updated = Date.now();
+  persist();
+  render();
+}
+function setMarkerTypePill(el){
+  const type = el.dataset.v;
+  document.querySelectorAll('#gmTypePills .pill').forEach(p=>p.classList.toggle('active', p.dataset.v===type));
+  document.getElementById('gmType').value = type;
+  document.getElementById('gmCountField').style.display = type==='grind' ? '' : 'none';
+  document.getElementById('gmDoneField').style.display = type==='collectible' ? '' : 'none';
+}
+function openMarkerForm(id, x, y){
+  const entry = entries.find(e=>e.id===gameMapPageId);
+  if(!entry) return;
+  editingMarkerId = id || null;
+  const m = id ? entry.gameMap.markers.find(mm=>mm.id===id) : null;
+  pendingMarkerCoords = m ? {x:m.x, y:m.y} : {x, y};
+  pendingMarkerType = m ? m.type : 'grind';
+  markerFormOpen = true;
+  render();
+}
+function closeMarkerForm(doRender){
+  markerFormOpen = false;
+  editingMarkerId = null;
+  pendingMarkerCoords = null;
+  pendingMarkerType = 'grind';
+  if(doRender!==false) render();
+}
+function saveMarkerForm(){
+  const entry = entries.find(e=>e.id===gameMapPageId);
+  if(!entry) return;
+  const title = document.getElementById('gmName').value.trim();
+  if(!title){ showToast('Введи название точки'); return; }
+  const type = document.getElementById('gmType').value;
+  const note = document.getElementById('gmNote').value.trim();
+  const count = parseInt(document.getElementById('gmCount').value) || 0;
+  const done = document.getElementById('gmDone').checked;
+  if(editingMarkerId){
+    const m = entry.gameMap.markers.find(mm=>mm.id===editingMarkerId);
+    Object.assign(m, {title, type, note, count, done});
+  } else {
+    entry.gameMap.markers.push({
+      id: 'm'+Date.now()+Math.random().toString(36).slice(2,7),
+      x: pendingMarkerCoords.x, y: pendingMarkerCoords.y,
+      title, type, note, count, done
+    });
+  }
+  entry.updated = Date.now();
+  persist();
+  closeMarkerForm(false);
+  render();
+  showToast('Точка сохранена');
+}
+function deleteMarker(){
+  const entry = entries.find(e=>e.id===gameMapPageId);
+  if(!entry || !editingMarkerId) return;
+  entry.gameMap.markers = entry.gameMap.markers.filter(m=>m.id!==editingMarkerId);
+  entry.updated = Date.now();
+  persist();
+  closeMarkerForm(false);
+  render();
+  showToast('Точка удалена');
+}
+function renderMapStageHtml(gm){
+  if(!gm.image) return `<div class="gmap-broken">Сначала добавь ссылку на картинку карты ниже, потом кликай по ней, чтобы ставить точки</div>`;
+  const visible = gm.markers.filter(m=>mapFilter==='all' || m.type===mapFilter);
+  const pins = visible.map(m=>`
+    <div class="gmap-pin gmap-pin-${m.type}${m.done?' done':''}" style="left:${(m.x*100).toFixed(2)}%;top:${(m.y*100).toFixed(2)}%" onclick="event.stopPropagation();openMarkerForm('${m.id}')" title="${escapeHtml(m.title)}">
+      <span class="gmap-pin-icon">${m.type==='collectible' ? (m.done?'✓':'★') : '⛏'}</span>
+      ${m.type==='grind' ? `<span class="gmap-pin-badge" onclick="event.stopPropagation();bumpMarkerCount('${m.id}')">${m.count||0}</span>` : ''}
+    </div>`).join('');
+  return `<div class="gmap-stage" onclick="onMapStageClick(event)">
+    <img src="${escapeHtml(gm.image)}" onerror="this.parentElement.innerHTML='<div class=&quot;gmap-broken&quot;>не удалось загрузить картинку — проверь ссылку</div>'">
+    ${pins}
+  </div>`;
+}
+function renderMarkerListHtml(gm){
+  const list = gm.markers.slice().sort((a,b)=> a.type===b.type ? a.title.localeCompare(b.title) : (a.type==='collectible' ? -1 : 1));
+  return list.length ? list.map(m=>`
+    <div class="gmap-list-row" onclick="openMarkerForm('${m.id}')">
+      <span class="gmap-list-icon">${m.type==='collectible' ? (m.done?'✓':'★') : '⛏'}</span>
+      <span class="gmap-list-title">${escapeHtml(m.title)}</span>
+      <span class="gmap-list-sub">${m.type==='grind' ? `×${m.count||0}` : (m.done?'собрано':'не собрано')}</span>
+    </div>`).join('') : `<div class="import-hint">Точек пока нет — кликни по карте, чтобы поставить первую.</div>`;
+}
+function renderMarkerFormHtml(entry){
+  const m = editingMarkerId ? entry.gameMap.markers.find(mm=>mm.id===editingMarkerId) : null;
+  const type = m ? m.type : pendingMarkerType;
+  return `
+    <div class="gmap-form" id="gmapForm">
+      <div class="subhead" style="margin-top:0;padding-top:0;border-top:none;">${m ? 'Редактировать точку' : 'Новая точка'}</div>
+      <div class="field">
+        <label>Название точки</label>
+        <input id="gmName" placeholder="напр. Сундук у водопада" value="${m ? escapeHtml(m.title) : ''}">
+      </div>
+      <div class="field">
+        <label>Тип</label>
+        <input type="hidden" id="gmType" value="${type}">
+        <div class="pill-group" id="gmTypePills">
+          <button type="button" class="pill ${type==='grind'?'active':''}" data-v="grind" onclick="setMarkerTypePill(this)">⛏ Гринд</button>
+          <button type="button" class="pill ${type==='collectible'?'active':''}" data-v="collectible" onclick="setMarkerTypePill(this)">★ Коллектабл</button>
+        </div>
+      </div>
+      <div class="field" id="gmCountField" style="${type==='grind'?'':'display:none;'}">
+        <label>Счётчик прохождений</label>
+        <input id="gmCount" type="number" min="0" value="${m ? (m.count||0) : 0}">
+      </div>
+      <div class="field" id="gmDoneField" style="${type==='collectible'?'':'display:none;'}">
+        <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;">
+          <input type="checkbox" id="gmDone" style="width:auto;" ${m && m.done ? 'checked' : ''}> Собрано
+        </label>
+      </div>
+      <div class="field">
+        <label>Заметка</label>
+        <textarea id="gmNote" placeholder="Как добраться, дроп, респ...">${m ? escapeHtml(m.note||'') : ''}</textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeMarkerForm()">Отмена</button>
+        ${m ? '<button class="btn-danger" onclick="deleteMarker()">Удалить</button>' : ''}
+        <button class="btn-primary" onclick="saveMarkerForm()">Сохранить точку</button>
+      </div>
+    </div>`;
+}
+function renderAchievementsHtml(entry){
+  const f = entry.data || {};
+  if(f.platform !== 'Steam' || !f.appid) return '';
+  const list = f.achievements;
+  let body;
+  if(achievementsLoading){
+    body = `<div class="import-hint">Загружаю ачивки...</div>`;
+  } else if(f.achievementsError){
+    body = `<div class="import-hint">${escapeHtml(f.achievementsError)}</div>`;
+  } else if(list && list.length){
+    const done = list.filter(a=>a.achieved).length;
+    const sorted = list.slice().sort((a,b)=> (b.achieved-a.achieved) || (b.unlocktime-a.unlocktime));
+    body = `
+      <div class="ach-progress">Открыто ${done} из ${list.length}</div>
+      <div class="bar-track" style="margin-bottom:12px;"><div class="bar-fill" style="width:${list.length?Math.round(done/list.length*100):0}%;background:var(--brass);"></div></div>
+      <div class="ach-grid">
+        ${sorted.map(a=>`
+          <div class="ach-tile${a.achieved?'':' locked'}" title="${escapeHtml(a.description||'')}">
+            ${a.icon ? `<img class="ach-icon" src="${escapeHtml(a.icon)}">` : `<div class="ach-icon ach-icon-fallback">🏆</div>`}
+            <div class="ach-info">
+              <div class="ach-title">${escapeHtml(a.title)}</div>
+              ${a.description ? `<div class="ach-desc">${escapeHtml(a.description)}</div>` : ''}
+              ${a.achieved && a.unlocktime ? `<div class="ach-desc">${formatDate(new Date(a.unlocktime*1000).toISOString().slice(0,10))}</div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    body = `<div class="import-hint">Ачивки ещё не загружены.</div>`;
+  }
+  return `
+    <div class="gmap-achievements">
+      <div class="gmap-page-top" style="margin-bottom:10px;">
+        <div class="subhead" style="margin:0;padding:0;border:none;">🏆 Достижения Steam</div>
+        <button class="btn-ghost" ${achievementsLoading?'disabled':''} onclick="loadGameAchievements('${entry.id}')">${achievementsLoading ? 'Загрузка...' : (list && list.length ? '🔄 Обновить' : 'Загрузить ачивки')}</button>
+      </div>
+      ${body}
+    </div>`;
+}
+function renderGameMapPage(){
+  const e = entries.find(x=>x.id===gameMapPageId);
+  if(!e){ gameMapPageId = null; return; }
+  if(!e.gameMap) e.gameMap = {image:'', markers:[]};
+  const gm = e.gameMap;
+  const cat = CATS[e.category] || CATS.games;
+  const initials = e.title.slice(0,2).toUpperCase();
+  const f = e.data || {};
+  const detailBits = cat.fields
+    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
+    .map(fd=>`<span class="gmap-detail"><b>${escapeHtml(fd.l)}:</b> ${escapeHtml(String(f[fd.k]))}</span>`).join('');
+  const stats = gameMapStats(gm.markers);
+
+  document.getElementById('gameMapView').innerHTML = `
+    <div class="gmap-page">
+      <div class="gmap-page-top">
+        <button class="btn-ghost" onclick="closeGameMapPage()">← Назад к библиотеке</button>
+        <button class="btn-ghost" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
+      </div>
+      <div class="gmap-page-header">
+        <div class="gmap-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
+        <div class="gmap-header-info">
+          <h1>${escapeHtml(e.title)}</h1>
+          <div class="view-row">
+            <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+            <span class="card-meta">${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}</span>
+          </div>
+          ${detailBits ? `<div class="gmap-details">${detailBits}</div>` : ''}
+        </div>
+      </div>
+      ${renderAchievementsHtml(e)}
+      <div class="gmap-page-body">
+        <div class="gmap-main">
+          <div class="gmap-stats">★ Коллектаблсы: ${stats.done}/${stats.collectibles} · ⛏ Гринд-точек: ${stats.grindSpots} (${stats.grindTotal} фармов)</div>
+          <div class="gmap-filter chip-row">
+            <button type="button" class="pill ${mapFilter==='all'?'active':''}" data-v="all" onclick="setMapFilterPill(this)">Все</button>
+            <button type="button" class="pill ${mapFilter==='grind'?'active':''}" data-v="grind" onclick="setMapFilterPill(this)">⛏ Гринд</button>
+            <button type="button" class="pill ${mapFilter==='collectible'?'active':''}" data-v="collectible" onclick="setMapFilterPill(this)">★ Коллектаблсы</button>
+          </div>
+          <div id="gmapImageArea">${renderMapStageHtml(gm)}</div>
+          <div class="field" style="margin-top:12px;">
+            <label>Ссылка на картинку карты</label>
+            <input id="gmapImageUrl" placeholder="https://..." value="${escapeHtml(gm.image||'')}">
+          </div>
+          <div class="modal-actions" style="margin-top:0;">
+            <button class="btn-ghost" style="flex:1" onclick="saveGameMapImage()">Сохранить по ссылке</button>
+            <button class="btn-ghost" style="flex:1" onclick="document.getElementById('gmapImageFile').click()">📁 Загрузить с компьютера</button>
+            <input type="file" id="gmapImageFile" accept="image/*" style="display:none" onchange="handleGameMapImageFile(this.files[0])">
+          </div>
+          ${gm.image ? `<button class="btn-ghost" style="width:100%;margin-bottom:10px;" onclick="downloadGameMapImage()">⬇ Скачать карту как файл</button>` : ''}
+          <div class="import-hint">Кликни по карте, чтобы поставить метку. У гринд-точек счётчик увеличивается кликом по цифре на метке; у коллектаблсов отмечается «собрано» в форме точки.</div>
+          <div class="import-hint">Чтобы карта не зависела от локального браузера: скачай файл кнопкой выше, положи его в <code>data/maps/</code> в репозитории и укажи в поле ссылки относительный путь, например <code>data/maps/far-cry-3.png</code> — так карта будет одинаковой на любом устройстве.</div>
+        </div>
+        <div class="gmap-side">
+          ${markerFormOpen ? renderMarkerFormHtml(e) : ''}
+          <div class="subhead" style="${markerFormOpen?'':'margin-top:0;padding-top:0;border-top:none;'}">Список точек</div>
+          <div id="gmapList">${renderMarkerListHtml(gm)}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
 async function saveEntry(keepOpen){
   const title = document.getElementById('fTitle').value.trim();
   if(!title){ showToast('Введи название'); document.getElementById('fTitle').focus(); return; }
@@ -724,6 +1044,9 @@ async function saveEntry(keepOpen){
   }
 }
 document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && gameMapPageId){
+    closeGameMapPage(); return;
+  }
   if(!document.getElementById('overlay').classList.contains('show')) return;
   if(e.key==='Escape'){ closeModal(); return; }
   if(e.key==='Enter' && document.activeElement.tagName!=='TEXTAREA' && document.activeElement.id!=='fSearchQuery'){
@@ -1391,6 +1714,72 @@ async function fetchOwnedGamesViaApi(steamId64, apiKey, proxies){
   return parseSteamGames(raw);
 }
 
+async function fetchGameAchievementSchema(appid, apiKey, proxies){
+  const url = `https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${appid}&key=${encodeURIComponent(apiKey)}&l=russian`;
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return null;
+  try{
+    const data = JSON.parse(raw);
+    return (data.game && data.game.availableGameStats && data.game.availableGameStats.achievements) || [];
+  }catch(e){ return null; }
+}
+async function fetchPlayerAchievements(appid, steamId64, apiKey, proxies){
+  const url = `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${encodeURIComponent(apiKey)}&steamid=${steamId64}&l=russian`;
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return null;
+  try{
+    const data = JSON.parse(raw);
+    if(!data.playerstats || data.playerstats.success===false) return null;
+    return data.playerstats.achievements || [];
+  }catch(e){ return null; }
+}
+function mergeAchievements(schema, player){
+  const playerMap = {};
+  (player||[]).forEach(p=>{ playerMap[p.apiname] = p; });
+  return (schema||[]).map(s=>{
+    const p = playerMap[s.name] || {};
+    return {
+      name: s.name,
+      title: s.displayName || s.name,
+      description: s.description || '',
+      icon: p.achieved ? s.icon : (s.icongray || s.icon || ''),
+      achieved: !!p.achieved,
+      unlocktime: p.unlocktime || 0
+    };
+  });
+}
+let achievementsLoading = false;
+async function loadGameAchievements(entryId){
+  const entry = entries.find(x=>x.id===entryId);
+  if(!entry || !entry.data || !entry.data.appid) return;
+  const apiKey = uiPrefs.steamApiKey;
+  if(!apiKey){ showToast('Сначала укажи Steam API-ключ в Импорт/Экспорт → Steam'); return; }
+  if(!uiPrefs.steamId64){ showToast('Сначала импортируй библиотеку через Steam — нужен твой SteamID'); return; }
+
+  achievementsLoading = true;
+  render();
+  try{
+    const [schema, player] = await Promise.all([
+      fetchGameAchievementSchema(entry.data.appid, apiKey, STEAM_PROXIES),
+      fetchPlayerAchievements(entry.data.appid, uiPrefs.steamId64, apiKey, STEAM_PROXIES)
+    ]);
+    if(!schema || !schema.length){
+      entry.data.achievementsError = 'У игры нет ачивок либо не удалось получить список — проверь, что «Сведения об играх» и статистика публичны в приватности Steam';
+      entry.data.achievements = null;
+    } else {
+      entry.data.achievements = mergeAchievements(schema, player);
+      entry.data.achievementsFetched = Date.now();
+      delete entry.data.achievementsError;
+    }
+    entry.updated = Date.now();
+    await persist();
+  }catch(e){
+    entry.data.achievementsError = 'Не удалось загрузить ачивки — попробуй ещё раз';
+  }
+  achievementsLoading = false;
+  render();
+}
+
 async function autoImportSteam(){
   const input = document.getElementById('steamLink').value.trim();
   const apiKey = document.getElementById('steamApiKey').value.trim();
@@ -1404,6 +1793,8 @@ async function autoImportSteam(){
   try{
     const steamId64 = await resolveSteamId64(base, apiKey, STEAM_PROXIES);
     if(steamId64){
+      uiPrefs.steamId64 = steamId64;
+      persistUiPrefs();
       const games = await fetchOwnedGamesViaApi(steamId64, apiKey, STEAM_PROXIES);
       if(games.length){
         await commitSteamGames(games, statusEl);
