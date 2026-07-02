@@ -758,10 +758,15 @@ async function saveEntry(keepOpen){
   if(!title){ showToast('Введи название'); document.getElementById('fTitle').focus(); return; }
   const id = document.getElementById('editId').value;
   const category = document.getElementById('fCategory').value;
-  const extraData = {};
+  const existing = id ? entries.find(x=>x.id===id) : null;
+  // Сохраняем внутренние поля (appid, raGameId, achievements и т.п.), которых нет
+  // среди видимых полей формы — иначе любое редактирование записи (рейтинг,
+  // заметки...) стирало бы синхронизацию со Steam/RetroAchievements.
+  const extraData = (existing && existing.category===category) ? {...existing.data} : {};
   CATS[category].fields.forEach(f=>{
     const v = document.getElementById('ex_'+f.k).value.trim();
     if(v) extraData[f.k] = f.type==='number' ? parseFloat(v) : v;
+    else delete extraData[f.k];
   });
   if(pendingImportMeta && category==='games') Object.assign(extraData, pendingImportMeta);
   pendingImportMeta = null;
@@ -811,6 +816,45 @@ document.addEventListener('keydown', e=>{
     e.preventDefault();
     saveEntry(false);
   }
+});
+
+/* ---------- HEATMAP TOOLTIP ---------- */
+// Нативный title на ячейках 10x10px ненадёжен (задержка, легко промахнуться) —
+// свой тултип, следующий за курсором, показывается сразу по mouseover.
+function getHmTooltipEl(){
+  let tip = document.getElementById('hmTooltip');
+  if(!tip){
+    tip = document.createElement('div');
+    tip.id = 'hmTooltip';
+    tip.className = 'hm-tooltip';
+    document.body.appendChild(tip);
+  }
+  return tip;
+}
+function positionHmTooltip(e){
+  const tip = getHmTooltipEl();
+  const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 10);
+  const y = Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 10);
+  tip.style.left = Math.max(4,x) + 'px';
+  tip.style.top = Math.max(4,y) + 'px';
+}
+document.addEventListener('mouseover', e=>{
+  const cell = e.target.closest && e.target.closest('.hm-cell[data-tip]');
+  if(!cell) return;
+  const tip = getHmTooltipEl();
+  tip.textContent = cell.dataset.tip;
+  tip.style.display = 'block';
+  positionHmTooltip(e);
+});
+document.addEventListener('mousemove', e=>{
+  const tip = document.getElementById('hmTooltip');
+  if(tip && tip.style.display==='block') positionHmTooltip(e);
+});
+document.addEventListener('mouseout', e=>{
+  const cell = e.target.closest && e.target.closest('.hm-cell[data-tip]');
+  if(!cell) return;
+  const tip = document.getElementById('hmTooltip');
+  if(tip) tip.style.display = 'none';
 });
 async function deleteEntry(){
   const id = document.getElementById('editId').value;
@@ -916,7 +960,7 @@ function buildHeatmap(filteredEntries, year){
         ${weeks.map(w=>`<div class="hm-col">${w.map(d=>{
           if(d.count===null) return `<div class="hm-cell hm-empty"></div>`;
           const tip = d.count ? `${d.date}: ${(titlesByDate[d.date]||[]).join(', ')}` : `${d.date}: нет завершений`;
-          return `<div class="hm-cell hm-l${levelOf(d.count)}" title="${escapeHtml(tip)}"></div>`;
+          return `<div class="hm-cell hm-l${levelOf(d.count)}" data-tip="${escapeHtml(tip)}"></div>`;
         }).join('')}</div>`).join('')}
       </div>
       <div class="heatmap-legend">меньше <span class="hm-cell hm-l0"></span><span class="hm-cell hm-l1"></span><span class="hm-cell hm-l2"></span><span class="hm-cell hm-l3"></span><span class="hm-cell hm-l4"></span> больше</div>
@@ -1516,6 +1560,16 @@ function mergeAchievements(schema, player){
   });
 }
 let achievementsLoading = false;
+// Если игра пройдена на 100%, дата последней открытой ачивки — самая точная
+// известная дата завершения, точнее ручной или дефолтной "сегодня" при импорте.
+function applyCompletionDateFromAchievements(entry){
+  const list = entry.data.achievements;
+  if(!list || !list.length || !list.every(a=>a.achieved)) return;
+  const times = list.map(a=>a.unlocktime).filter(Boolean);
+  if(!times.length) return;
+  entry.watchDate = new Date(Math.max(...times)*1000).toISOString().slice(0,10);
+  if(entry.status!=='completed') entry.status = 'completed';
+}
 async function loadSteamAchievements(entry){
   const apiKey = uiPrefs.steamApiKey;
   if(!apiKey){ showToast('Сначала укажи Steam API-ключ в Импорт/Экспорт → Steam'); return; }
@@ -1535,6 +1589,7 @@ async function loadSteamAchievements(entry){
       entry.data.achievements = mergeAchievements(schema, player);
       entry.data.achievementsFetched = Date.now();
       delete entry.data.achievementsError;
+      applyCompletionDateFromAchievements(entry);
     }
     entry.updated = Date.now();
     await persist();
@@ -1561,6 +1616,7 @@ async function loadRaAchievements(entry){
       entry.data.achievements = mergeRaAchievements(achievements);
       entry.data.achievementsFetched = Date.now();
       delete entry.data.achievementsError;
+      applyCompletionDateFromAchievements(entry);
     }
     entry.updated = Date.now();
     await persist();
@@ -1656,6 +1712,7 @@ async function commitRaGames(games, statusEl){
     if(!byGame[g.GameID] || g.HardcoreMode===false) byGame[g.GameID] = g;
   });
   let added = 0, updated = 0;
+  const today = new Date().toISOString().slice(0,10);
   Object.values(byGame).forEach(g=>{
     const cover = g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : '';
     const existing = entries.find(x=>x.category==='games' && x.data && x.data.platform==='RetroAchievements' && x.data.raGameId===g.GameID);
@@ -1664,6 +1721,7 @@ async function commitRaGames(games, statusEl){
       existing.cover = cover || existing.cover;
       existing.data = {...existing.data, raGameId: g.GameID, consoleName: g.ConsoleName, platform: 'RetroAchievements'};
       if(existing.status!=='completed' && status==='completed') existing.status = 'completed';
+      if(status==='completed' && !existing.watchDate) existing.watchDate = today;
       existing.updated = Date.now();
       updated++;
     } else {
@@ -1671,6 +1729,7 @@ async function commitRaGames(games, statusEl){
         id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
         title: g.Title, category: 'games', status,
         rating: null, year: null, cover, notes: '',
+        watchDate: status==='completed' ? today : null,
         data: { platform: 'RetroAchievements', raGameId: g.GameID, consoleName: g.ConsoleName },
         updated: Date.now()
       });

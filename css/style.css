@@ -181,6 +181,7 @@ body.theme-light .card::before{opacity:.85;}
 .hm-l4{background:var(--brass);}
 .heatmap-legend{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--muted);margin-top:8px;}
 .heatmap-legend .hm-cell{width:9px;height:9px;}
+.hm-tooltip{display:none;position:fixed;z-index:100;background:var(--surface-alt);border:1px solid var(--brass-dim);color:var(--text);padding:6px 10px;border-radius:6px;font-size:11.5px;pointer-events:none;max-width:260px;box-shadow:0 6px 18px rgba(0,0,0,.35);}
 
 .overlay{position:fixed;inset:0;background:rgba(6,7,9,.65);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
 .overlay.show{display:flex;}
