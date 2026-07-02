@@ -212,6 +212,7 @@ body.theme-light .card::before{opacity:.85;}
 .sr-info{flex:1;min-width:0;}
 .sr-title{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sr-year{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.sr-badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--brass);border:1px solid var(--brass-dim);border-radius:3px;padding:1px 4px;margin-left:6px;vertical-align:middle;}
 .sr-status{padding:8px 10px;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
 .import-tabs{display:flex;gap:8px;margin-bottom:18px;}
 .imp-tab{flex:1;padding:9px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;}
@@ -234,7 +235,7 @@ body.theme-light .card::before{opacity:.85;}
 .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:7px;padding:11px 16px;cursor:pointer;font-family:'Inter',sans-serif;}
 .btn-danger{background:transparent;border:1px solid #4A2C2A;color:#C0554F;border-radius:7px;padding:11px 16px;cursor:pointer;font-family:'Inter',sans-serif;}
 
-.steam-achievements{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:6px;}
+.achievements-panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:6px;}
 .ach-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
 .ach-progress{font-size:12.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
 .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;max-height:360px;overflow-y:auto;}

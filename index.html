@@ -84,7 +84,7 @@
     <input type="hidden" id="editId">
     <div class="field">
       <label>Категория</label>
-      <select id="fCategory" onchange="renderExtraFields(); clearSearch();">
+      <select id="fCategory" onchange="onCategoryChange()">
         <option value="movies">Фильм</option>
         <option value="series">Сериал</option>
         <option value="anime">Аниме</option>
@@ -197,6 +197,7 @@
       <button class="imp-tab" id="tabFile" onclick="switchImportTab('file')">Файл CSV/JSON</button>
       <button class="imp-tab" id="tabShiki" onclick="switchImportTab('shiki')">Shikimori</button>
       <button class="imp-tab" id="tabSteam" onclick="switchImportTab('steam')">Steam</button>
+      <button class="imp-tab" id="tabRA" onclick="switchImportTab('ra')">RetroAchievements</button>
     </div>
 
     <div class="import-panel active" id="panelExport">
@@ -257,6 +258,25 @@
       <div class="import-hint">Тянет данные по каждой игре из Steam Store API — сначала проверяет офлайн-базу (<code>data/steam-games-db.json</code>), новые данные применяются к записям и попадают в базу локально. Может занять время для большой библиотеки.</div>
       <button class="btn-ghost" style="width:100%" onclick="downloadSteamDb()">⬇ Скачать базу данных (JSON)</button>
       <div class="import-hint">Скачивает всю накопленную офлайн-базу — пришли этот файл, чтобы сохранить в репозиторий и не собирать те же данные заново на других устройствах.</div>
+    </div>
+
+    <div class="import-panel" id="panelRA">
+      <div class="field" style="margin-top:0;">
+        <label>Ник на RetroAchievements</label>
+        <input id="raUsername" placeholder="твой_ник" onchange="syncRaCreds()">
+      </div>
+      <div class="field">
+        <label>Web API ключ</label>
+        <input id="raApiKey" placeholder="вставь ключ" type="password" onchange="syncRaCreds()">
+        <div class="import-hint" style="margin-top:4px;">Найдёшь в <a href="https://retroachievements.org/controlpanel.php" target="_blank" style="color:var(--brass);">своей панели управления</a>, раздел «Keys».</div>
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="autoImportRA()">Импортировать пройденные игры</button>
+      <div id="raStatus" class="import-hint"></div>
+      <div class="import-hint">Прямого поиска по названию в API RetroAchievements нет — чтобы ретро-игры находились в поиске при добавлении записи (например, начни вводить «sonic»), нужно один раз собрать локальную базу игр по всем платформам.</div>
+      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="buildRaGamesDb(document.getElementById('raDbStatus'))">🔍 Собрать базу игр (все платформы)</button>
+      <div id="raDbStatus" class="import-hint"></div>
+      <button class="btn-ghost" style="width:100%" onclick="downloadRaGamesDb()">⬇ Скачать базу игр (JSON)</button>
+      <div class="import-hint">Скачивает собранную базу — пришли файл как <code>data/retroachievements-games-db.json</code>, чтобы сохранить в репозиторий и не собирать её заново на других устройствах.</div>
     </div>
 
     <div class="modal-actions">
