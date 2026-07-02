@@ -362,6 +362,13 @@ function quickSetRating(ev, id, value){
   persist(); render();
 }
 
+function ratingTier(r){
+  if(!r) return 'none';
+  if(r>=8) return 'great';
+  if(r>=6) return 'good';
+  if(r>=4) return 'mixed';
+  return 'bad';
+}
 function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
@@ -370,6 +377,7 @@ function cardHtml(e){
     <div class="cover">
       <div class="catbar"></div>
       ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
+      <input class="quick-rating rating-badge rating-${ratingTier(e.rating)}" type="number" min="0" max="10" placeholder="–" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
     </div>
     <div class="card-body">
       <div class="card-top">
@@ -378,10 +386,7 @@ function cardHtml(e){
       </div>
       <div class="card-meta">${cat.label}${e.year?' · '+e.year:''}${e.country?' · '+escapeHtml(e.country):''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</div>
       ${subLine(e) ? `<div class="card-sub">${escapeHtml(subLine(e))}</div>` : ''}
-      <div class="card-foot">
-        <input class="quick-rating" type="number" min="0" max="10" placeholder="—" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
-        <span class="progress-txt">${escapeHtml(progressLine(e))}</span>
-      </div>
+      ${progressLine(e) ? `<div class="progress-txt">${escapeHtml(progressLine(e))}</div>` : ''}
     </div>
   </div>`;
 }
