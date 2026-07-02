@@ -22,7 +22,7 @@ const CATS = {
   manga:{label:'Манга', color:'var(--c-manga)', hex:'#6B8F71',
     fields:[{k:'author',l:'Автор/художник'},{k:'chRead',l:'Глав прочитано',type:'number'},{k:'totalCh',l:'Всего глав',type:'number'}]},
   games:{label:'Игры', color:'var(--c-games)', hex:'#3F8E8E',
-    fields:[{k:'developer',l:'Разработчик'},{k:'platform',l:'Платформа',ph:'Xbox Series S'},{k:'hours',l:'Часов наиграно',type:'number'},{k:'genre',l:'Жанр'}]},
+    fields:[{k:'developer',l:'Разработчик'},{k:'platform',l:'Платформа',ph:'Xbox Series S'},{k:'consoleName',l:'Консоль'},{k:'hours',l:'Часов наиграно',type:'number'},{k:'genre',l:'Жанр'}]},
 };
 const STATUS_LABEL = {planning:'план',progress:'смотрю',completed:'завершено',hold:'отложено',dropped:'брошено'};
 const PROGRESS_LABEL_BY_CAT = {books:'читаю',manga:'читаю',games:'играю'};
@@ -115,8 +115,8 @@ function buildTabs(){
   });
   document.getElementById('tabs').innerHTML = html;
 }
-function setCat(c){ activeCat = c; statsMode=false; render(); }
-function toggleStats(){ statsMode = !statsMode; render(); }
+function setCat(c){ activeCat = c; statsMode=false; gamePageId=null; render(); }
+function toggleStats(){ statsMode = !statsMode; gamePageId=null; render(); }
 
 function toggleFiltersPanel(){
   const p = document.getElementById('filtersPanel');
@@ -166,8 +166,10 @@ function getFiltered(){
 function render(){
   buildTabs();
   document.getElementById('statsBtn').classList.toggle('active', statsMode);
-  document.getElementById('libraryView').style.display = statsMode ? 'none' : 'block';
+  document.getElementById('libraryView').style.display = (statsMode || gamePageId) ? 'none' : 'block';
   document.getElementById('statsView').style.display = statsMode ? 'block' : 'none';
+  document.getElementById('gamePage').style.display = gamePageId ? 'block' : 'none';
+  if(gamePageId){ renderGamePage(); return; }
   if(statsMode){ renderStats(); return; }
 
   const list = getFiltered();
@@ -289,7 +291,7 @@ function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="card" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="card" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <div class="cover">
       <div class="catbar"></div>
       ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
@@ -311,7 +313,7 @@ function cardHtml(e){
 function rowHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <span class="row-dot"></span>
     <span class="row-title">${escapeHtml(e.title)}</span>
     <span class="row-cat">${cat.label}</span>
@@ -325,7 +327,7 @@ function compactHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   const metaBits = [cat.label, e.year, subLine(e), progressLine(e)].filter(Boolean);
-  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <div class="compact-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
     <div class="compact-body">
       <div class="compact-top">
@@ -697,7 +699,7 @@ function openView(id){
   else descWrap.style.display = 'none';
 
   document.getElementById('viewNotes').textContent = e.notes || 'без заметок';
-  renderViewAchievements(e);
+  renderAchievementsInto('viewAchievements', e);
   document.getElementById('viewOverlay').classList.add('show');
 }
 function closeView(){ document.getElementById('viewOverlay').classList.remove('show'); viewingId = null; }
@@ -707,9 +709,67 @@ function editFromView(){
   openModal(id);
 }
 
-/* ---------- STEAM ACHIEVEMENTS ---------- */
-function renderViewAchievements(entry){
-  const el = document.getElementById('viewAchievements');
+/* ---------- GAME PAGE (полная страница вместо модалки для игр) ---------- */
+let gamePageId = null;
+function openEntry(id){
+  const e = entries.find(x=>x.id===id);
+  if(e && e.category==='games'){ openGamePage(id); return; }
+  openView(id);
+}
+function openGamePage(id){
+  gamePageId = id;
+  render();
+}
+function closeGamePage(){
+  gamePageId = null;
+  render();
+}
+function renderGamePage(){
+  const e = entries.find(x=>x.id===gamePageId);
+  if(!e){ gamePageId = null; return; }
+  const cat = CATS[e.category] || CATS.games;
+  const initials = e.title.slice(0,2).toUpperCase();
+  const f = e.data || {};
+  const fieldsHtml = cat.fields
+    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
+    .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
+    .join('');
+
+  document.getElementById('gamePage').innerHTML = `
+    <div class="game-page">
+      <div class="game-page-top">
+        <button class="btn-ghost" onclick="closeGamePage()">← Назад к библиотеке</button>
+        <button class="btn-primary" style="flex:none;" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
+      </div>
+      <div class="game-page-header">
+        <div class="game-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
+        <div class="game-header-info">
+          <h1>${escapeHtml(e.title)}</h1>
+          <div class="view-row">
+            <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+            <span class="card-meta">${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</span>
+          </div>
+          <div class="game-page-fields">${fieldsHtml}</div>
+        </div>
+      </div>
+      ${e.description ? `<div class="game-page-block"><div class="view-field-label">Описание</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
+      <div class="game-page-block"><div class="view-field-label">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
+      <div id="gamePageAchievements"></div>
+    </div>`;
+  renderAchievementsInto('gamePageAchievements', e);
+}
+
+// После загрузки ачивок обновляем ту вью, что сейчас реально открыта (модалка
+// или полная страница игры) — иначе подтянутые разработчик/жанр/ачивки не
+// покажутся без переоткрытия.
+function refreshOpenEntryView(entry){
+  if(gamePageId === entry.id) renderGamePage();
+  else if(viewingId === entry.id) openView(entry.id);
+}
+
+/* ---------- ACHIEVEMENTS (Steam + RetroAchievements) ---------- */
+function renderAchievementsInto(containerId, entry){
+  const el = document.getElementById(containerId);
   if(!el) return;
   const f = entry.data || {};
   const isSteam = f.platform === 'Steam' && f.appid;
@@ -810,6 +870,9 @@ async function saveEntry(keepOpen){
   }
 }
 document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && gamePageId && !document.getElementById('overlay').classList.contains('show')){
+    closeGamePage(); return;
+  }
   if(!document.getElementById('overlay').classList.contains('show')) return;
   if(e.key==='Escape'){ closeModal(); return; }
   if(e.key==='Enter' && document.activeElement.tagName!=='TEXTAREA' && document.activeElement.id!=='fSearchQuery'){
@@ -1597,7 +1660,7 @@ async function loadSteamAchievements(entry){
   if(!uiPrefs.steamId64){ showToast('Сначала импортируй библиотеку через Steam — нужен твой SteamID'); return; }
 
   achievementsLoading = true;
-  renderViewAchievements(entry);
+  refreshOpenEntryView(entry);
   try{
     const [schema, player] = await Promise.all([
       fetchGameAchievementSchema(entry.data.appid, apiKey, STEAM_PROXIES),
@@ -1618,7 +1681,7 @@ async function loadSteamAchievements(entry){
     entry.data.achievementsError = 'Не удалось загрузить ачивки — попробуй ещё раз';
   }
   achievementsLoading = false;
-  renderViewAchievements(entry);
+  refreshOpenEntryView(entry);
 }
 async function loadRaAchievements(entry){
   const apiKey = uiPrefs.raApiKey;
@@ -1626,7 +1689,7 @@ async function loadRaAchievements(entry){
   if(!apiKey || !username){ showToast('Сначала укажи ник и Web API ключ RetroAchievements в Импорт/Экспорт → RetroAchievements'); return; }
 
   achievementsLoading = true;
-  renderViewAchievements(entry);
+  refreshOpenEntryView(entry);
   try{
     const info = await fetchRaGameInfo(entry.data.raGameId, username, apiKey, RA_PROXIES);
     const achievements = info && info.Achievements ? Object.values(info.Achievements) : null;
@@ -1656,7 +1719,7 @@ async function loadRaAchievements(entry){
     entry.data.achievementsError = 'Не удалось загрузить ачивки — попробуй ещё раз';
   }
   achievementsLoading = false;
-  renderViewAchievements(entry);
+  refreshOpenEntryView(entry);
 }
 async function loadGameAchievements(entryId){
   const entry = entries.find(x=>x.id===entryId);
