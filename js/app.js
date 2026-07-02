@@ -729,6 +729,37 @@ function saveGameMapImage(){
   render();
   showToast('Картинка карты сохранена');
 }
+function downloadGameMapImage(){
+  const entry = entries.find(x=>x.id===gameMapPageId);
+  if(!entry || !entry.gameMap.image){ showToast('Сначала добавь картинку карты'); return; }
+  const slug = entry.title.toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-+|-+$/g,'') || 'map';
+  const isDataUrl = entry.gameMap.image.startsWith('data:');
+  const ext = isDataUrl ? (entry.gameMap.image.match(/^data:image\/(\w+)/)||[,'png'])[1] : (entry.gameMap.image.split('.').pop().split(/[?#]/)[0] || 'png');
+  const a = document.createElement('a');
+  a.href = entry.gameMap.image;
+  a.download = `${slug}-map.${ext}`;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  if(!isDataUrl) showToast('Если файл не скачался сам — сохрани картинку правым кликом (кросс-доменные ссылки браузер не всегда даёт скачать напрямую)');
+}
+function handleGameMapImageFile(file){
+  if(!file) return;
+  const entry = entries.find(x=>x.id===gameMapPageId);
+  if(!entry) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    entry.gameMap.image = reader.result;
+    entry.updated = Date.now();
+    persist();
+    render();
+    showToast('Картинка карты загружена');
+  };
+  reader.onerror = () => showToast('Не удалось прочитать файл');
+  reader.readAsDataURL(file);
+}
 function onMapStageClick(ev){
   const rect = ev.currentTarget.getBoundingClientRect();
   const x = (ev.clientX - rect.left) / rect.width;
@@ -906,8 +937,14 @@ function renderGameMapPage(){
             <label>Ссылка на картинку карты</label>
             <input id="gmapImageUrl" placeholder="https://..." value="${escapeHtml(gm.image||'')}">
           </div>
-          <button class="btn-ghost" style="width:100%" onclick="saveGameMapImage()">Сохранить картинку</button>
+          <div class="modal-actions" style="margin-top:0;">
+            <button class="btn-ghost" style="flex:1" onclick="saveGameMapImage()">Сохранить по ссылке</button>
+            <button class="btn-ghost" style="flex:1" onclick="document.getElementById('gmapImageFile').click()">📁 Загрузить с компьютера</button>
+            <input type="file" id="gmapImageFile" accept="image/*" style="display:none" onchange="handleGameMapImageFile(this.files[0])">
+          </div>
+          ${gm.image ? `<button class="btn-ghost" style="width:100%;margin-bottom:10px;" onclick="downloadGameMapImage()">⬇ Скачать карту как файл</button>` : ''}
           <div class="import-hint">Кликни по карте, чтобы поставить метку. У гринд-точек счётчик увеличивается кликом по цифре на метке; у коллектаблсов отмечается «собрано» в форме точки.</div>
+          <div class="import-hint">Чтобы карта не зависела от локального браузера: скачай файл кнопкой выше, положи его в <code>data/maps/</code> в репозитории и укажи в поле ссылки относительный путь, например <code>data/maps/far-cry-3.png</code> — так карта будет одинаковой на любом устройстве.</div>
         </div>
         <div class="gmap-side">
           ${markerFormOpen ? renderMarkerFormHtml(e) : ''}
