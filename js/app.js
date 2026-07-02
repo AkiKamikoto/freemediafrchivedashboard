@@ -908,6 +908,19 @@ function availableYears(){
 }
 
 let statsYear = 'all';
+let statsCategory = 'all';
+function achievementsAgg(list){
+  let done=0, total=0, gamesWithData=0;
+  list.forEach(e=>{
+    const ach = e.data && e.data.achievements;
+    if(ach && ach.length){
+      gamesWithData++;
+      total += ach.length;
+      done += ach.filter(a=>a.achieved).length;
+    }
+  });
+  return {done, total, gamesWithData};
+}
 
 function buildHeatmap(filteredEntries, year){
   const counts = {};
@@ -974,7 +987,9 @@ function renderStats(){
     return;
   }
   const years = availableYears();
-  const list = statsYear==='all' ? entries : entries.filter(e=>entryYear(e)===parseInt(statsYear));
+  let list = statsYear==='all' ? entries : entries.filter(e=>entryYear(e)===parseInt(statsYear));
+  if(statsCategory!=='all') list = list.filter(e=>e.category===statsCategory);
+  const achAgg = achievementsAgg(list);
 
   const total = list.length;
   const completed = list.filter(e=>e.status==='completed').length;
@@ -1007,6 +1022,10 @@ function renderStats(){
           <option value="all" ${statsYear==='all'?'selected':''}>Всё время</option>
           ${years.map(y=>`<option value="${y}" ${String(statsYear)===String(y)?'selected':''}>${y}</option>`).join('')}
         </select>
+        <select class="filter" id="statsCatSelect" onchange="statsCategory=this.value; renderStats();">
+          <option value="all" ${statsCategory==='all'?'selected':''}>Все категории</option>
+          ${Object.entries(CATS).map(([key,c])=>`<option value="${key}" ${statsCategory===key?'selected':''}>${c.label}</option>`).join('')}
+        </select>
       </div>
 
       <div class="wrapped-card">
@@ -1020,6 +1039,7 @@ function renderStats(){
         </div>
         ${top[0] ? `<div class="wrapped-top">🏆 Лучшее: <b>${escapeHtml(top[0].title)}</b> — ${top[0].rating}/10</div>` : ''}
         ${topCountry ? `<div class="wrapped-top">🌍 Чаще всего: <b>${escapeHtml(topCountry[0])}</b> (${topCountry[1]})</div>` : ''}
+        ${achAgg.total ? `<div class="wrapped-top">🏆 Ачивок открыто: <b>${achAgg.done}/${achAgg.total}</b> в ${achAgg.gamesWithData} ${achAgg.gamesWithData===1?'игре':'играх'}</div>` : ''}
       </div>
 
       <div>
@@ -1032,6 +1052,7 @@ function renderStats(){
         <div class="stat-card"><div class="num">${completed}</div><div class="lbl">Завершено</div></div>
         <div class="stat-card"><div class="num">${avgRating}</div><div class="lbl">Средняя оценка</div></div>
         <div class="stat-card"><div class="num">${totalHours}</div><div class="lbl">Часов всего (оценка)</div></div>
+        ${achAgg.total ? `<div class="stat-card"><div class="num">${achAgg.done}/${achAgg.total}</div><div class="lbl">Ачивок открыто</div></div>` : ''}
       </div>
 
       <div class="chart-row">
@@ -1617,6 +1638,17 @@ async function loadRaAchievements(entry){
       entry.data.achievementsFetched = Date.now();
       delete entry.data.achievementsError;
       applyCompletionDateFromAchievements(entry);
+    }
+    // GetGameInfoAndUserProgress заодно отдаёт метаданные игры — раз уж запрос
+    // всё равно сделан, дозаполняем пустые поля записи, не тратя лишние вызовы API.
+    if(info){
+      if(!entry.data.developer && info.Developer) entry.data.developer = info.Developer;
+      if(!entry.data.genre && info.Genre) entry.data.genre = info.Genre;
+      if(!entry.year && info.Released){
+        const m = String(info.Released).match(/(\d{4})/);
+        if(m) entry.year = parseInt(m[1]);
+      }
+      if(!entry.cover && info.ImageBoxArt) entry.cover = `https://retroachievements.org${info.ImageBoxArt}`;
     }
     entry.updated = Date.now();
     await persist();
