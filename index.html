@@ -190,23 +190,26 @@
 </div>
 
 <div class="overlay" id="importOverlay">
-  <div class="modal">
+  <div class="modal" style="max-width:560px;">
     <h2>Импорт данных</h2>
     <div class="import-tabs">
       <button class="imp-tab active" id="tabExport" onclick="switchImportTab('export')">Экспорт</button>
-      <button class="imp-tab" id="tabFile" onclick="switchImportTab('file')">Файл CSV/JSON</button>
-      <button class="imp-tab" id="tabShiki" onclick="switchImportTab('shiki')">Shikimori</button>
+      <button class="imp-tab" id="tabFile" onclick="switchImportTab('file')">Файл</button>
       <button class="imp-tab" id="tabSteam" onclick="switchImportTab('steam')">Steam</button>
       <button class="imp-tab" id="tabRA" onclick="switchImportTab('ra')">RetroAchievements</button>
+      <button class="imp-tab" id="tabShiki" onclick="switchImportTab('shiki')">Shikimori</button>
     </div>
 
     <div class="import-panel active" id="panelExport">
-      <div class="import-hint" style="margin-top:0;">Скачай все свои записи в файл — для бэкапа или переноса.</div>
+      <div class="subhead" style="margin-top:0;padding-top:0;border-top:none;">Бэкап / перенос</div>
+      <div class="import-hint" style="margin-top:0;">Скачай все свои записи в файл.</div>
       <div class="modal-actions" style="margin-top:10px;">
-        <button class="btn-primary" onclick="exportData('json')">⬇ Скачать JSON</button>
-        <button class="btn-primary" onclick="exportData('csv')">⬇ Скачать CSV</button>
+        <button class="btn-primary" onclick="exportData('json')">⬇ JSON</button>
+        <button class="btn-primary" onclick="exportData('csv')">⬇ CSV</button>
       </div>
-      <div class="import-hint">Если из-за повторного импорта появились дубли (одна и та же запись несколько раз) — можно почистить одной кнопкой. Совпадения ищутся по названию и категории; при склейке сохраняются обложка, оценка и заметки из любой копии.</div>
+
+      <div class="subhead">Дубликаты</div>
+      <div class="import-hint" style="margin-top:0;">Склеивает записи с одинаковым названием и категорией, оставляя лучшую обложку, оценку и заметки.</div>
       <div class="modal-actions">
         <button class="btn-ghost" style="width:100%" onclick="dedupeEntries()">🧹 Удалить дубликаты</button>
       </div>
@@ -219,7 +222,7 @@
       </div>
       <div id="mapArea"></div>
       <div class="import-hint">
-        Экспортируй свои данные из сервиса (обычно в настройках аккаунта → «Экспорт данных» / «Export») и загрузи файл сюда.
+        Экспортируй данные из сервиса (обычно в настройках аккаунта → «Экспорт данных») и загрузи файл сюда.
         <div class="svc-list">
           <div class="svc-item"><b>Кинориум</b> — Настройки → Экспорт коллекции (CSV)</div>
           <div class="svc-item"><b>Steam</b> — сторонние экспортёры библиотеки (напр. steam-tools.info) → CSV/JSON</div>
@@ -229,38 +232,32 @@
       </div>
     </div>
 
-    <div class="import-panel" id="panelShiki">
-      <div class="field">
-        <label>Ник на Shikimori</label>
-        <input id="shikiUser" placeholder="твой_ник">
-      </div>
-      <div class="modal-actions" style="margin-top:6px;">
-        <button class="btn-primary" onclick="importShikimori('anime')">Импорт аниме</button>
-        <button class="btn-primary" onclick="importShikimori('manga')">Импорт манги</button>
-      </div>
-      <div id="shikiStatus" class="import-hint"></div>
-    </div>
-
     <div class="import-panel" id="panelSteam">
+      <div class="subhead" style="margin-top:0;padding-top:0;border-top:none;">Библиотека</div>
       <div class="field" style="margin-top:0;">
-        <label>Ссылка на профиль Steam (или просто ник)</label>
+        <label>Ссылка на профиль (или ник)</label>
         <input id="steamLink" placeholder="steamcommunity.com/id/твой_ник">
       </div>
       <div class="field">
-        <label>Steam Web API ключ</label>
+        <label>Web API ключ</label>
         <input id="steamApiKey" placeholder="вставь ключ" type="password" onchange="saveSteamApiKey(this.value)">
-        <div class="import-hint" style="margin-top:4px;">Бесплатный ключ за 30 секунд: <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color:var(--brass);">steamcommunity.com/dev/apikey</a>.</div>
+        <div class="import-hint" style="margin-top:4px;">Бесплатно за 30 секунд: <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color:var(--brass);">steamcommunity.com/dev/apikey</a>.</div>
       </div>
-      <button class="btn-primary" style="width:100%" onclick="autoImportSteam()">Импортировать</button>
+      <button class="btn-primary" style="width:100%" onclick="autoImportSteam()">Импортировать библиотеку</button>
       <div id="steamStatus" class="import-hint"></div>
-      <div class="import-hint">Нужно, чтобы в приватности Steam пункт «Сведения об играх» был Public (Изменить профиль → Настройки приватности) — иначе данные недоступны никаким способом.</div>
-      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="enrichSteamGames(document.getElementById('steamStatus'))">🔍 Обогатить метаданные (разработчик, жанр, описание)</button>
-      <div class="import-hint">Тянет данные по каждой игре из Steam Store API — сначала проверяет офлайн-базу (<code>data/steam-games-db.json</code>), новые данные применяются к записям и попадают в базу локально. Может занять время для большой библиотеки.</div>
-      <button class="btn-ghost" style="width:100%" onclick="downloadSteamDb()">⬇ Скачать базу данных (JSON)</button>
-      <div class="import-hint">Скачивает всю накопленную офлайн-базу — пришли этот файл, чтобы сохранить в репозиторий и не собирать те же данные заново на других устройствах.</div>
+      <div class="import-hint">Нужно, чтобы «Сведения об играх» были Public (Настройки приватности Steam).</div>
+
+      <div class="subhead">Метаданные (офлайн-база)</div>
+      <div class="import-hint" style="margin-top:0;">Разработчик, жанр, описание — тянутся из Steam Store API, кешируются в <code>data/steam-games-db.json</code>.</div>
+      <div class="modal-actions">
+        <button class="btn-ghost" style="flex:1" onclick="enrichSteamGames(document.getElementById('steamStatus'))">🔍 Обогатить</button>
+        <button class="btn-ghost" style="flex:1" onclick="downloadSteamDb()">⬇ Скачать базу</button>
+      </div>
+      <div class="import-hint">Скачанный файл — в репозиторий как <code>data/steam-games-db.json</code>, чтобы не собирать заново на других устройствах.</div>
     </div>
 
     <div class="import-panel" id="panelRA">
+      <div class="subhead" style="margin-top:0;padding-top:0;border-top:none;">Прогресс</div>
       <div class="field" style="margin-top:0;">
         <label>Ник на RetroAchievements</label>
         <input id="raUsername" placeholder="твой_ник" onchange="syncRaCreds()">
@@ -268,15 +265,32 @@
       <div class="field">
         <label>Web API ключ</label>
         <input id="raApiKey" placeholder="вставь ключ" type="password" onchange="syncRaCreds()">
-        <div class="import-hint" style="margin-top:4px;">Найдёшь в <a href="https://retroachievements.org/controlpanel.php" target="_blank" style="color:var(--brass);">своей панели управления</a>, раздел «Keys».</div>
+        <div class="import-hint" style="margin-top:4px;">В <a href="https://retroachievements.org/controlpanel.php" target="_blank" style="color:var(--brass);">панели управления</a>, раздел «Keys».</div>
       </div>
       <button class="btn-primary" style="width:100%" onclick="autoImportRA()">Импортировать пройденные игры</button>
       <div id="raStatus" class="import-hint"></div>
-      <div class="import-hint">Прямого поиска по названию в API RetroAchievements нет — чтобы ретро-игры находились в поиске при добавлении записи (например, начни вводить «sonic»), нужно один раз собрать локальную базу игр по всем платформам.</div>
-      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="buildRaGamesDb(document.getElementById('raDbStatus'))">🔍 Собрать базу игр (все платформы)</button>
+
+      <div class="subhead">База игр для поиска (офлайн)</div>
+      <div class="import-hint" style="margin-top:0;">В API RetroAchievements нет поиска по названию — чтобы ретро-игры находились при добавлении записи (например, «sonic»), нужно один раз собрать базу по всем платформам.</div>
+      <div class="modal-actions">
+        <button class="btn-ghost" style="flex:1" onclick="buildRaGamesDb(document.getElementById('raDbStatus'))">🔍 Собрать базу</button>
+        <button class="btn-ghost" style="flex:1" onclick="downloadRaGamesDb()">⬇ Скачать базу</button>
+      </div>
       <div id="raDbStatus" class="import-hint"></div>
-      <button class="btn-ghost" style="width:100%" onclick="downloadRaGamesDb()">⬇ Скачать базу игр (JSON)</button>
-      <div class="import-hint">Скачивает собранную базу — пришли файл как <code>data/retroachievements-games-db.json</code>, чтобы сохранить в репозиторий и не собирать её заново на других устройствах.</div>
+      <div class="import-hint">Скачанный файл — в репозиторий как <code>data/retroachievements-games-db.json</code>.</div>
+    </div>
+
+    <div class="import-panel" id="panelShiki">
+      <div class="subhead" style="margin-top:0;padding-top:0;border-top:none;">Аниме и манга</div>
+      <div class="field" style="margin-top:0;">
+        <label>Ник на Shikimori</label>
+        <input id="shikiUser" placeholder="твой_ник">
+      </div>
+      <div class="modal-actions" style="margin-top:6px;">
+        <button class="btn-primary" style="flex:1" onclick="importShikimori('anime')">Импорт аниме</button>
+        <button class="btn-primary" style="flex:1" onclick="importShikimori('manga')">Импорт манги</button>
+      </div>
+      <div id="shikiStatus" class="import-hint"></div>
     </div>
 
     <div class="modal-actions">
