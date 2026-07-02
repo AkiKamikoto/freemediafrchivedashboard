@@ -22,7 +22,7 @@ const CATS = {
   manga:{label:'Манга', color:'var(--c-manga)', hex:'#6B8F71',
     fields:[{k:'author',l:'Автор/художник'},{k:'chRead',l:'Глав прочитано',type:'number'},{k:'totalCh',l:'Всего глав',type:'number'}]},
   games:{label:'Игры', color:'var(--c-games)', hex:'#3F8E8E',
-    fields:[{k:'developer',l:'Разработчик'},{k:'platform',l:'Платформа',ph:'Xbox Series S'},{k:'hours',l:'Часов наиграно',type:'number'},{k:'genre',l:'Жанр'}]},
+    fields:[{k:'developer',l:'Разработчик'},{k:'platform',l:'Платформа',ph:'Xbox Series S'},{k:'consoleName',l:'Консоль'},{k:'hours',l:'Часов наиграно',type:'number'},{k:'genre',l:'Жанр'}]},
 };
 const STATUS_LABEL = {planning:'план',progress:'смотрю',completed:'завершено',hold:'отложено',dropped:'брошено'};
 const PROGRESS_LABEL_BY_CAT = {books:'читаю',manga:'читаю',games:'играю'};
@@ -38,6 +38,7 @@ let statsMode = false;
 let uiPrefs = {theme:'dark', view:'cards', groupBy:'none'};
 
 let steamGamesDb = {};
+let raGamesDb = { games: [] };
 async function load(){
   try{
     const res = await window.storage.get('archive-entries');
@@ -51,6 +52,10 @@ async function load(){
     const dbRes = await fetch('data/steam-games-db.json');
     if(dbRes.ok) steamGamesDb = await dbRes.json();
   }catch(e){ /* offline cache unavailable, enrichment will fetch live */ }
+  try{
+    const raRes = await fetch('data/retroachievements-games-db.json');
+    if(raRes.ok) raGamesDb = await raRes.json();
+  }catch(e){ /* offline cache unavailable — сбор базы вручную в Импорт/Экспорт → RetroAchievements */ }
   applyUiPrefs();
   render();
 }
@@ -78,6 +83,8 @@ function applyUiPrefs(){
   document.getElementById('viewSelect').value = uiPrefs.view;
   document.getElementById('groupBy').value = uiPrefs.groupBy || 'none';
   if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
+  if(uiPrefs.raUsername) document.getElementById('raUsername').value = uiPrefs.raUsername;
+  if(uiPrefs.raApiKey) document.getElementById('raApiKey').value = uiPrefs.raApiKey;
 }
 function saveSteamApiKey(v){
   uiPrefs.steamApiKey = v.trim();
@@ -108,8 +115,8 @@ function buildTabs(){
   });
   document.getElementById('tabs').innerHTML = html;
 }
-function setCat(c){ activeCat = c; statsMode=false; render(); }
-function toggleStats(){ statsMode = !statsMode; render(); }
+function setCat(c){ activeCat = c; statsMode=false; gamePageId=null; render(); }
+function toggleStats(){ statsMode = !statsMode; gamePageId=null; render(); }
 
 function toggleFiltersPanel(){
   const p = document.getElementById('filtersPanel');
@@ -159,8 +166,10 @@ function getFiltered(){
 function render(){
   buildTabs();
   document.getElementById('statsBtn').classList.toggle('active', statsMode);
-  document.getElementById('libraryView').style.display = statsMode ? 'none' : 'block';
+  document.getElementById('libraryView').style.display = (statsMode || gamePageId) ? 'none' : 'block';
   document.getElementById('statsView').style.display = statsMode ? 'block' : 'none';
+  document.getElementById('gamePage').style.display = gamePageId ? 'block' : 'none';
+  if(gamePageId){ renderGamePage(); return; }
   if(statsMode){ renderStats(); return; }
 
   const list = getFiltered();
@@ -234,7 +243,7 @@ function subLine(e){
   if(e.category==='series') return f.creator || '';
   if(e.category==='anime') return f.studio || '';
   if(e.category==='books' || e.category==='manga') return f.author || '';
-  if(e.category==='games') return f.developer || '';
+  if(e.category==='games') return f.developer || (f.platform==='RetroAchievements' ? f.consoleName : '') || '';
   return '';
 }
 function progressLine(e){
@@ -282,7 +291,7 @@ function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="card" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="card" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <div class="cover">
       <div class="catbar"></div>
       ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
@@ -304,7 +313,7 @@ function cardHtml(e){
 function rowHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <span class="row-dot"></span>
     <span class="row-title">${escapeHtml(e.title)}</span>
     <span class="row-cat">${cat.label}</span>
@@ -318,7 +327,7 @@ function compactHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
   const metaBits = [cat.label, e.year, subLine(e), progressLine(e)].filter(Boolean);
-  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openView('${e.id}')">
+  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
     <div class="compact-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
     <div class="compact-body">
       <div class="compact-top">
@@ -337,6 +346,7 @@ function formatDate(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `
 /* ---------- FORM ---------- */
 /* ---------- SMART SEARCH / AUTOFILL ---------- */
 let searchTimer = null;
+let pendingImportMeta = null;
 function onSearchInput(){
   clearTimeout(searchTimer);
   const q = document.getElementById('fSearchQuery').value.trim();
@@ -351,6 +361,23 @@ function clearSearch(){
   const box = document.getElementById('searchResults');
   box.classList.remove('show'); box.innerHTML='';
 }
+function onCategoryChange(){
+  renderExtraFields();
+  clearSearch();
+  pendingImportMeta = null;
+}
+function searchRetroAchievements(q){
+  const needle = q.toLowerCase();
+  const list = raGamesDb.games || [];
+  return list.filter(g=>g.title && g.title.toLowerCase().includes(needle)).slice(0,6).map(g=>({
+    title: g.title,
+    year: '',
+    cover: g.imageIcon ? `https://retroachievements.org${g.imageIcon}` : '',
+    description: '',
+    source: 'RA',
+    meta: { platform: 'RetroAchievements', raGameId: g.id, consoleName: g.consoleName || '' }
+  }));
+}
 async function runSearch(q){
   const cat = document.getElementById('fCategory').value;
   const box = document.getElementById('searchResults');
@@ -361,13 +388,18 @@ async function runSearch(q){
     else if(cat==='anime') results = await searchJikan(q,'anime');
     else if(cat==='manga') results = await searchJikan(q,'manga');
     else if(cat==='books') results = await searchOpenLibrary(q);
-    else if(cat==='games') results = await searchCheapShark(q);
+    else if(cat==='games'){
+      const ra = searchRetroAchievements(q);
+      let store = [];
+      try{ store = await searchCheapShark(q); }catch(e){ /* RA-результаты всё равно покажем */ }
+      results = [...ra, ...store].slice(0, 8);
+    }
 
     if(!results.length){ box.innerHTML = `<div class="sr-status">ничего не найдено — заполни вручную</div>`; return; }
     box.innerHTML = results.map((r,i)=>`
       <div class="sr-item" onclick='applyResult(${i})'>
         <img class="sr-thumb" src="${r.cover||''}" onerror="this.style.visibility='hidden'">
-        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}</div><div class="sr-year">${r.year||''}</div></div>
+        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source==='RA' ? ' <span class="sr-badge">RA</span>' : ''}</div><div class="sr-year">${r.year||''}</div></div>
       </div>`).join('');
     window.__searchCache = results;
   }catch(e){
@@ -386,6 +418,7 @@ function applyResult(i){
     const el = document.getElementById('ex_'+k);
     if(el) el.value = extra[k];
   });
+  pendingImportMeta = r.meta || null;
   clearSearch();
   showToast('Данные подставлены');
 }
@@ -602,6 +635,7 @@ function updateRatingReadout(){
 function openModal(id){
   document.getElementById('editId').value = id||'';
   clearSearch();
+  pendingImportMeta = null;
   if(id){
     const e = entries.find(x=>x.id===id);
     document.getElementById('modalTitle').textContent = 'Редактировать';
@@ -665,7 +699,7 @@ function openView(id){
   else descWrap.style.display = 'none';
 
   document.getElementById('viewNotes').textContent = e.notes || 'без заметок';
-  renderViewAchievements(e);
+  renderAchievementsInto('viewAchievements', e);
   document.getElementById('viewOverlay').classList.add('show');
 }
 function closeView(){ document.getElementById('viewOverlay').classList.remove('show'); viewingId = null; }
@@ -675,12 +709,73 @@ function editFromView(){
   openModal(id);
 }
 
-/* ---------- STEAM ACHIEVEMENTS ---------- */
-function renderViewAchievements(entry){
-  const el = document.getElementById('viewAchievements');
+/* ---------- GAME PAGE (полная страница вместо модалки для игр) ---------- */
+let gamePageId = null;
+function openEntry(id){
+  const e = entries.find(x=>x.id===id);
+  if(e && e.category==='games'){ openGamePage(id); return; }
+  openView(id);
+}
+function openGamePage(id){
+  gamePageId = id;
+  render();
+}
+function closeGamePage(){
+  gamePageId = null;
+  render();
+}
+function renderGamePage(){
+  const e = entries.find(x=>x.id===gamePageId);
+  if(!e){ gamePageId = null; return; }
+  const cat = CATS[e.category] || CATS.games;
+  const initials = e.title.slice(0,2).toUpperCase();
+  const f = e.data || {};
+  const fieldsHtml = cat.fields
+    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
+    .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
+    .join('');
+
+  document.getElementById('gamePage').innerHTML = `
+    <div class="game-page">
+      <div class="game-page-top">
+        <button class="btn-ghost" onclick="closeGamePage()">← Назад к библиотеке</button>
+        <button class="btn-primary" style="flex:none;" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
+      </div>
+      <div class="game-page-header">
+        <div class="game-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
+        <div class="game-header-info">
+          <h1>${escapeHtml(e.title)}</h1>
+          <div class="view-row">
+            <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+            <span class="card-meta">${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</span>
+          </div>
+          <div class="game-page-fields">${fieldsHtml}</div>
+        </div>
+      </div>
+      ${e.description ? `<div class="game-page-block"><div class="view-field-label">Описание</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
+      <div class="game-page-block"><div class="view-field-label">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
+      <div id="gamePageAchievements"></div>
+    </div>`;
+  renderAchievementsInto('gamePageAchievements', e);
+}
+
+// После загрузки ачивок обновляем ту вью, что сейчас реально открыта (модалка
+// или полная страница игры) — иначе подтянутые разработчик/жанр/ачивки не
+// покажутся без переоткрытия.
+function refreshOpenEntryView(entry){
+  if(gamePageId === entry.id) renderGamePage();
+  else if(viewingId === entry.id) openView(entry.id);
+}
+
+/* ---------- ACHIEVEMENTS (Steam + RetroAchievements) ---------- */
+function renderAchievementsInto(containerId, entry){
+  const el = document.getElementById(containerId);
   if(!el) return;
   const f = entry.data || {};
-  if(f.platform !== 'Steam' || !f.appid){ el.innerHTML = ''; return; }
+  const isSteam = f.platform === 'Steam' && f.appid;
+  const isRa = f.platform === 'RetroAchievements' && f.raGameId;
+  if(!isSteam && !isRa){ el.innerHTML = ''; return; }
+  const label = isSteam ? 'Достижения Steam' : 'Достижения RetroAchievements';
   const list = f.achievements;
   let body;
   if(achievementsLoading){
@@ -708,9 +803,9 @@ function renderViewAchievements(entry){
     body = `<div class="import-hint">Ачивки ещё не загружены.</div>`;
   }
   el.innerHTML = `
-    <div class="steam-achievements">
+    <div class="achievements-panel">
       <div class="ach-header">
-        <div class="subhead" style="margin:0;padding:0;border:none;">🏆 Достижения Steam</div>
+        <div class="subhead" style="margin:0;padding:0;border:none;">🏆 ${label}</div>
         <button class="btn-ghost" ${achievementsLoading?'disabled':''} onclick="loadGameAchievements('${entry.id}')">${achievementsLoading ? 'Загрузка...' : (list && list.length ? '🔄 Обновить' : 'Загрузить ачивки')}</button>
       </div>
       ${body}
@@ -723,11 +818,18 @@ async function saveEntry(keepOpen){
   if(!title){ showToast('Введи название'); document.getElementById('fTitle').focus(); return; }
   const id = document.getElementById('editId').value;
   const category = document.getElementById('fCategory').value;
-  const extraData = {};
+  const existing = id ? entries.find(x=>x.id===id) : null;
+  // Сохраняем внутренние поля (appid, raGameId, achievements и т.п.), которых нет
+  // среди видимых полей формы — иначе любое редактирование записи (рейтинг,
+  // заметки...) стирало бы синхронизацию со Steam/RetroAchievements.
+  const extraData = (existing && existing.category===category) ? {...existing.data} : {};
   CATS[category].fields.forEach(f=>{
     const v = document.getElementById('ex_'+f.k).value.trim();
     if(v) extraData[f.k] = f.type==='number' ? parseFloat(v) : v;
+    else delete extraData[f.k];
   });
+  if(pendingImportMeta && category==='games') Object.assign(extraData, pendingImportMeta);
+  pendingImportMeta = null;
   const ratingVal = parseFloat(document.getElementById('fRating').value);
   const data = {
     title, category,
@@ -768,12 +870,54 @@ async function saveEntry(keepOpen){
   }
 }
 document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && gamePageId && !document.getElementById('overlay').classList.contains('show')){
+    closeGamePage(); return;
+  }
   if(!document.getElementById('overlay').classList.contains('show')) return;
   if(e.key==='Escape'){ closeModal(); return; }
   if(e.key==='Enter' && document.activeElement.tagName!=='TEXTAREA' && document.activeElement.id!=='fSearchQuery'){
     e.preventDefault();
     saveEntry(false);
   }
+});
+
+/* ---------- HEATMAP TOOLTIP ---------- */
+// Нативный title на ячейках 10x10px ненадёжен (задержка, легко промахнуться) —
+// свой тултип, следующий за курсором, показывается сразу по mouseover.
+function getHmTooltipEl(){
+  let tip = document.getElementById('hmTooltip');
+  if(!tip){
+    tip = document.createElement('div');
+    tip.id = 'hmTooltip';
+    tip.className = 'hm-tooltip';
+    document.body.appendChild(tip);
+  }
+  return tip;
+}
+function positionHmTooltip(e){
+  const tip = getHmTooltipEl();
+  const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 10);
+  const y = Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 10);
+  tip.style.left = Math.max(4,x) + 'px';
+  tip.style.top = Math.max(4,y) + 'px';
+}
+document.addEventListener('mouseover', e=>{
+  const cell = e.target.closest && e.target.closest('.hm-cell[data-tip]');
+  if(!cell) return;
+  const tip = getHmTooltipEl();
+  tip.textContent = cell.dataset.tip;
+  tip.style.display = 'block';
+  positionHmTooltip(e);
+});
+document.addEventListener('mousemove', e=>{
+  const tip = document.getElementById('hmTooltip');
+  if(tip && tip.style.display==='block') positionHmTooltip(e);
+});
+document.addEventListener('mouseout', e=>{
+  const cell = e.target.closest && e.target.closest('.hm-cell[data-tip]');
+  if(!cell) return;
+  const tip = document.getElementById('hmTooltip');
+  if(tip) tip.style.display = 'none';
 });
 async function deleteEntry(){
   const id = document.getElementById('editId').value;
@@ -827,10 +971,29 @@ function availableYears(){
 }
 
 let statsYear = 'all';
+let statsCategory = 'all';
+function achievementsAgg(list){
+  let done=0, total=0, gamesWithData=0;
+  list.forEach(e=>{
+    const ach = e.data && e.data.achievements;
+    if(ach && ach.length){
+      gamesWithData++;
+      total += ach.length;
+      done += ach.filter(a=>a.achieved).length;
+    }
+  });
+  return {done, total, gamesWithData};
+}
 
 function buildHeatmap(filteredEntries, year){
   const counts = {};
-  filteredEntries.forEach(e=>{ if(e.watchDate) counts[e.watchDate] = (counts[e.watchDate]||0)+1; });
+  const titlesByDate = {};
+  filteredEntries.forEach(e=>{
+    if(e.watchDate){
+      counts[e.watchDate] = (counts[e.watchDate]||0)+1;
+      (titlesByDate[e.watchDate] = titlesByDate[e.watchDate]||[]).push(e.title);
+    }
+  });
 
   let start, end;
   if(year==='all'){
@@ -870,10 +1033,11 @@ function buildHeatmap(filteredEntries, year){
         ${monthLabels.map(m=>`<span style="grid-column:${m.wi+1}">${m.label}</span>`).join('')}
       </div>
       <div class="heatmap-grid" style="grid-template-columns:repeat(${weeks.length},1fr)">
-        ${weeks.map(w=>`<div class="hm-col">${w.map(d=>
-          d.count===null ? `<div class="hm-cell hm-empty"></div>` :
-          `<div class="hm-cell hm-l${levelOf(d.count)}" title="${d.date}: ${d.count}"></div>`
-        ).join('')}</div>`).join('')}
+        ${weeks.map(w=>`<div class="hm-col">${w.map(d=>{
+          if(d.count===null) return `<div class="hm-cell hm-empty"></div>`;
+          const tip = d.count ? `${d.date}: ${(titlesByDate[d.date]||[]).join(', ')}` : `${d.date}: нет завершений`;
+          return `<div class="hm-cell hm-l${levelOf(d.count)}" data-tip="${escapeHtml(tip)}"></div>`;
+        }).join('')}</div>`).join('')}
       </div>
       <div class="heatmap-legend">меньше <span class="hm-cell hm-l0"></span><span class="hm-cell hm-l1"></span><span class="hm-cell hm-l2"></span><span class="hm-cell hm-l3"></span><span class="hm-cell hm-l4"></span> больше</div>
     </div>`;
@@ -886,7 +1050,9 @@ function renderStats(){
     return;
   }
   const years = availableYears();
-  const list = statsYear==='all' ? entries : entries.filter(e=>entryYear(e)===parseInt(statsYear));
+  let list = statsYear==='all' ? entries : entries.filter(e=>entryYear(e)===parseInt(statsYear));
+  if(statsCategory!=='all') list = list.filter(e=>e.category===statsCategory);
+  const achAgg = achievementsAgg(list);
 
   const total = list.length;
   const completed = list.filter(e=>e.status==='completed').length;
@@ -919,6 +1085,10 @@ function renderStats(){
           <option value="all" ${statsYear==='all'?'selected':''}>Всё время</option>
           ${years.map(y=>`<option value="${y}" ${String(statsYear)===String(y)?'selected':''}>${y}</option>`).join('')}
         </select>
+        <select class="filter" id="statsCatSelect" onchange="statsCategory=this.value; renderStats();">
+          <option value="all" ${statsCategory==='all'?'selected':''}>Все категории</option>
+          ${Object.entries(CATS).map(([key,c])=>`<option value="${key}" ${statsCategory===key?'selected':''}>${c.label}</option>`).join('')}
+        </select>
       </div>
 
       <div class="wrapped-card">
@@ -932,6 +1102,7 @@ function renderStats(){
         </div>
         ${top[0] ? `<div class="wrapped-top">🏆 Лучшее: <b>${escapeHtml(top[0].title)}</b> — ${top[0].rating}/10</div>` : ''}
         ${topCountry ? `<div class="wrapped-top">🌍 Чаще всего: <b>${escapeHtml(topCountry[0])}</b> (${topCountry[1]})</div>` : ''}
+        ${achAgg.total ? `<div class="wrapped-top">🏆 Ачивок открыто: <b>${achAgg.done}/${achAgg.total}</b> в ${achAgg.gamesWithData} ${achAgg.gamesWithData===1?'игре':'играх'}</div>` : ''}
       </div>
 
       <div>
@@ -944,6 +1115,7 @@ function renderStats(){
         <div class="stat-card"><div class="num">${completed}</div><div class="lbl">Завершено</div></div>
         <div class="stat-card"><div class="num">${avgRating}</div><div class="lbl">Средняя оценка</div></div>
         <div class="stat-card"><div class="num">${totalHours}</div><div class="lbl">Часов всего (оценка)</div></div>
+        ${achAgg.total ? `<div class="stat-card"><div class="num">${achAgg.done}/${achAgg.total}</div><div class="lbl">Ачивок открыто</div></div>` : ''}
       </div>
 
       <div class="chart-row">
@@ -1065,10 +1237,12 @@ function switchImportTab(tab){
   document.getElementById('tabFile').classList.toggle('active', tab==='file');
   document.getElementById('tabShiki').classList.toggle('active', tab==='shiki');
   document.getElementById('tabSteam').classList.toggle('active', tab==='steam');
+  document.getElementById('tabRA').classList.toggle('active', tab==='ra');
   document.getElementById('panelExport').classList.toggle('active', tab==='export');
   document.getElementById('panelFile').classList.toggle('active', tab==='file');
   document.getElementById('panelShiki').classList.toggle('active', tab==='shiki');
   document.getElementById('panelSteam').classList.toggle('active', tab==='steam');
+  document.getElementById('panelRA').classList.toggle('active', tab==='ra');
 }
 
 let importRows = [];
@@ -1470,15 +1644,23 @@ function mergeAchievements(schema, player){
   });
 }
 let achievementsLoading = false;
-async function loadGameAchievements(entryId){
-  const entry = entries.find(x=>x.id===entryId);
-  if(!entry || !entry.data || !entry.data.appid) return;
+// Если игра пройдена на 100%, дата последней открытой ачивки — самая точная
+// известная дата завершения, точнее ручной или дефолтной "сегодня" при импорте.
+function applyCompletionDateFromAchievements(entry){
+  const list = entry.data.achievements;
+  if(!list || !list.length || !list.every(a=>a.achieved)) return;
+  const times = list.map(a=>a.unlocktime).filter(Boolean);
+  if(!times.length) return;
+  entry.watchDate = new Date(Math.max(...times)*1000).toISOString().slice(0,10);
+  if(entry.status!=='completed') entry.status = 'completed';
+}
+async function loadSteamAchievements(entry){
   const apiKey = uiPrefs.steamApiKey;
   if(!apiKey){ showToast('Сначала укажи Steam API-ключ в Импорт/Экспорт → Steam'); return; }
   if(!uiPrefs.steamId64){ showToast('Сначала импортируй библиотеку через Steam — нужен твой SteamID'); return; }
 
   achievementsLoading = true;
-  renderViewAchievements(entry);
+  refreshOpenEntryView(entry);
   try{
     const [schema, player] = await Promise.all([
       fetchGameAchievementSchema(entry.data.appid, apiKey, STEAM_PROXIES),
@@ -1491,6 +1673,7 @@ async function loadGameAchievements(entryId){
       entry.data.achievements = mergeAchievements(schema, player);
       entry.data.achievementsFetched = Date.now();
       delete entry.data.achievementsError;
+      applyCompletionDateFromAchievements(entry);
     }
     entry.updated = Date.now();
     await persist();
@@ -1498,7 +1681,51 @@ async function loadGameAchievements(entryId){
     entry.data.achievementsError = 'Не удалось загрузить ачивки — попробуй ещё раз';
   }
   achievementsLoading = false;
-  renderViewAchievements(entry);
+  refreshOpenEntryView(entry);
+}
+async function loadRaAchievements(entry){
+  const apiKey = uiPrefs.raApiKey;
+  const username = uiPrefs.raUsername;
+  if(!apiKey || !username){ showToast('Сначала укажи ник и Web API ключ RetroAchievements в Импорт/Экспорт → RetroAchievements'); return; }
+
+  achievementsLoading = true;
+  refreshOpenEntryView(entry);
+  try{
+    const info = await fetchRaGameInfo(entry.data.raGameId, username, apiKey, RA_PROXIES);
+    const achievements = info && info.Achievements ? Object.values(info.Achievements) : null;
+    if(!achievements || !achievements.length){
+      entry.data.achievementsError = 'Не удалось получить ачивки — проверь ник, ключ и что у игры вообще есть набор ачивок на RetroAchievements';
+      entry.data.achievements = null;
+    } else {
+      entry.data.achievements = mergeRaAchievements(achievements);
+      entry.data.achievementsFetched = Date.now();
+      delete entry.data.achievementsError;
+      applyCompletionDateFromAchievements(entry);
+    }
+    // GetGameInfoAndUserProgress заодно отдаёт метаданные игры — раз уж запрос
+    // всё равно сделан, дозаполняем пустые поля записи, не тратя лишние вызовы API.
+    if(info){
+      if(!entry.data.developer && info.Developer) entry.data.developer = info.Developer;
+      if(!entry.data.genre && info.Genre) entry.data.genre = info.Genre;
+      if(!entry.year && info.Released){
+        const m = String(info.Released).match(/(\d{4})/);
+        if(m) entry.year = parseInt(m[1]);
+      }
+      if(!entry.cover && info.ImageBoxArt) entry.cover = `https://retroachievements.org${info.ImageBoxArt}`;
+    }
+    entry.updated = Date.now();
+    await persist();
+  }catch(e){
+    entry.data.achievementsError = 'Не удалось загрузить ачивки — попробуй ещё раз';
+  }
+  achievementsLoading = false;
+  refreshOpenEntryView(entry);
+}
+async function loadGameAchievements(entryId){
+  const entry = entries.find(x=>x.id===entryId);
+  if(!entry || !entry.data) return;
+  if(entry.data.platform === 'Steam' && entry.data.appid) await loadSteamAchievements(entry);
+  else if(entry.data.platform === 'RetroAchievements' && entry.data.raGameId) await loadRaAchievements(entry);
 }
 
 async function autoImportSteam(){
@@ -1525,6 +1752,160 @@ async function autoImportSteam(){
   }catch(e){ /* handled below */ }
   statusEl.textContent = 'Не получилось импортировать — проверь ключ, ник профиля и что «Сведения об играх» установлены в Public';
 }
+
+/* ---------- RETROACHIEVEMENTS ---------- */
+const RA_PROXIES = [
+  u => `/api/retroachievements?url=${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+];
+function saveRaCreds(username, apiKey){
+  uiPrefs.raUsername = username.trim();
+  uiPrefs.raApiKey = apiKey.trim();
+  persistUiPrefs();
+}
+function syncRaCreds(){
+  saveRaCreds(document.getElementById('raUsername').value, document.getElementById('raApiKey').value);
+}
+// Аутентификация RA — параметры z (ник) и y (ключ) добавляются к каждому запросу,
+// как в официальной библиотеке @retroachievements/api.
+function buildRaUrl(endpoint, username, apiKey, params){
+  const qs = new URLSearchParams({ z: username, y: apiKey, ...params });
+  return `https://retroachievements.org/API/${endpoint}?${qs.toString()}`;
+}
+async function fetchRaCompletedGames(username, apiKey, proxies){
+  const url = buildRaUrl('API_GetUserCompletedGames.php', username, apiKey, { u: username });
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return [];
+  try{ return JSON.parse(raw) || []; }catch(e){ return []; }
+}
+async function fetchRaGameInfo(gameId, username, apiKey, proxies){
+  const url = buildRaUrl('API_GetGameInfoAndUserProgress.php', username, apiKey, { g: gameId, u: username });
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+function mergeRaAchievements(list){
+  return (list||[]).map(a=>{
+    const achieved = !!(a.DateEarnedHardcore || a.DateEarned);
+    return {
+      name: String(a.ID),
+      title: a.Title || '',
+      description: a.Description || '',
+      icon: `https://media.retroachievements.org/Badge/${a.BadgeName}${achieved?'':'_lock'}.png`,
+      achieved,
+      unlocktime: (a.DateEarnedHardcore || a.DateEarned) ? Math.floor(new Date((a.DateEarnedHardcore||a.DateEarned)+' UTC').getTime()/1000) : 0
+    };
+  });
+}
+async function commitRaGames(games, statusEl){
+  // API отдаёт по 2 записи на игру (softcore/hardcore) — берём softcore, там уже
+  // учтены все ачивки, включая хардкорные.
+  const byGame = {};
+  games.forEach(g=>{
+    if(!byGame[g.GameID] || g.HardcoreMode===false) byGame[g.GameID] = g;
+  });
+  let added = 0, updated = 0;
+  const today = new Date().toISOString().slice(0,10);
+  Object.values(byGame).forEach(g=>{
+    const cover = g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : '';
+    const existing = entries.find(x=>x.category==='games' && x.data && x.data.platform==='RetroAchievements' && x.data.raGameId===g.GameID);
+    const status = g.PctWon>=1 ? 'completed' : (g.NumAwarded>0 ? 'progress' : 'planning');
+    if(existing){
+      existing.cover = cover || existing.cover;
+      existing.data = {...existing.data, raGameId: g.GameID, consoleName: g.ConsoleName, platform: 'RetroAchievements'};
+      if(existing.status!=='completed' && status==='completed') existing.status = 'completed';
+      if(status==='completed' && !existing.watchDate) existing.watchDate = today;
+      existing.updated = Date.now();
+      updated++;
+    } else {
+      entries.push({
+        id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
+        title: g.Title, category: 'games', status,
+        rating: null, year: null, cover, notes: '',
+        watchDate: status==='completed' ? today : null,
+        data: { platform: 'RetroAchievements', raGameId: g.GameID, consoleName: g.ConsoleName },
+        updated: Date.now()
+      });
+      added++;
+    }
+  });
+  await persist();
+  render();
+  const msg = added && updated ? `Готово — добавлено ${added}, обновлено ${updated}`
+    : updated ? `Готово — обновлено ${updated} игр`
+    : `Готово — импортировано ${added} игр`;
+  statusEl.textContent = msg;
+  showToast(msg);
+}
+async function autoImportRA(){
+  const username = document.getElementById('raUsername').value.trim();
+  const apiKey = document.getElementById('raApiKey').value.trim();
+  const statusEl = document.getElementById('raStatus');
+  if(!username){ statusEl.textContent = 'Вставь ник на RetroAchievements'; return; }
+  if(!apiKey){ statusEl.textContent = 'Вставь Web API ключ (получить: retroachievements.org/controlpanel.php)'; return; }
+  saveRaCreds(username, apiKey);
+  statusEl.textContent = 'пробую забрать автоматически...';
+  try{
+    const games = await fetchRaCompletedGames(username, apiKey, RA_PROXIES);
+    if(games.length){
+      await commitRaGames(games, statusEl);
+      return;
+    }
+  }catch(e){ /* handled below */ }
+  statusEl.textContent = 'Не получилось импортировать — проверь ник и ключ (retroachievements.org/controlpanel.php)';
+}
+
+// Прямого поиска игр по названию в RA API нет — база консолей+игр собирается
+// заранее (по всем платформам) и используется локально при добавлении записи,
+// как офлайн-кэш steam-games-db.json для Steam.
+async function buildRaGamesDb(statusEl){
+  const username = uiPrefs.raUsername, apiKey = uiPrefs.raApiKey;
+  if(!username || !apiKey){ statusEl.textContent = 'Сначала укажи ник и ключ выше'; return; }
+  statusEl.textContent = 'Получаю список платформ...';
+  let consoles = [];
+  try{
+    const raw = await fetchViaProxies(buildRaUrl('API_GetConsoleIDs.php', username, apiKey, {a:1, g:1}), RA_PROXIES);
+    consoles = raw ? JSON.parse(raw) : [];
+  }catch(e){ consoles = []; }
+  if(!consoles || !consoles.length){ statusEl.textContent = 'Не удалось получить список платформ — проверь ник и ключ'; return; }
+
+  const allGames = [];
+  for(let i=0;i<consoles.length;i++){
+    const c = consoles[i];
+    const consoleId = c.ID ?? c.Id ?? c.id;
+    const consoleName = c.Name ?? c.name ?? '';
+    statusEl.textContent = `Платформа ${i+1}/${consoles.length}: ${consoleName || consoleId}...`;
+    try{
+      const raw = await fetchViaProxies(buildRaUrl('API_GetGameList.php', username, apiKey, {i: consoleId, f: 1}), RA_PROXIES);
+      const games = raw ? JSON.parse(raw) : [];
+      (games||[]).forEach(g=>{
+        allGames.push({
+          id: g.ID ?? g.Id ?? g.id,
+          title: g.Title ?? g.title ?? '',
+          consoleName: g.ConsoleName ?? consoleName,
+          imageIcon: g.ImageIcon ?? g.imageIcon ?? ''
+        });
+      });
+    }catch(e){ /* платформу пропускаем, продолжаем остальные */ }
+    await new Promise(r=>setTimeout(r, 300));
+  }
+  raGamesDb = { games: allGames.filter(g=>g.title), builtAt: new Date().toISOString().slice(0,10) };
+  statusEl.textContent = `Готово — собрано игр: ${raGamesDb.games.length}. Нажми «Скачать базу», чтобы сохранить в репозиторий.`;
+  showToast(`RA база: ${raGamesDb.games.length} игр`);
+}
+function downloadRaGamesDb(){
+  if(!raGamesDb.games || !raGamesDb.games.length){ showToast('База пуста — сначала нажми «Собрать базу игр»'); return; }
+  const blob = new Blob([JSON.stringify(raGamesDb, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'retroachievements-games-db.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(`Скачано игр: ${raGamesDb.games.length}`);
+}
+
 document.getElementById('dropzone').addEventListener('dragover', e=>{e.preventDefault(); e.currentTarget.classList.add('drag');});
 document.getElementById('dropzone').addEventListener('dragleave', e=>{e.currentTarget.classList.remove('drag');});
 document.getElementById('dropzone').addEventListener('drop', e=>{

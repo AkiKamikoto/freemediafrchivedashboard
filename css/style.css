@@ -181,6 +181,7 @@ body.theme-light .card::before{opacity:.85;}
 .hm-l4{background:var(--brass);}
 .heatmap-legend{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--muted);margin-top:8px;}
 .heatmap-legend .hm-cell{width:9px;height:9px;}
+.hm-tooltip{display:none;position:fixed;z-index:100;background:var(--surface-alt);border:1px solid var(--brass-dim);color:var(--text);padding:6px 10px;border-radius:6px;font-size:11.5px;pointer-events:none;max-width:260px;box-shadow:0 6px 18px rgba(0,0,0,.35);}
 
 .overlay{position:fixed;inset:0;background:rgba(6,7,9,.65);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
 .overlay.show{display:flex;}
@@ -212,9 +213,10 @@ body.theme-light .card::before{opacity:.85;}
 .sr-info{flex:1;min-width:0;}
 .sr-title{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sr-year{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.sr-badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--brass);border:1px solid var(--brass-dim);border-radius:3px;padding:1px 4px;margin-left:6px;vertical-align:middle;}
 .sr-status{padding:8px 10px;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
-.import-tabs{display:flex;gap:8px;margin-bottom:18px;}
-.imp-tab{flex:1;padding:9px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;}
+.import-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.imp-tab{flex:0 1 auto;white-space:nowrap;padding:8px 13px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;}
 .imp-tab.active{border-color:var(--brass);color:var(--brass);background:var(--surface-alt);}
 .import-panel{display:none;}
 .import-panel.active{display:block;}
@@ -234,7 +236,7 @@ body.theme-light .card::before{opacity:.85;}
 .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:7px;padding:11px 16px;cursor:pointer;font-family:'Inter',sans-serif;}
 .btn-danger{background:transparent;border:1px solid #4A2C2A;color:#C0554F;border-radius:7px;padding:11px 16px;cursor:pointer;font-family:'Inter',sans-serif;}
 
-.steam-achievements{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:6px;}
+.achievements-panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:6px;}
 .ach-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
 .ach-progress{font-size:12.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
 .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;max-height:360px;overflow-y:auto;}
@@ -245,6 +247,19 @@ body.theme-light .card::before{opacity:.85;}
 .ach-info{min-width:0;}
 .ach-title{font-size:12.5px;font-weight:600;color:var(--text);}
 .ach-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+
+.game-page{max-width:900px;display:flex;flex-direction:column;gap:16px;}
+.game-page-top{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.game-page-header{display:flex;gap:20px;align-items:flex-start;}
+.game-cover{width:130px;height:174px;border-radius:10px;overflow:hidden;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.game-cover img{width:100%;height:100%;object-fit:cover;}
+.game-cover .fallback{font-family:'Fraunces',serif;font-size:32px;font-weight:600;color:var(--brass);opacity:.6;}
+.game-header-info{flex:1;min-width:0;}
+.game-header-info h1{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin:0 0 8px;}
+.game-page-fields{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 14px;}
+.game-page-block{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;}
+.game-page .ach-grid{max-height:none;overflow:visible;}
+@media(max-width:640px){ .game-page-header{flex-direction:column;} }
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface-alt);border:1px solid var(--brass-dim);color:var(--text);padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:60;font-family:'IBM Plex Mono',monospace;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
 
