@@ -830,7 +830,13 @@ let statsYear = 'all';
 
 function buildHeatmap(filteredEntries, year){
   const counts = {};
-  filteredEntries.forEach(e=>{ if(e.watchDate) counts[e.watchDate] = (counts[e.watchDate]||0)+1; });
+  const titlesByDate = {};
+  filteredEntries.forEach(e=>{
+    if(e.watchDate){
+      counts[e.watchDate] = (counts[e.watchDate]||0)+1;
+      (titlesByDate[e.watchDate] = titlesByDate[e.watchDate]||[]).push(e.title);
+    }
+  });
 
   let start, end;
   if(year==='all'){
@@ -870,10 +876,11 @@ function buildHeatmap(filteredEntries, year){
         ${monthLabels.map(m=>`<span style="grid-column:${m.wi+1}">${m.label}</span>`).join('')}
       </div>
       <div class="heatmap-grid" style="grid-template-columns:repeat(${weeks.length},1fr)">
-        ${weeks.map(w=>`<div class="hm-col">${w.map(d=>
-          d.count===null ? `<div class="hm-cell hm-empty"></div>` :
-          `<div class="hm-cell hm-l${levelOf(d.count)}" title="${d.date}: ${d.count}"></div>`
-        ).join('')}</div>`).join('')}
+        ${weeks.map(w=>`<div class="hm-col">${w.map(d=>{
+          if(d.count===null) return `<div class="hm-cell hm-empty"></div>`;
+          const tip = d.count ? `${d.date}: ${(titlesByDate[d.date]||[]).join(', ')}` : `${d.date}: нет завершений`;
+          return `<div class="hm-cell hm-l${levelOf(d.count)}" title="${escapeHtml(tip)}"></div>`;
+        }).join('')}</div>`).join('')}
       </div>
       <div class="heatmap-legend">меньше <span class="hm-cell hm-l0"></span><span class="hm-cell hm-l1"></span><span class="hm-cell hm-l2"></span><span class="hm-cell hm-l3"></span><span class="hm-cell hm-l4"></span> больше</div>
     </div>`;
