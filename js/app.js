@@ -155,6 +155,11 @@ function applyUiPrefs(){
   if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
   if(uiPrefs.raUsername) document.getElementById('raUsername').value = uiPrefs.raUsername;
   if(uiPrefs.raApiKey) document.getElementById('raApiKey').value = uiPrefs.raApiKey;
+  if(uiPrefs.rawgApiKey) document.getElementById('rawgApiKey').value = uiPrefs.rawgApiKey;
+}
+function saveRawgApiKey(v){
+  uiPrefs.rawgApiKey = v.trim();
+  persistUiPrefs();
 }
 function saveSteamApiKey(v){
   uiPrefs.steamApiKey = v.trim();
@@ -448,6 +453,35 @@ function searchRetroAchievements(q){
     meta: { platform: 'RetroAchievements', raGameId: g.id, consoleName: g.consoleName || '' }
   }));
 }
+async function searchRAWG(q){
+  const apiKey = uiPrefs.rawgApiKey;
+  if(!apiKey) return [];
+  const res = await fetch(`https://api.rawg.io/api/games?search=${encodeURIComponent(q)}&key=${encodeURIComponent(apiKey)}&page_size=6`);
+  const data = await res.json();
+  return (data.results||[]).map(g=>({
+    title: g.name,
+    year: g.released ? g.released.slice(0,4) : '',
+    cover: g.background_image || '',
+    source: 'RAWG',
+    rawgId: g.id,
+    extra: { genre: (g.genres||[]).map(x=>x.name).join(', ') }
+  }));
+}
+// Описание и разработчика RAWG отдаёт только в карточке конкретной игры
+// (не в поиске) — подтягиваем отдельным запросом сразу после выбора результата,
+// не блокируя основную подстановку полей.
+async function fetchRawgDetails(id){
+  const apiKey = uiPrefs.rawgApiKey;
+  if(!apiKey) return;
+  try{
+    const res = await fetch(`https://api.rawg.io/api/games/${id}?key=${encodeURIComponent(apiKey)}`);
+    const g = await res.json();
+    const descEl = document.getElementById('fDescription');
+    if(descEl && !descEl.value && g.description_raw) descEl.value = g.description_raw.slice(0,1000);
+    const devEl = document.getElementById('ex_developer');
+    if(devEl && !devEl.value && g.developers && g.developers.length) devEl.value = g.developers.map(d=>d.name).join(', ');
+  }catch(e){ /* базовые поля уже подставлены, описание — необязательный бонус */ }
+}
 async function runSearch(q){
   const cat = document.getElementById('fCategory').value;
   const box = document.getElementById('searchResults');
@@ -460,16 +494,18 @@ async function runSearch(q){
     else if(cat==='books') results = await searchOpenLibrary(q);
     else if(cat==='games'){
       const ra = searchRetroAchievements(q);
+      let rawg = [];
+      try{ rawg = await searchRAWG(q); }catch(e){ /* нет ключа или недоступен — пропускаем */ }
       let store = [];
-      try{ store = await searchCheapShark(q); }catch(e){ /* RA-результаты всё равно покажем */ }
-      results = [...ra, ...store].slice(0, 8);
+      try{ store = await searchCheapShark(q); }catch(e){ /* остальные результаты всё равно покажем */ }
+      results = [...ra, ...rawg, ...store].slice(0, 8);
     }
 
     if(!results.length){ box.innerHTML = `<div class="sr-status">ничего не найдено — заполни вручную</div>`; return; }
     box.innerHTML = results.map((r,i)=>`
       <div class="sr-item" onclick='applyResult(${i})'>
         <img class="sr-thumb" src="${r.cover||''}" onerror="this.style.visibility='hidden'">
-        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source==='RA' ? ' <span class="sr-badge">RA</span>' : ''}</div><div class="sr-year">${r.year||''}</div></div>
+        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source ? ` <span class="sr-badge">${r.source}</span>` : ''}</div><div class="sr-year">${r.year||''}</div></div>
       </div>`).join('');
     window.__searchCache = results;
   }catch(e){
@@ -491,6 +527,7 @@ function applyResult(i){
   pendingImportMeta = r.meta || null;
   clearSearch();
   showToast('Данные подставлены');
+  if(r.source==='RAWG' && r.rawgId) fetchRawgDetails(r.rawgId);
 }
 
 async function searchITunes(q, media){
@@ -1308,11 +1345,13 @@ function switchImportTab(tab){
   document.getElementById('tabShiki').classList.toggle('active', tab==='shiki');
   document.getElementById('tabSteam').classList.toggle('active', tab==='steam');
   document.getElementById('tabRA').classList.toggle('active', tab==='ra');
+  document.getElementById('tabRAWG').classList.toggle('active', tab==='rawg');
   document.getElementById('panelExport').classList.toggle('active', tab==='export');
   document.getElementById('panelFile').classList.toggle('active', tab==='file');
   document.getElementById('panelShiki').classList.toggle('active', tab==='shiki');
   document.getElementById('panelSteam').classList.toggle('active', tab==='steam');
   document.getElementById('panelRA').classList.toggle('active', tab==='ra');
+  document.getElementById('panelRAWG').classList.toggle('active', tab==='rawg');
 }
 
 let importRows = [];
@@ -1580,6 +1619,39 @@ function backfillSteamDetFromEntry(e){
   };
 }
 
+async function enrichRawgGames(statusEl){
+  const apiKey = uiPrefs.rawgApiKey;
+  if(!apiKey){ statusEl.textContent = 'Сначала укажи RAWG API-ключ выше'; return; }
+  const targets = entries.filter(e=>e.category==='games' && (!e.data.developer || !e.data.genre || !e.description));
+  if(!targets.length){ statusEl.textContent = 'Все игры уже обогащены'; return; }
+
+  let done = 0, failed = 0;
+  for(let i=0;i<targets.length;i++){
+    const entry = targets[i];
+    statusEl.textContent = `Обогащение: ${i+1}/${targets.length}...`;
+    try{
+      const searchRes = await fetch(`https://api.rawg.io/api/games?search=${encodeURIComponent(entry.title)}&key=${encodeURIComponent(apiKey)}&page_size=1`);
+      const searchData = await searchRes.json();
+      const match = searchData.results && searchData.results[0];
+      if(match){
+        const detRes = await fetch(`https://api.rawg.io/api/games/${match.id}?key=${encodeURIComponent(apiKey)}`);
+        const det = await detRes.json();
+        if(!entry.data.genre && det.genres && det.genres.length) entry.data.genre = det.genres.map(g=>g.name).join(', ');
+        if(!entry.data.developer && det.developers && det.developers.length) entry.data.developer = det.developers.map(d=>d.name).join(', ');
+        if(!entry.description && det.description_raw) entry.description = det.description_raw.slice(0,1000);
+        if(!entry.year && det.released) entry.year = parseInt(det.released.slice(0,4));
+        if(!entry.cover && det.background_image) entry.cover = det.background_image;
+        entry.updated = Date.now();
+        done++;
+      } else failed++;
+    }catch(e){ failed++; }
+    await new Promise(r=>setTimeout(r, 300));
+  }
+  await persist();
+  render();
+  statusEl.textContent = `Готово — обогащено ${done}${failed?`, не найдено ${failed}`:''}`;
+  showToast(`RAWG: обогащено ${done}`);
+}
 async function enrichSteamGames(statusEl){
   // Восстанавливаем уже обогащённые локально записи, которых ещё нет в offline-базе
   // (например, обогащённые до того, как появилась сама база).
