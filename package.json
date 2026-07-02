@@ -4,6 +4,6 @@
   "version": "1.0.0",
   "description": "Личный трекер медиа — статический фронтенд + несколько serverless-функций (Vercel) для CORS-прокси и профилей",
   "dependencies": {
-    "@vercel/postgres": "^0.10.0"
+    "pg": "^8.13.0"
   }
 }

@@ -32,12 +32,16 @@
 
 По умолчанию всё хранится только в браузере. Чтобы включить вход через GitHub и синхронизацию библиотеки между устройствами, нужно один раз настроить бэкенд на Vercel:
 
-1. **База данных.** В панели проекта на Vercel → Storage → создать Postgres и подключить к проекту (переменные окружения `POSTGRES_URL` и т.п. добавятся автоматически).
+1. **База данных — Supabase.**
+   - Либо через маркетплейс Vercel (Storage → Browse Marketplace → Supabase → Add Integration → подключить к проекту — тогда переменные окружения проставятся сами),
+   - либо напрямую на [supabase.com](https://supabase.com): создать проект → Project Settings → Database → **Connection pooling** (важно — не «Direct connection»: у прямого подключения лимит соединений маленький, а serverless-функции могут открывать много параллельных). Скопируй connection string (режим Transaction, порт 6543).
+   - Если подключал не через маркетплейс Vercel — добавь скопированную строку вручную в переменные окружения проекта на Vercel как `POSTGRES_URL` (или `DATABASE_URL` — код проверяет обе).
 2. **GitHub OAuth App.** На [github.com/settings/developers](https://github.com/settings/developers) → New OAuth App:
    - Homepage URL: адрес твоего деплоя (например `https://your-app.vercel.app`)
    - Authorization callback URL: `https://your-app.vercel.app/api/auth/callback`
    - Скопируй Client ID и сгенерируй Client Secret.
 3. **Переменные окружения** в настройках проекта на Vercel (Settings → Environment Variables):
+   - `POSTGRES_URL` (или `DATABASE_URL`) — из шага 1, если не проставилось само через маркетплейс
    - `GITHUB_CLIENT_ID` — из шага 2
    - `GITHUB_CLIENT_SECRET` — из шага 2
    - `SESSION_SECRET` — любая длинная случайная строка (например `openssl rand -hex 32`)
