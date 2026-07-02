@@ -21,9 +21,16 @@ body{display:flex;min-height:100vh;}
 .tab .count{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
 .rail-divider{height:1px;background:var(--line);margin:14px 4px;}
 .rail-bottom{margin-top:auto;display:flex;flex-direction:column;gap:6px;}
-.rail-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.5px;padding:9px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;text-align:left;transition:.15s;}
+.rail-btn{display:block;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.5px;padding:9px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;text-align:left;text-decoration:none;transition:.15s;}
 .rail-btn:hover{border-color:var(--brass-dim);color:var(--brass);}
 .rail-btn.active{border-color:var(--brass);color:var(--brass);}
+
+#authWidget{margin-bottom:10px;}
+.auth-widget{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;}
+.auth-avatar{width:24px;height:24px;border-radius:50%;flex-shrink:0;background:var(--surface-alt);}
+.auth-login{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+.auth-logout{color:var(--muted);text-decoration:none;font-size:14px;flex-shrink:0;}
+.auth-logout:hover{color:var(--brass);}
 
 main{flex:1;padding:26px 32px 60px;min-width:0;}
 .topbar{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap;}

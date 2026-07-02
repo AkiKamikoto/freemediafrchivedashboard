@@ -14,13 +14,33 @@
 - Импорт/экспорт CSV и JSON
 - Статистика: тепловая карта активности, диаграммы, карта мира по странам
 - Тёмная/светлая тема, режим "стена постеров"
-- Данные хранятся локально в браузере (window.storage)
+- Данные хранятся локально в браузере (window.storage), опционально — синхронизация через профиль GitHub (см. ниже)
+- Интеграции: Steam (библиотека + ачивки), RetroAchievements (прогресс + ачивки ретро-игр), Shikimori (аниме/манга)
 
 ## Стек
 
-Без сборки, vanilla JS + CSS, разбито по файлам:
+Без сборки, vanilla JS + CSS на фронте, плюс несколько serverless-функций (Vercel) для CORS-прокси и профиля:
 
 - `index.html` — разметка
 - `css/style.css` — стили
 - `js/app.js` — логика приложения
 - `js/worldmap.js` — данные SVG-карты мира (сжатая карта из открытого пакета `@svg-maps/world`, MIT)
+- `api/steam.js`, `api/retroachievements.js` — CORS-прокси к Steam/RetroAchievements API
+- `api/auth/*`, `api/data.js`, `api/_lib/*` — вход через GitHub и серверная синхронизация профиля (опционально, см. ниже)
+
+## Профиль (синхронизация между устройствами)
+
+По умолчанию всё хранится только в браузере. Чтобы включить вход через GitHub и синхронизацию библиотеки между устройствами, нужно один раз настроить бэкенд на Vercel:
+
+1. **База данных.** В панели проекта на Vercel → Storage → создать Postgres и подключить к проекту (переменные окружения `POSTGRES_URL` и т.п. добавятся автоматически).
+2. **GitHub OAuth App.** На [github.com/settings/developers](https://github.com/settings/developers) → New OAuth App:
+   - Homepage URL: адрес твоего деплоя (например `https://your-app.vercel.app`)
+   - Authorization callback URL: `https://your-app.vercel.app/api/auth/callback`
+   - Скопируй Client ID и сгенерируй Client Secret.
+3. **Переменные окружения** в настройках проекта на Vercel (Settings → Environment Variables):
+   - `GITHUB_CLIENT_ID` — из шага 2
+   - `GITHUB_CLIENT_SECRET` — из шага 2
+   - `SESSION_SECRET` — любая длинная случайная строка (например `openssl rand -hex 32`)
+4. Передеплой проекта, чтобы переменные подхватились.
+
+После этого в интерфейсе слева появится кнопка «Войти через GitHub». Без этой настройки приложение работает как обычно — полностью локально, кнопка входа просто не будет работать.

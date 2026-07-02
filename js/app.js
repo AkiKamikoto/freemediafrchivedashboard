@@ -58,6 +58,74 @@ async function load(){
   }catch(e){ /* offline cache unavailable — сбор базы вручную в Импорт/Экспорт → RetroAchievements */ }
   applyUiPrefs();
   render();
+  initCloudAuth();
+}
+
+/* ---------- ПРОФИЛЬ (GitHub OAuth + серверная синхронизация) ----------
+ * Работает только если на бэкенде настроены GITHUB_CLIENT_ID/SECRET,
+ * SESSION_SECRET и подключён Vercel Postgres (см. README). Если /api/auth/me
+ * недоступен (открыт локально файлом, бэкенд не настроен) — просто остаёмся
+ * в обычном локальном режиме, как раньше.
+ */
+let cloudUser = null;
+async function initCloudAuth(){
+  try{
+    const res = await fetch('/api/auth/me');
+    if(res.ok){
+      const data = await res.json();
+      if(data.loggedIn){
+        cloudUser = { login: data.login, avatarUrl: data.avatarUrl };
+        await syncFromCloudOnLogin();
+      }
+    }
+  }catch(e){ /* бэкенд недоступен — работаем локально */ }
+  renderAuthWidget();
+}
+async function syncFromCloudOnLogin(){
+  try{
+    const res = await fetch('/api/data');
+    if(!res.ok) return;
+    const cloud = await res.json();
+    const hasCloudData = cloud.entries && cloud.entries.length;
+    if(hasCloudData){
+      entries = cloud.entries;
+      uiPrefs = {...uiPrefs, ...(cloud.uiPrefs||{})};
+      await persist(false); await persistUiPrefs(false);
+      applyUiPrefs(); render();
+      showToast(`Загружено из профиля: ${entries.length} записей`);
+    } else if(entries.length){
+      if(confirm(`В профиле GitHub (${cloudUser.login}) пока нет данных. Загрузить туда текущую локальную библиотеку (${entries.length} записей)?`)){
+        await pushToCloud();
+        showToast('Библиотека загружена в профиль');
+      }
+    }
+  }catch(e){ /* остаёмся в локальном режиме для этой сессии */ }
+}
+let cloudPushTimer = null;
+function scheduleCloudPush(){
+  if(!cloudUser) return;
+  clearTimeout(cloudPushTimer);
+  cloudPushTimer = setTimeout(pushToCloud, 1200);
+}
+async function pushToCloud(){
+  if(!cloudUser) return;
+  try{
+    await fetch('/api/data', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ entries, uiPrefs })
+    });
+  }catch(e){ /* следующее изменение попробует запушить снова */ }
+}
+function renderAuthWidget(){
+  const el = document.getElementById('authWidget');
+  if(!el) return;
+  el.innerHTML = cloudUser ? `
+    <div class="auth-widget" title="Синхронизировано с профилем GitHub">
+      <img class="auth-avatar" src="${escapeHtml(cloudUser.avatarUrl||'')}">
+      <span class="auth-login">${escapeHtml(cloudUser.login)}</span>
+      <a class="auth-logout" href="/api/auth/logout" title="Выйти">⎋</a>
+    </div>` : `<a class="rail-btn" href="/api/auth/login">🔗 Войти через GitHub</a>`;
 }
 function downloadSteamDb(){
   if(!Object.keys(steamGamesDb).length){ showToast('База пуста — сначала нажми «Обогатить метаданные»'); return; }
@@ -69,13 +137,15 @@ function downloadSteamDb(){
   URL.revokeObjectURL(a.href);
   showToast(`Скачано записей: ${Object.keys(steamGamesDb).length}`);
 }
-async function persist(){
+async function persist(push){
   try{ await window.storage.set('archive-entries', JSON.stringify(entries)); }
   catch(e){ console.error('storage failed', e); }
+  if(push!==false) scheduleCloudPush();
 }
-async function persistUiPrefs(){
+async function persistUiPrefs(push){
   try{ await window.storage.set('archive-ui-prefs', JSON.stringify(uiPrefs)); }
   catch(e){ /* ignore */ }
+  if(push!==false) scheduleCloudPush();
 }
 function applyUiPrefs(){
   document.body.classList.toggle('theme-light', uiPrefs.theme==='light');
