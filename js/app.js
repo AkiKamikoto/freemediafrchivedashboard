@@ -894,6 +894,44 @@ function renderMarkerFormHtml(entry){
       </div>
     </div>`;
 }
+function renderAchievementsHtml(entry){
+  const f = entry.data || {};
+  if(f.platform !== 'Steam' || !f.appid) return '';
+  const list = f.achievements;
+  let body;
+  if(achievementsLoading){
+    body = `<div class="import-hint">Загружаю ачивки...</div>`;
+  } else if(f.achievementsError){
+    body = `<div class="import-hint">${escapeHtml(f.achievementsError)}</div>`;
+  } else if(list && list.length){
+    const done = list.filter(a=>a.achieved).length;
+    const sorted = list.slice().sort((a,b)=> (b.achieved-a.achieved) || (b.unlocktime-a.unlocktime));
+    body = `
+      <div class="ach-progress">Открыто ${done} из ${list.length}</div>
+      <div class="bar-track" style="margin-bottom:12px;"><div class="bar-fill" style="width:${list.length?Math.round(done/list.length*100):0}%;background:var(--brass);"></div></div>
+      <div class="ach-grid">
+        ${sorted.map(a=>`
+          <div class="ach-tile${a.achieved?'':' locked'}" title="${escapeHtml(a.description||'')}">
+            ${a.icon ? `<img class="ach-icon" src="${escapeHtml(a.icon)}">` : `<div class="ach-icon ach-icon-fallback">🏆</div>`}
+            <div class="ach-info">
+              <div class="ach-title">${escapeHtml(a.title)}</div>
+              ${a.description ? `<div class="ach-desc">${escapeHtml(a.description)}</div>` : ''}
+              ${a.achieved && a.unlocktime ? `<div class="ach-desc">${formatDate(new Date(a.unlocktime*1000).toISOString().slice(0,10))}</div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    body = `<div class="import-hint">Ачивки ещё не загружены.</div>`;
+  }
+  return `
+    <div class="gmap-achievements">
+      <div class="gmap-page-top" style="margin-bottom:10px;">
+        <div class="subhead" style="margin:0;padding:0;border:none;">🏆 Достижения Steam</div>
+        <button class="btn-ghost" ${achievementsLoading?'disabled':''} onclick="loadGameAchievements('${entry.id}')">${achievementsLoading ? 'Загрузка...' : (list && list.length ? '🔄 Обновить' : 'Загрузить ачивки')}</button>
+      </div>
+      ${body}
+    </div>`;
+}
 function renderGameMapPage(){
   const e = entries.find(x=>x.id===gameMapPageId);
   if(!e){ gameMapPageId = null; return; }
@@ -924,6 +962,7 @@ function renderGameMapPage(){
           ${detailBits ? `<div class="gmap-details">${detailBits}</div>` : ''}
         </div>
       </div>
+      ${renderAchievementsHtml(e)}
       <div class="gmap-page-body">
         <div class="gmap-main">
           <div class="gmap-stats">★ Коллектаблсы: ${stats.done}/${stats.collectibles} · ⛏ Гринд-точек: ${stats.grindSpots} (${stats.grindTotal} фармов)</div>
@@ -1675,6 +1714,72 @@ async function fetchOwnedGamesViaApi(steamId64, apiKey, proxies){
   return parseSteamGames(raw);
 }
 
+async function fetchGameAchievementSchema(appid, apiKey, proxies){
+  const url = `https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${appid}&key=${encodeURIComponent(apiKey)}&l=russian`;
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return null;
+  try{
+    const data = JSON.parse(raw);
+    return (data.game && data.game.availableGameStats && data.game.availableGameStats.achievements) || [];
+  }catch(e){ return null; }
+}
+async function fetchPlayerAchievements(appid, steamId64, apiKey, proxies){
+  const url = `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${encodeURIComponent(apiKey)}&steamid=${steamId64}&l=russian`;
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return null;
+  try{
+    const data = JSON.parse(raw);
+    if(!data.playerstats || data.playerstats.success===false) return null;
+    return data.playerstats.achievements || [];
+  }catch(e){ return null; }
+}
+function mergeAchievements(schema, player){
+  const playerMap = {};
+  (player||[]).forEach(p=>{ playerMap[p.apiname] = p; });
+  return (schema||[]).map(s=>{
+    const p = playerMap[s.name] || {};
+    return {
+      name: s.name,
+      title: s.displayName || s.name,
+      description: s.description || '',
+      icon: p.achieved ? s.icon : (s.icongray || s.icon || ''),
+      achieved: !!p.achieved,
+      unlocktime: p.unlocktime || 0
+    };
+  });
+}
+let achievementsLoading = false;
+async function loadGameAchievements(entryId){
+  const entry = entries.find(x=>x.id===entryId);
+  if(!entry || !entry.data || !entry.data.appid) return;
+  const apiKey = uiPrefs.steamApiKey;
+  if(!apiKey){ showToast('Сначала укажи Steam API-ключ в Импорт/Экспорт → Steam'); return; }
+  if(!uiPrefs.steamId64){ showToast('Сначала импортируй библиотеку через Steam — нужен твой SteamID'); return; }
+
+  achievementsLoading = true;
+  render();
+  try{
+    const [schema, player] = await Promise.all([
+      fetchGameAchievementSchema(entry.data.appid, apiKey, STEAM_PROXIES),
+      fetchPlayerAchievements(entry.data.appid, uiPrefs.steamId64, apiKey, STEAM_PROXIES)
+    ]);
+    if(!schema || !schema.length){
+      entry.data.achievementsError = 'У игры нет ачивок либо не удалось получить список — проверь, что «Сведения об играх» и статистика публичны в приватности Steam';
+      entry.data.achievements = null;
+    } else {
+      entry.data.achievements = mergeAchievements(schema, player);
+      entry.data.achievementsFetched = Date.now();
+      delete entry.data.achievementsError;
+    }
+    entry.updated = Date.now();
+    await persist();
+  }catch(e){
+    entry.data.achievementsError = 'Не удалось загрузить ачивки — попробуй ещё раз';
+  }
+  achievementsLoading = false;
+  render();
+}
+
 async function autoImportSteam(){
   const input = document.getElementById('steamLink').value.trim();
   const apiKey = document.getElementById('steamApiKey').value.trim();
@@ -1688,6 +1793,8 @@ async function autoImportSteam(){
   try{
     const steamId64 = await resolveSteamId64(base, apiKey, STEAM_PROXIES);
     if(steamId64){
+      uiPrefs.steamId64 = steamId64;
+      persistUiPrefs();
       const games = await fetchOwnedGamesViaApi(steamId64, apiKey, STEAM_PROXIES);
       if(games.length){
         await commitSteamGames(games, statusEl);
