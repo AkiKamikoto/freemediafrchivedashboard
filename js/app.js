@@ -1962,7 +1962,16 @@ function mergeRaAchievements(list){
     };
   });
 }
-async function commitRaGames(games, statusEl){
+async function fetchRaWantToPlay(username, apiKey, proxies){
+  const url = buildRaUrl('API_GetUserWantToPlayList.php', username, apiKey, { u: username, c: 500 });
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return [];
+  try{
+    const data = JSON.parse(raw);
+    return data.Results || [];
+  }catch(e){ return []; }
+}
+async function commitRaGames(games, statusEl, wantToPlay){
   // API отдаёт по 2 записи на игру (softcore/hardcore) — берём softcore, там уже
   // учтены все ачивки, включая хардкорные.
   const byGame = {};
@@ -1994,11 +2003,31 @@ async function commitRaGames(games, statusEl){
       added++;
     }
   });
+
+  // Список "Хочу сыграть" — только те, которых ещё нет в архиве вообще
+  // (не понижаем статус уже начатых/пройденных игр до "план").
+  let wishlisted = 0;
+  (wantToPlay||[]).forEach(g=>{
+    const gameId = g.ID;
+    if(entries.find(x=>x.category==='games' && x.data && x.data.platform==='RetroAchievements' && x.data.raGameId===gameId)) return;
+    const cover = g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : '';
+    entries.push({
+      id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
+      title: g.Title, category: 'games', status: 'planning',
+      rating: null, year: null, cover, notes: '', watchDate: null,
+      data: { platform: 'RetroAchievements', raGameId: gameId, consoleName: g.ConsoleName },
+      updated: Date.now()
+    });
+    wishlisted++;
+  });
+
   await persist();
   render();
-  const msg = added && updated ? `Готово — добавлено ${added}, обновлено ${updated}`
-    : updated ? `Готово — обновлено ${updated} игр`
-    : `Готово — импортировано ${added} игр`;
+  const parts = [];
+  if(added) parts.push(`добавлено ${added}`);
+  if(updated) parts.push(`обновлено ${updated}`);
+  if(wishlisted) parts.push(`из "хочу сыграть" ${wishlisted}`);
+  const msg = parts.length ? `Готово — ${parts.join(', ')}` : 'Готово — новых игр нет';
   statusEl.textContent = msg;
   showToast(msg);
 }
@@ -2012,8 +2041,9 @@ async function autoImportRA(){
   statusEl.textContent = 'пробую забрать автоматически...';
   try{
     const games = await fetchRaCompletedGames(username, apiKey, RA_PROXIES);
-    if(games.length){
-      await commitRaGames(games, statusEl);
+    const wantToPlay = await fetchRaWantToPlay(username, apiKey, RA_PROXIES);
+    if(games.length || wantToPlay.length){
+      await commitRaGames(games, statusEl, wantToPlay);
       return;
     }
   }catch(e){ /* handled below */ }
