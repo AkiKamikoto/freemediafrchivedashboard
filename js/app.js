@@ -842,10 +842,21 @@ function renderGamePage(){
   const cat = CATS[e.category] || CATS.games;
   const initials = e.title.slice(0,2).toUpperCase();
   const f = e.data || {};
-  const fieldsHtml = cat.fields
-    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
-    .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
-    .join('');
+
+  // Теги-пилюли вместо таблицы полей — жанр разбивается на отдельные теги,
+  // остальное (платформа/консоль/разработчик) идёт как есть, как ярлыки Steam.
+  const tags = [];
+  if(f.genre) f.genre.split(',').map(s=>s.trim()).filter(Boolean).forEach(g=>tags.push(g));
+  if(f.consoleName) tags.push(f.consoleName);
+  if(f.platform) tags.push(f.platform);
+  if(f.developer) tags.push(f.developer);
+
+  const metaBits = [
+    e.rating ? '★ '+e.rating+'/10' : '',
+    e.year || '',
+    f.hours ? f.hours+' ч.' : '',
+    e.watchDate ? formatDate(e.watchDate) : ''
+  ].filter(Boolean).join(' · ');
 
   document.getElementById('gamePage').innerHTML = `
     <div class="game-page">
@@ -853,19 +864,24 @@ function renderGamePage(){
         <button class="btn-ghost" onclick="closeGamePage()">← Назад к библиотеке</button>
         <button class="btn-primary" style="flex:none;" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
       </div>
-      <div class="game-page-header">
-        <div class="game-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
-        <div class="game-header-info">
-          <h1>${escapeHtml(e.title)}</h1>
-          <div class="view-row">
-            <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
-            <span class="card-meta">${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</span>
+
+      <div class="game-hero">
+        ${e.cover ? `<div class="game-hero-bg" style="background-image:url('${escapeHtml(e.cover)}')"></div>` : ''}
+        <div class="game-hero-scrim">
+          <div class="game-hero-cap">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
+          <div class="game-hero-info">
+            <h1>${escapeHtml(e.title)}</h1>
+            <div class="view-row">
+              <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+              <span class="card-meta">${cat.label}${metaBits ? ' · '+metaBits : ''}</span>
+            </div>
+            ${tags.length ? `<div class="game-tags">${tags.map(t=>`<span class="game-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
           </div>
-          <div class="game-page-fields">${fieldsHtml}</div>
         </div>
       </div>
-      ${e.description ? `<div class="game-page-block"><div class="view-field-label">Описание</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
-      <div class="game-page-block"><div class="view-field-label">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
+
+      ${e.description ? `<div class="game-page-block"><div class="game-section-title">Об игре</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
+      <div class="game-page-block"><div class="game-section-title">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
       <div id="gamePageAchievements"></div>
     </div>`;
   renderAchievementsInto('gamePageAchievements', e);
