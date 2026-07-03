@@ -34,8 +34,9 @@ function statusLabel(e){
 
 let entries = [];
 let activeCat = 'all';
-let statsMode = false;
-let uiPrefs = {theme:'dark', view:'cards', groupBy:'none'};
+let screen = 'home'; // 'home' | 'detail' | 'stats'
+let detailId = null;
+let uiPrefs = {};
 
 let steamGamesDb = {};
 let raGamesDb = { games: [] };
@@ -78,10 +79,6 @@ async function persistUiPrefs(){
   catch(e){ /* ignore */ }
 }
 function applyUiPrefs(){
-  document.body.classList.toggle('theme-light', uiPrefs.theme==='light');
-  document.getElementById('themeBtn').textContent = uiPrefs.theme==='light' ? '🌙 Тёмная тема' : '☀ Светлая тема';
-  document.getElementById('viewSelect').value = uiPrefs.view;
-  document.getElementById('groupBy').value = uiPrefs.groupBy || 'none';
   if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
   if(uiPrefs.raUsername) document.getElementById('raUsername').value = uiPrefs.raUsername;
   if(uiPrefs.raApiKey) document.getElementById('raApiKey').value = uiPrefs.raApiKey;
@@ -90,38 +87,29 @@ function saveSteamApiKey(v){
   uiPrefs.steamApiKey = v.trim();
   persistUiPrefs();
 }
-function toggleTheme(){
-  uiPrefs.theme = uiPrefs.theme==='light' ? 'dark' : 'light';
-  applyUiPrefs(); persistUiPrefs();
-}
-function setViewMode(v){
-  uiPrefs.view = v;
-  persistUiPrefs(); render();
-}
-function setGroupBy(v){
-  uiPrefs.groupBy = v;
-  persistUiPrefs(); render();
-}
 
-function buildTabs(){
+function goHome(){ screen='home'; detailId=null; render(); }
+function goStats(){ screen='stats'; render(); }
+function openDetail(id){ screen='detail'; detailId=id; render(); }
+function setCat(c){ activeCat = c; screen='home'; detailId=null; render(); }
+
+function renderNav(){
   const counts = {};
   Object.keys(CATS).forEach(k=>counts[k]=0);
   entries.forEach(e=>{ if(counts[e.category]!==undefined) counts[e.category]++; });
-  let html = `<div class="tab ${activeCat==='all'&&!statsMode?'active':''}" onclick="setCat('all')">
-    <span class="dot" style="background:var(--brass)"></span>Всё<span class="count">${entries.length}</span></div>`;
+  let html = `<button class="nav-pill ${activeCat==='all'&&screen==='home'?'active':''}" onclick="setCat('all')">Всё</button>`;
   Object.entries(CATS).forEach(([key,c])=>{
-    html += `<div class="tab ${activeCat===key&&!statsMode?'active':''}" onclick="setCat('${key}')">
-      <span class="dot" style="background:${c.color}"></span>${c.label}<span class="count">${counts[key]}</span></div>`;
+    html += `<button class="nav-pill ${activeCat===key&&screen==='home'?'active':''}" onclick="setCat('${key}')">${c.label}</button>`;
   });
-  document.getElementById('tabs').innerHTML = html;
+  document.getElementById('navCats').innerHTML = html;
+  document.getElementById('statsBtn').classList.toggle('active', screen==='stats');
+  document.getElementById('importNavBtn').classList.toggle('active', document.getElementById('importOverlay').classList.contains('show'));
 }
-function setCat(c){ activeCat = c; statsMode=false; gamePageId=null; render(); }
-function toggleStats(){ statsMode = !statsMode; gamePageId=null; render(); }
 
 function toggleFiltersPanel(){
   const p = document.getElementById('filtersPanel');
-  p.classList.toggle('show');
-  if(p.classList.contains('show')) populateCountryFilter();
+  p.style.display = p.style.display==='none' ? '' : 'none';
+  if(p.style.display!=='none') populateCountryFilter();
 }
 function populateCountryFilter(){
   const sel = document.getElementById('fltCountry');
@@ -133,13 +121,18 @@ function populateCountryFilter(){
 function resetFilters(){
   ['fltYearFrom','fltYearTo','fltRatingFrom','fltRatingTo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fltCountry').value = '';
-  render();
+  renderHomeContent();
+}
+
+let homeStatusFilter = '';
+function setHomeStatusFilter(v){
+  homeStatusFilter = homeStatusFilter===v ? '' : v;
+  renderHomeContent();
 }
 
 function getFiltered(){
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const st = document.getElementById('statusFilter').value;
-  const sortBy = document.getElementById('sortBy').value;
+  const q = (document.getElementById('searchInput').value||'').toLowerCase();
+  const sortBy = document.getElementById('sortBy') ? document.getElementById('sortBy').value : 'updated';
   const yFrom = parseInt(document.getElementById('fltYearFrom').value)||null;
   const yTo = parseInt(document.getElementById('fltYearTo').value)||null;
   const rFrom = document.getElementById('fltRatingFrom').value!=='' ? parseFloat(document.getElementById('fltRatingFrom').value) : null;
@@ -148,7 +141,7 @@ function getFiltered(){
 
   let list = entries.filter(e=>{
     if(activeCat!=='all' && e.category!==activeCat) return false;
-    if(st && e.status!==st) return false;
+    if(homeStatusFilter && e.status!==homeStatusFilter) return false;
     if(q && !e.title.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q) && !(e.description||'').toLowerCase().includes(q)) return false;
     if(yFrom && (!e.year || e.year<yFrom)) return false;
     if(yTo && (!e.year || e.year>yTo)) return false;
@@ -164,54 +157,13 @@ function getFiltered(){
 }
 
 function render(){
-  buildTabs();
-  document.getElementById('statsBtn').classList.toggle('active', statsMode);
-  document.getElementById('libraryView').style.display = (statsMode || gamePageId) ? 'none' : 'block';
-  document.getElementById('statsView').style.display = statsMode ? 'block' : 'none';
-  document.getElementById('gamePage').style.display = gamePageId ? 'block' : 'none';
-  if(gamePageId){ renderGamePage(); return; }
-  if(statsMode){ renderStats(); return; }
-
-  const list = getFiltered();
-  const content = document.getElementById('content');
-  if(list.length===0){
-    content.innerHTML = `<div class="empty"><div class="big">Пока пусто</div>Добавь первую запись в архив, или попробуй сбросить фильтры</div>`;
-    return;
-  }
-
-  const mode = uiPrefs.view;
-  const renderItem = mode==='list' ? rowHtml : mode==='compact' ? compactHtml : cardHtml;
-  const wrapClass = mode==='posters' ? 'grid poster-mode' : mode==='list' ? 'list-view' : mode==='compact' ? 'compact-view' : 'grid';
-  const wrap = items => `<div class="${wrapClass}">${items.map(renderItem).join('')}</div>`;
-
-  if(uiPrefs.groupBy && uiPrefs.groupBy!=='none'){
-    const groups = groupEntries(list, uiPrefs.groupBy);
-    content.innerHTML = groups.map(([label, items])=>`<div class="group-header">${escapeHtml(label)} <span class="group-count">${items.length}</span></div>${wrap(items)}`).join('');
-  } else {
-    content.innerHTML = wrap(list);
-  }
-}
-
-function groupEntries(list, by){
-  const map = new Map();
-  if(by==='year'){
-    list.forEach(e=>{
-      const key = e.year ? String(e.year) : 'Без года';
-      if(!map.has(key)) map.set(key, []);
-      map.get(key).push(e);
-    });
-    return Array.from(map.entries()).sort((a,b)=>{
-      if(a[0]==='Без года') return 1;
-      if(b[0]==='Без года') return -1;
-      return Number(b[0])-Number(a[0]);
-    });
-  }
-  list.forEach(e=>{
-    if(!map.has(e.status)) map.set(e.status, []);
-    map.get(e.status).push(e);
-  });
-  const order = ['progress','planning','hold','completed','dropped'];
-  return order.filter(s=>map.has(s)).map(s=>[STATUS_LABEL[s], map.get(s)]);
+  renderNav();
+  document.getElementById('homeScreen').style.display = screen==='home' ? 'block' : 'none';
+  document.getElementById('detailScreen').style.display = screen==='detail' ? 'block' : 'none';
+  document.getElementById('statsScreen').style.display = screen==='stats' ? 'block' : 'none';
+  if(screen==='home') renderHomeContent();
+  else if(screen==='detail') renderDetail();
+  else if(screen==='stats') renderStats();
 }
 
 function pickForMe(){
@@ -267,77 +219,89 @@ function onCoverError(img, initials, extraHtml){
   img.parentElement.innerHTML = `${extraHtml}<div class="fallback">${initials}</div>`;
 }
 
-const STATUS_OPTIONS = [['planning','план'],['progress','в процессе'],['completed','завершено'],['hold','отложено'],['dropped','брошено']];
-function quickSetStatus(ev, id, status){
-  ev.stopPropagation();
-  const e = entries.find(x=>x.id===id);
-  if(!e) return;
-  e.status = status;
-  if(status==='completed' && !e.watchDate) e.watchDate = new Date().toISOString().slice(0,10);
-  e.updated = Date.now();
-  persist(); render();
+function catGradKeys(catKey){
+  const map = {movies:['--g-movies-1','--g-movies-2'],series:['--g-series-1','--g-series-2'],anime:['--g-anime-1','--g-anime-2'],
+    manga:['--g-manga-1','--g-manga-2'],books:['--g-books-1','--g-books-2'],games:['--g-games-1','--g-games-2']};
+  return map[catKey] || map.movies;
 }
-function quickSetRating(ev, id, value){
-  ev.stopPropagation();
-  const e = entries.find(x=>x.id===id);
-  if(!e) return;
-  const v = parseInt(value);
-  e.rating = (isNaN(v) || v<=0) ? null : Math.min(10, v);
-  e.updated = Date.now();
-  persist(); render();
+function catGradient(catKey){
+  const [a,b] = catGradKeys(catKey);
+  return `linear-gradient(160deg, var(${a}), var(${b}))`;
 }
 
-function cardHtml(e){
+function posterHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
-  const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="card" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
-    <div class="cover">
-      <div class="catbar"></div>
-      ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
+  return `<div class="poster" onclick="openDetail('${e.id}')">
+    <div class="poster-art" style="background:${catGradient(e.category)};">
+      ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<span class="poster-fallback" style="color:${cat.color}">${initials}</span>`}
+      <span class="poster-status" style="color:${cat.color};border-color:${cat.color};">${statusLabel(e)}</span>
+      ${e.rating ? `<span class="poster-rating">${e.rating}/10</span>` : ''}
     </div>
-    <div class="card-body">
-      <div class="card-top">
-        <div class="card-title">${escapeHtml(e.title)}</div>
-        <select class="stamp stamp-select ${STATUS_CLASS[e.status]}" onclick="event.stopPropagation()" onchange="quickSetStatus(event,'${e.id}',this.value)">${statusOpts}</select>
-      </div>
-      <div class="card-meta">${cat.label}${e.year?' · '+e.year:''}${e.country?' · '+escapeHtml(e.country):''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</div>
-      ${subLine(e) ? `<div class="card-sub">${escapeHtml(subLine(e))}</div>` : ''}
-      <div class="card-foot">
-        <input class="quick-rating" type="number" min="0" max="10" placeholder="—" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
-        <span class="progress-txt">${escapeHtml(progressLine(e))}</span>
-      </div>
-    </div>
-  </div>`;
-}
-function rowHtml(e){
-  const cat = CATS[e.category] || CATS.movies;
-  const statusOpts = STATUS_OPTIONS.map(([v,l])=>`<option value="${v}"${e.status===v?' selected':''}>${l}</option>`).join('');
-  return `<div class="row-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
-    <span class="row-dot"></span>
-    <span class="row-title">${escapeHtml(e.title)}</span>
-    <span class="row-cat">${cat.label}</span>
-    <span class="row-year">${e.year||'—'}</span>
-    <select class="stamp stamp-select row-status ${STATUS_CLASS[e.status]}" onclick="event.stopPropagation()" onchange="quickSetStatus(event,'${e.id}',this.value)">${statusOpts}</select>
-    <input class="quick-rating row-rating" type="number" min="0" max="10" placeholder="—" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
+    <div class="poster-title">${escapeHtml(e.title)}</div>
+    <div class="poster-meta">${cat.label}${e.year?' · '+e.year:''}</div>
   </div>`;
 }
 
-function compactHtml(e){
-  const cat = CATS[e.category] || CATS.movies;
-  const initials = e.title.slice(0,2).toUpperCase();
-  const metaBits = [cat.label, e.year, subLine(e), progressLine(e)].filter(Boolean);
-  return `<div class="compact-item" style="--cat-color:${cat.color}" onclick="openEntry('${e.id}')">
-    <div class="compact-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
-    <div class="compact-body">
-      <div class="compact-top">
-        <span class="compact-title">${escapeHtml(e.title)}</span>
-        <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
-      </div>
-      <div class="compact-meta">${metaBits.map(escapeHtml).join(' · ')}</div>
-    </div>
-    <span class="rating">${e.rating? e.rating+'/10' : '—'}</span>
-  </div>`;
+function renderHomeContent(){
+  const list = getFiltered();
+
+  // status chips
+  const chipDefs = Object.keys(STATUS_LABEL).map(k=>[k, STATUS_LABEL[k]]);
+  document.getElementById('statusChips').innerHTML = chipDefs.map(([k,l])=>
+    `<button class="status-chip ${homeStatusFilter===k?'active':''}" onclick="setHomeStatusFilter('${k}')">${l}</button>`).join('');
+
+  // hero: currently-in-progress item (most recently updated), fallback to most recent overall
+  const heroArea = document.getElementById('heroArea');
+  const heroPool = entries.filter(e=>e.status==='progress').sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const hero = heroPool[0] || [...entries].sort((a,b)=>(b.updated||0)-(a.updated||0))[0];
+  if(!hero){
+    heroArea.innerHTML = '';
+  } else {
+    const cat = CATS[hero.category] || CATS.movies;
+    const initials = hero.title.slice(0,2).toUpperCase();
+    const metaBits = [cat.label, hero.year, subLine(hero)].filter(Boolean).join(' · ');
+    heroArea.innerHTML = `
+      <section class="hero" style="background:linear-gradient(115deg, var(${catGradKeys(hero.category)[0]}) 0%, var(${catGradKeys(hero.category)[1]}) 55%, var(--bg) 100%);" onclick="openDetail('${hero.id}')">
+        <div class="hero-scrim"></div>
+        <div class="hero-initials">${initials}</div>
+        <div class="hero-inner">
+          <div class="hero-eyebrow">
+            <span class="hero-badge">${hero.status==='progress' ? 'СЕЙЧАС' : 'НЕДАВНО'}</span>
+            <span class="hero-meta">${escapeHtml(metaBits)}</span>
+          </div>
+          <h1 class="hero-title">${escapeHtml(hero.title)}</h1>
+          ${hero.description ? `<p class="hero-desc">${escapeHtml(hero.description)}</p>` : ''}
+          <div class="hero-actions">
+            <span class="hero-cta">Открыть →</span>
+            ${hero.rating ? `<span class="hero-rating">★ ${hero.rating}</span>` : ''}
+          </div>
+        </div>
+      </section>`;
+  }
+
+  const shelvesArea = document.getElementById('shelvesArea');
+  if(!list.length){
+    shelvesArea.innerHTML = `<div class="empty"><div class="big">Пока пусто</div>Добавь первую запись в архив, или попробуй сбросить фильтры</div>`;
+    return;
+  }
+  const shelves = [];
+  const progress = list.filter(e=>e.status==='progress');
+  if(progress.length) shelves.push(['Продолжаю', progress]);
+  if(activeCat==='all'){
+    Object.keys(CATS).forEach(k=>{
+      const g = list.filter(e=>e.category===k && e.status!=='progress');
+      if(g.length) shelves.push([CATS[k].label, g]);
+    });
+  } else {
+    const rest = list.filter(e=>e.status!=='progress');
+    if(rest.length) shelves.push([CATS[activeCat].label, rest]);
+  }
+  shelvesArea.innerHTML = shelves.map(([name, items])=>`
+    <section class="shelf">
+      <div class="shelf-head"><h2>${escapeHtml(name)}</h2><span class="shelf-count">${items.length}</span></div>
+      <div class="shelf-row">${items.map(posterHtml).join('')}</div>
+    </section>`).join('');
 }
 
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -551,43 +515,6 @@ function buildCountryMapChart(countryCounts){
   return `<div class="map-wrap">${svg.outerHTML}</div>`;
 }
 
-function buildDonutChart(data){
-  if(!data.length) return `<div class="import-hint">Пока нет данных</div>`;
-  const total = data.reduce((s,d)=>s+d.value,0);
-  const r = 52, cx=64, cy=64, circ = 2*Math.PI*r;
-  let offset = 0;
-  const segments = data.map(d=>{
-    const frac = d.value/total;
-    const dash = frac*circ;
-    const seg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="16"
-      stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
-    offset += dash;
-    return seg;
-  }).join('');
-  const legend = data.map(d=>`
-    <div class="legend-row"><span class="legend-dot" style="background:${d.color}"></span>${d.label} <b>${d.value}</b> <span class="legend-pct">(${Math.round(d.value/total*100)}%)</span></div>
-  `).join('');
-  return `
-    <div class="donut-wrap">
-      <svg width="128" height="128" viewBox="0 0 128 128">${segments}</svg>
-      <div class="legend">${legend}</div>
-    </div>`;
-}
-
-function buildColumnChart(histCounts){
-  const entriesArr = Object.entries(histCounts).map(([k,v])=>[parseInt(k),v]);
-  const max = Math.max(...entriesArr.map(x=>x[1]),1);
-  const w=18, gap=8, chartH=120;
-  const bars = entriesArr.map((([r,c],i)=>{
-    const h = c===0 ? 0 : Math.max(4, (c/max)*chartH);
-    const x = i*(w+gap);
-    return `<rect x="${x}" y="${chartH-h}" width="${w}" height="${h}" rx="3" fill="var(--brass)"><title>${r}/10: ${c}</title></rect>
-      <text x="${x+w/2}" y="${chartH+16}" text-anchor="middle" class="col-label">${r}</text>`;
-  })).join('');
-  const totalW = entriesArr.length*(w+gap);
-  return `<svg width="${totalW}" height="${chartH+24}" viewBox="0 0 ${totalW} ${chartH+24}" class="col-chart">${bars}</svg>`;
-}
-
 function fieldHistory(key){
   const vals = new Set();
   entries.forEach(e=>{ if(e.data && e.data[key]) vals.add(e.data[key]); });
@@ -673,98 +600,94 @@ function openModal(id){
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
 
-let viewingId = null;
-function openView(id){
-  viewingId = id;
+function openEntry(id){ openDetail(id); }
+
+function setDetailStatus(id, status){
   const e = entries.find(x=>x.id===id);
   if(!e) return;
+  e.status = status;
+  if(status==='completed' && !e.watchDate) e.watchDate = new Date().toISOString().slice(0,10);
+  e.updated = Date.now();
+  persist();
+  showToast('Статус: '+statusLabel(e));
+  renderDetail();
+}
+
+function renderDetail(){
+  const e = entries.find(x=>x.id===detailId);
+  if(!e){ goHome(); return; }
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
-  document.getElementById('viewCover').innerHTML = e.cover
-    ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">`
-    : `<div class="fallback">${initials}</div>`;
-  document.getElementById('viewTitle').textContent = e.title;
-  document.getElementById('viewStamp').textContent = statusLabel(e);
-  document.getElementById('viewStamp').className = `stamp ${STATUS_CLASS[e.status]}`;
-  document.getElementById('viewMeta').textContent = `${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.country?' · '+e.country:''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}`;
-
+  const [g1,g2] = catGradKeys(e.category);
   const f = e.data||{};
-  document.getElementById('viewFields').innerHTML = cat.fields
-    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
-    .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
-    .join('');
 
-  const descWrap = document.getElementById('viewDescriptionWrap');
-  if(e.description){ descWrap.style.display=''; document.getElementById('viewDescription').textContent = e.description; }
-  else descWrap.style.display = 'none';
-
-  document.getElementById('viewNotes').textContent = e.notes || 'без заметок';
-  renderAchievementsInto('viewAchievements', e);
-  document.getElementById('viewOverlay').classList.add('show');
-}
-function closeView(){ document.getElementById('viewOverlay').classList.remove('show'); viewingId = null; }
-function editFromView(){
-  const id = viewingId;
-  closeView();
-  openModal(id);
-}
-
-/* ---------- GAME PAGE (полная страница вместо модалки для игр) ---------- */
-let gamePageId = null;
-function openEntry(id){
-  const e = entries.find(x=>x.id===id);
-  if(e && e.category==='games'){ openGamePage(id); return; }
-  openView(id);
-}
-function openGamePage(id){
-  gamePageId = id;
-  render();
-}
-function closeGamePage(){
-  gamePageId = null;
-  render();
-}
-function renderGamePage(){
-  const e = entries.find(x=>x.id===gamePageId);
-  if(!e){ gamePageId = null; return; }
-  const cat = CATS[e.category] || CATS.games;
-  const initials = e.title.slice(0,2).toUpperCase();
-  const f = e.data || {};
   const fieldsHtml = cat.fields
     .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
     .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
     .join('');
 
-  document.getElementById('gamePage').innerHTML = `
-    <div class="game-page">
-      <div class="game-page-top">
-        <button class="btn-ghost" onclick="closeGamePage()">← Назад к библиотеке</button>
-        <button class="btn-primary" style="flex:none;" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
-      </div>
-      <div class="game-page-header">
-        <div class="game-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
-        <div class="game-header-info">
-          <h1>${escapeHtml(e.title)}</h1>
-          <div class="view-row">
-            <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
-            <span class="card-meta">${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</span>
+  const statusPillsHtml = Object.keys(STATUS_LABEL).map(k=>
+    `<button class="status-pill ${e.status===k?'active':''}" style="${e.status===k?`border-color:${statusColor(k)};color:${statusColor(k)};`:''}" onclick="setDetailStatus('${e.id}','${k}')">${STATUS_LABEL[k]}</button>`
+  ).join('');
+
+  const extraMeta = [e.country, e.timesWatched>1?'×'+e.timesWatched:'', e.watchDate?formatDate(e.watchDate):''].filter(Boolean).join(' · ');
+
+  const similar = entries.filter(x=>x.category===e.category && x.id!==e.id).slice(0,8);
+
+  document.getElementById('detailScreen').innerHTML = `
+    <div class="detail-header" style="background:linear-gradient(120deg, var(${g1}) 0%, var(${g2}) 45%, var(--bg) 100%);">
+      <div class="detail-scrim"></div>
+      <div class="detail-header-inner">
+        <div class="detail-cover">
+          ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<span class="detail-cover-fallback" style="color:${cat.color}">${initials}</span>`}
+        </div>
+        <div class="detail-info">
+          <button class="back-btn" onclick="goHome()">← НАЗАД В КАТАЛОГ</button>
+          <div class="detail-eyebrow" style="color:${cat.color}">${cat.label}${e.year?' · '+e.year:''}${extraMeta?' · '+escapeHtml(extraMeta):''}</div>
+          <h1 class="detail-title">${escapeHtml(e.title)}</h1>
+          <div class="detail-pills-row">
+            ${statusPillsHtml}
+            ${e.rating ? `<span class="detail-rating">★ ${e.rating}/10</span>` : ''}
           </div>
-          <div class="game-page-fields">${fieldsHtml}</div>
         </div>
       </div>
-      ${e.description ? `<div class="game-page-block"><div class="view-field-label">Описание</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
-      <div class="game-page-block"><div class="view-field-label">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
-      <div id="gamePageAchievements"></div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-main">
+        ${e.description ? `<div><div class="section-cap">Описание</div><p class="detail-text">${escapeHtml(e.description)}</p></div>` : ''}
+        <div><div class="section-cap">Мои заметки</div><div class="detail-notes-box">${escapeHtml(e.notes || 'Заметок пока нет.')}</div></div>
+        <div id="detailAchievements"></div>
+        ${similar.length ? `
+        <div>
+          <div class="section-cap">Похожее в коллекции</div>
+          <div class="similar-row">
+            ${similar.map(s=>{
+              const sc = CATS[s.category]||CATS.movies; const si = s.title.slice(0,2).toUpperCase(); const [sg1,sg2]=catGradKeys(s.category);
+              return `<div class="similar-item" onclick="openDetail('${s.id}')">
+                <div class="similar-art" style="background:linear-gradient(160deg, var(${sg1}), var(${sg2}));">
+                  ${s.cover ? `<img src="${escapeHtml(s.cover)}" onerror="onCoverError(this,'${si}')">` : `<span class="poster-fallback" style="color:${sc.color};font-size:24px;">${si}</span>`}
+                </div>
+                <div class="similar-title">${escapeHtml(s.title)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+      </div>
+      <aside class="detail-sidebar">
+        ${fieldsHtml ? `<div class="side-card">${fieldsHtml}</div>` : ''}
+        <button class="edit-btn" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
+      </aside>
     </div>`;
-  renderAchievementsInto('gamePageAchievements', e);
+  renderAchievementsInto('detailAchievements', e);
+}
+function statusColor(k){
+  return {planning:'#8B93A1', progress:'#5B9CD9', completed:'#6EB56E', hold:'#D9A25B', dropped:'#C0554F'}[k] || '#8B93A1';
 }
 
-// После загрузки ачивок обновляем ту вью, что сейчас реально открыта (модалка
-// или полная страница игры) — иначе подтянутые разработчик/жанр/ачивки не
-// покажутся без переоткрытия.
+// После загрузки ачивок обновляем открытый экран детали — иначе подтянутые
+// разработчик/жанр/ачивки не покажутся без повторного открытия.
 function refreshOpenEntryView(entry){
-  if(gamePageId === entry.id) renderGamePage();
-  else if(viewingId === entry.id) openView(entry.id);
+  if(detailId === entry.id) renderDetail();
 }
 
 /* ---------- ACHIEVEMENTS (Steam + RetroAchievements) ---------- */
@@ -870,8 +793,8 @@ async function saveEntry(keepOpen){
   }
 }
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape' && gamePageId && !document.getElementById('overlay').classList.contains('show')){
-    closeGamePage(); return;
+  if(e.key==='Escape' && screen==='detail' && !document.getElementById('overlay').classList.contains('show')){
+    goHome(); return;
   }
   if(!document.getElementById('overlay').classList.contains('show')) return;
   if(e.key==='Escape'){ closeModal(); return; }
@@ -1043,8 +966,32 @@ function buildHeatmap(filteredEntries, year){
     </div>`;
 }
 
+function monthlyActivity(list, year){
+  const now = new Date();
+  const buckets = []; // [{label, n}] oldest -> newest, 12 entries
+  if(year==='all'){
+    for(let i=11;i>=0;i--){
+      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      buckets.push({y:d.getFullYear(), m:d.getMonth(), label:d.toLocaleDateString('ru-RU',{month:'short'}), n:0});
+    }
+  } else {
+    const y = parseInt(year);
+    for(let m=0;m<12;m++) buckets.push({y, m, label:new Date(y,m,1).toLocaleDateString('ru-RU',{month:'short'}), n:0});
+  }
+  list.forEach(e=>{
+    if(!e.watchDate) return;
+    const d = new Date(e.watchDate);
+    const b = buckets.find(x=>x.y===d.getFullYear() && x.m===d.getMonth());
+    if(b) b.n++;
+  });
+  const max = Math.max(1, ...buckets.map(b=>b.n));
+  const total = buckets.reduce((s,b)=>s+b.n,0);
+  const peak = buckets.reduce((a,b)=>b.n>a.n?b:a, buckets[0]);
+  return {buckets, max, total, peakLabel: peak.n ? peak.label : '—'};
+}
+
 function renderStats(){
-  const el = document.getElementById('statsView');
+  const el = document.getElementById('statsScreen');
   if(entries.length===0){
     el.innerHTML = `<div class="empty"><div class="big">Нет данных</div>Статистика появится после первых записей</div>`;
     return;
@@ -1055,97 +1002,154 @@ function renderStats(){
   const achAgg = achievementsAgg(list);
 
   const total = list.length;
-  const completed = list.filter(e=>e.status==='completed').length;
+  const completedList = list.filter(e=>e.status==='completed');
+  const progressList = list.filter(e=>e.status==='progress');
   const rated = list.filter(e=>e.rating);
   const avgRating = rated.length ? (rated.reduce((s,e)=>s+e.rating,0)/rated.length).toFixed(1) : '—';
-  const totalHours = Math.round(list.reduce((s,e)=>s+estimateHours(e),0));
 
   const byCat = Object.entries(CATS).map(([key,c])=>({key,c,count:list.filter(e=>e.category===key).length}));
-  const maxCount = Math.max(...byCat.map(x=>x.count),1);
-  const favCat = byCat.reduce((a,b)=>b.count>a.count?b:a, byCat[0]);
+  const maxCat = Math.max(1, ...byCat.map(x=>x.count));
 
-  const top = [...rated].sort((a,b)=>b.rating-a.rating).slice(0,8);
+  const top = [...rated].sort((a,b)=>b.rating-a.rating).slice(0,6);
   const rewatched = [...list].filter(e=>e.timesWatched>1).sort((a,b)=>b.timesWatched-a.timesWatched).slice(0,8);
-
-  const histCounts = {};
-  for(let i=1;i<=10;i++) histCounts[i]=0;
-  rated.forEach(e=>{ const r=Math.round(e.rating); if(histCounts[r]!==undefined) histCounts[r]++; });
-  const maxHist = Math.max(...Object.values(histCounts),1);
 
   const countryCounts = {};
   list.forEach(e=>{ if(e.country) countryCounts[e.country] = (countryCounts[e.country]||0)+1; });
   const countryList = Object.entries(countryCounts).sort((a,b)=>b[1]-a[1]);
-  const maxCountry = Math.max(...countryList.map(x=>x[1]),1);
-  const topCountry = countryList[0];
+
+  // status donut
+  const statusOrder = ['completed','progress','hold','planning','dropped'];
+  let cum = 0;
+  const statusArcs = statusOrder.map(k=>{
+    const n = list.filter(e=>e.status===k).length;
+    const pct = total ? n/total*100 : 0;
+    const arc = {label:STATUS_LABEL[k], n, color:statusColor(k), pctTxt:Math.round(pct)+'%', dash:pct.toFixed(2)+' '+(100-pct).toFixed(2), offset:(-cum).toFixed(2)};
+    cum += pct;
+    return arc;
+  }).filter(a=>a.n>0);
+  const donutPct = total ? Math.round(completedList.length/total*100) : 0;
+
+  // rating distribution bars (10..5)
+  const scores = [10,9,8,7,6,5];
+  const scoreCounts = scores.map(s=>rated.filter(e=>Math.round(e.rating)===s).length);
+  const maxScore = Math.max(1,...scoreCounts);
+
+  const activity = monthlyActivity(list, statsYear);
 
   el.innerHTML = `
-    <div class="stats-wrap">
-      <div class="topbar" style="margin-bottom:4px;">
-        <select class="filter" id="statsYearSelect" onchange="statsYear=this.value; renderStats();">
-          <option value="all" ${statsYear==='all'?'selected':''}>Всё время</option>
-          ${years.map(y=>`<option value="${y}" ${String(statsYear)===String(y)?'selected':''}>${y}</option>`).join('')}
-        </select>
-        <select class="filter" id="statsCatSelect" onchange="statsCategory=this.value; renderStats();">
-          <option value="all" ${statsCategory==='all'?'selected':''}>Все категории</option>
-          ${Object.entries(CATS).map(([key,c])=>`<option value="${key}" ${statsCategory===key?'selected':''}>${c.label}</option>`).join('')}
-        </select>
-      </div>
-
-      <div class="wrapped-card">
-        <div class="wrapped-eyebrow">${statsYear==='all' ? 'ИТОГИ ЗА ВСЁ ВРЕМЯ' : 'ИТОГИ ' + statsYear}</div>
-        <div class="wrapped-big">${total}</div>
-        <div class="wrapped-sub">записей в архиве${total?`, из них ${completed} завершено`:''}</div>
-        <div class="wrapped-row">
-          <div class="wrapped-stat"><b>${totalHours}ч</b><span>времени потрачено</span></div>
-          <div class="wrapped-stat"><b>${favCat.count?favCat.c.label:'—'}</b><span>любимая категория</span></div>
-          <div class="wrapped-stat"><b>${avgRating}</b><span>средняя оценка</span></div>
+    <div style="padding:36px 40px 70px;max-width:1600px;margin:0 auto;">
+      <div class="stats-topbar">
+        <div>
+          <h1 class="stats-h1">Статистика</h1>
+          <p class="stats-sub">${statsCategory==='all' ? 'вся коллекция' : CATS[statsCategory].label}</p>
         </div>
-        ${top[0] ? `<div class="wrapped-top">🏆 Лучшее: <b>${escapeHtml(top[0].title)}</b> — ${top[0].rating}/10</div>` : ''}
-        ${topCountry ? `<div class="wrapped-top">🌍 Чаще всего: <b>${escapeHtml(topCountry[0])}</b> (${topCountry[1]})</div>` : ''}
-        ${achAgg.total ? `<div class="wrapped-top">🏆 Ачивок открыто: <b>${achAgg.done}/${achAgg.total}</b> в ${achAgg.gamesWithData} ${achAgg.gamesWithData===1?'игре':'играх'}</div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <select class="range-chip" id="statsCatSelect" onchange="statsCategory=this.value; renderStats();" style="cursor:pointer;">
+            <option value="all" ${statsCategory==='all'?'selected':''}>Все категории</option>
+            ${Object.entries(CATS).map(([key,c])=>`<option value="${key}" ${statsCategory===key?'selected':''}>${c.label}</option>`).join('')}
+          </select>
+          <button class="range-chip ${statsYear==='all'?'active':''}" onclick="statsYear='all'; renderStats();">Всё время</button>
+          ${years.slice(0,4).map(y=>`<button class="range-chip ${String(statsYear)===String(y)?'active':''}" onclick="statsYear='${y}'; renderStats();">${y}</button>`).join('')}
+        </div>
       </div>
 
-      <div>
-        <div class="section-title">Активность</div>
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-icon">№</div><div class="metric-num-row"><div class="metric-num">${total}</div></div><div class="metric-lbl">Всего записей</div><div class="metric-sub">в 6 категориях</div></div>
+        <div class="metric-card"><div class="metric-icon">✓</div><div class="metric-num-row"><div class="metric-num" style="color:#6EB56E;">${completedList.length}</div></div><div class="metric-lbl">Завершено</div><div class="metric-sub">${donutPct}% коллекции</div></div>
+        <div class="metric-card"><div class="metric-icon">⟳</div><div class="metric-num-row"><div class="metric-num" style="color:#5B9CD9;">${progressList.length}</div></div><div class="metric-lbl">В процессе</div><div class="metric-sub">активно сейчас</div></div>
+        <div class="metric-card"><div class="metric-icon">★</div><div class="metric-num-row"><div class="metric-num" style="color:var(--brass);">${avgRating}</div></div><div class="metric-lbl">Средняя оценка</div><div class="metric-sub">из ${rated.length} оценённых</div></div>
+        ${achAgg.total ? `<div class="metric-card"><div class="metric-icon">🏆</div><div class="metric-num-row"><div class="metric-num" style="font-size:24px;color:var(--brass);">${achAgg.done}/${achAgg.total}</div></div><div class="metric-lbl">Ачивок открыто</div><div class="metric-sub">в ${achAgg.gamesWithData} играх</div></div>` : ''}
+      </div>
+
+      <div class="stats-two-col">
+        <div class="stats-card">
+          <h3>По статусу</h3>
+          <p class="stats-card-sub">${total} записей всего</p>
+          <div style="display:flex;align-items:center;gap:26px;flex-wrap:wrap;">
+            <div style="position:relative;width:158px;height:158px;flex-shrink:0;">
+              <svg width="158" height="158" viewBox="0 0 42 42" style="transform:rotate(-90deg);">
+                <circle cx="21" cy="21" r="15.915" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"></circle>
+                ${statusArcs.map(a=>`<circle cx="21" cy="21" r="15.915" fill="none" stroke="${a.color}" stroke-width="5" stroke-dasharray="${a.dash}" stroke-dashoffset="${a.offset}" stroke-linecap="round"></circle>`).join('')}
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:600;">${donutPct}%</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--muted);letter-spacing:.5px;">ЗАВЕРШЕНО</div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:150px;display:flex;flex-direction:column;gap:9px;">
+              ${statusArcs.map(a=>`
+                <div class="donut-legend-row">
+                  <span class="donut-legend-dot" style="background:${a.color}"></span>
+                  <span style="flex:1;font-size:13px;color:#C4BCAD;">${a.label}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;">${a.n}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted-dim);width:36px;text-align:right;">${a.pctTxt}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="stats-card">
+          <h3>Распределение оценок</h3>
+          <p class="stats-card-sub">средняя ${avgRating} · оценено ${rated.length}</p>
+          <div class="rating-bars-row">
+            ${scores.map((s,i)=>{
+              const n = scoreCounts[i];
+              const h = Math.round(n/maxScore*100);
+              const fill = s>=9 ? 'var(--brass)' : (s>=7 ? 'rgba(226,169,59,.55)' : 'rgba(255,255,255,.18)');
+              return `<div class="rating-bar-col">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${n?'#C4BCAD':'transparent'};">${n||''}</div>
+                <div style="width:100%;border-radius:5px 5px 2px 2px;background:${fill};height:${h}%;min-height:3px;"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8272;">${s}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card" style="margin-bottom:18px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+          <h3 style="margin:0;">Активность по месяцам</h3>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted-dim);">${activity.total} завершено · пик в ${activity.peakLabel}</span>
+        </div>
+        <div class="activity-bars-row">
+          ${activity.buckets.map(b=>`
+            <div class="activity-bar-col">
+              <div style="width:100%;border-radius:4px;background:${b.n===0?'rgba(255,255,255,.06)':'rgba(226,169,59,'+(0.3+0.6*b.n/activity.max).toFixed(2)+')'};height:${Math.round(b.n/activity.max*100)}%;min-height:4px;" title="${b.n}"></div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted-dim);">${b.label}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="stats-grid-2">
+        <div class="stats-card">
+          <h3 style="margin-bottom:18px;">По категориям</h3>
+          ${byCat.map(x=>`
+            <div class="cat-bar-row">
+              <span class="cat-bar-label">${x.c.label}</span>
+              <div class="cat-bar-track"><div class="cat-bar-fill" style="background:${x.c.hex};width:${Math.round(x.count/maxCat*100)}%;"></div></div>
+              <span style="width:24px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;">${x.count}</span>
+              <span style="width:38px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted-dim);">${total?Math.round(x.count/total*100):0}%</span>
+            </div>`).join('')}
+        </div>
+        <div class="stats-card">
+          <h3 style="margin-bottom:14px;">Топ по оценке</h3>
+          ${top.length ? top.map((e,i)=>`
+            <div class="top-row-item" onclick="openDetail('${e.id}')">
+              <span class="top-rank">0${i+1}</span>
+              <span class="top-dot" style="background:${CATS[e.category].hex}"></span>
+              <span class="top-title">${escapeHtml(e.title)}</span>
+              <span class="top-val">★ ${e.rating}</span>
+            </div>`).join('') : `<div class="import-hint" style="margin-top:0;">Пока нет оценённых записей</div>`}
+        </div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <h3 style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:600;margin:0 0 14px;">Активность (по дням)</h3>
         ${buildHeatmap(list, statsYear)}
       </div>
 
-      <div class="stat-cards">
-        <div class="stat-card"><div class="num">${total}</div><div class="lbl">Всего записей</div></div>
-        <div class="stat-card"><div class="num">${completed}</div><div class="lbl">Завершено</div></div>
-        <div class="stat-card"><div class="num">${avgRating}</div><div class="lbl">Средняя оценка</div></div>
-        <div class="stat-card"><div class="num">${totalHours}</div><div class="lbl">Часов всего (оценка)</div></div>
-        ${achAgg.total ? `<div class="stat-card"><div class="num">${achAgg.done}/${achAgg.total}</div><div class="lbl">Ачивок открыто</div></div>` : ''}
-      </div>
-
-      <div class="chart-row">
-        <div class="chart-box">
-          <div class="section-title">По категориям</div>
-          ${buildDonutChart(byCat.filter(x=>x.count>0).map(x=>({label:x.c.label,value:x.count,color:x.c.hex})))}
-        </div>
-        <div class="chart-box">
-          <div class="section-title">Оценки</div>
-          ${buildColumnChart(histCounts)}
-        </div>
-      </div>
-
-      ${top.length ? `
-      <div>
-        <div class="section-title">Топ по оценке</div>
-        <div class="top-list">
-          ${top.map((e,i)=>`
-            <div class="top-row">
-              <div class="rank">${i+1}</div>
-              <div class="t-cat" style="background:${CATS[e.category].hex}"></div>
-              <div class="t-title">${escapeHtml(e.title)}</div>
-              <div class="t-rating">${e.rating}/10</div>
-            </div>`).join('')}
-        </div>
-      </div>` : ''}
-
       ${countryList.length ? `
-      <div>
-        <div class="section-title">По странам</div>
+      <div class="stats-card" style="margin-top:18px;">
+        <h3 style="margin-bottom:14px;">По странам</h3>
         <div id="countryMapArea"></div>
         <div class="chip-row" style="margin-top:12px;">
           ${countryList.slice(0,8).map(([country,c])=>`<div class="chip">${escapeHtml(country)} <b>${c}</b></div>`).join('')}
@@ -1153,17 +1157,15 @@ function renderStats(){
       </div>` : ''}
 
       ${rewatched.length ? `
-      <div>
-        <div class="section-title">Топ пересмотров</div>
-        <div class="top-list">
-          ${rewatched.map((e,i)=>`
-            <div class="top-row">
-              <div class="rank">${i+1}</div>
-              <div class="t-cat" style="background:${CATS[e.category].hex}"></div>
-              <div class="t-title">${escapeHtml(e.title)}</div>
-              <div class="t-rating">×${e.timesWatched}</div>
-            </div>`).join('')}
-        </div>
+      <div class="stats-card" style="margin-top:18px;">
+        <h3 style="margin-bottom:14px;">Топ пересмотров</h3>
+        ${rewatched.map((e,i)=>`
+          <div class="top-row-item" onclick="openDetail('${e.id}')">
+            <span class="top-rank">0${i+1}</span>
+            <span class="top-dot" style="background:${CATS[e.category].hex}"></span>
+            <span class="top-title">${escapeHtml(e.title)}</span>
+            <span class="top-val">×${e.timesWatched}</span>
+          </div>`).join('')}
       </div>` : ''}
     </div>
   `;
@@ -1230,8 +1232,8 @@ function exportData(format){
 }
 
 /* ---------- IMPORT ---------- */
-function openImportModal(){ document.getElementById('importOverlay').classList.add('show'); }
-function closeImportModal(){ document.getElementById('importOverlay').classList.remove('show'); }
+function openImportModal(){ document.getElementById('importOverlay').classList.add('show'); renderNav(); }
+function closeImportModal(){ document.getElementById('importOverlay').classList.remove('show'); renderNav(); }
 function switchImportTab(tab){
   document.getElementById('tabExport').classList.toggle('active', tab==='export');
   document.getElementById('tabFile').classList.toggle('active', tab==='file');
@@ -1913,15 +1915,8 @@ document.getElementById('dropzone').addEventListener('drop', e=>{
   if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
 });
 document.getElementById('importOverlay').addEventListener('click', e=>{ if(e.target.id==='importOverlay') closeImportModal(); });
-
-document.getElementById('searchInput').addEventListener('input', render);
-document.getElementById('statusFilter').addEventListener('change', render);
-document.getElementById('sortBy').addEventListener('change', render);
-['fltYearFrom','fltYearTo','fltRatingFrom','fltRatingTo'].forEach(id=>document.getElementById(id).addEventListener('input', render));
-document.getElementById('fltCountry').addEventListener('change', render);
 document.getElementById('pickOverlay').addEventListener('click', e=>{ if(e.target.id==='pickOverlay') closePickModal(); });
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
-document.getElementById('viewOverlay').addEventListener('click', e=>{ if(e.target.id==='viewOverlay') closeView(); });
 document.addEventListener('click', e=>{
   if(!e.target.closest('.search-wrap')){
     document.getElementById('searchResults').classList.remove('show');

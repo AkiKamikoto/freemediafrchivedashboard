@@ -3,80 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <title>Архив</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<aside class="rail">
-  <div class="brand">Архив <small>каталог</small></div>
-  <div id="tabs"></div>
-  <div class="rail-divider"></div>
-  <div class="rail-bottom">
-    <button class="rail-btn" onclick="pickForMe()">🎲 Выбери за меня</button>
-    <select class="rail-btn" id="viewSelect" onchange="setViewMode(this.value)">
-      <option value="cards">📇 Карточки</option>
-      <option value="posters">🖼 Стена постеров</option>
-      <option value="list">📋 Список</option>
-      <option value="compact">☰ Компактный список</option>
-    </select>
-    <button class="rail-btn" onclick="toggleTheme()" id="themeBtn">☀ Светлая тема</button>
-    <button class="rail-btn" onclick="openImportModal()">📦 Импорт / Экспорт</button>
-    <button class="rail-btn" id="statsBtn" onclick="toggleStats()">📊 Статистика</button>
-  </div>
-</aside>
+<header class="topnav">
+  <button class="brand" onclick="goHome()">АРХИВ<span>CLUB</span></button>
+  <nav class="nav-cats" id="navCats"></nav>
+  <button class="nav-icon-btn" onclick="pickForMe()">🎲 ВЫБРАТЬ</button>
+  <button class="nav-icon-btn" id="importNavBtn" onclick="openImportModal()">ИМПОРТ / ЭКСПОРТ</button>
+  <button class="nav-icon-btn" id="statsBtn" onclick="goStats()">СТАТИСТИКА</button>
+  <button class="btn-add" onclick="openModal()">+ Добавить</button>
+</header>
 
 <main>
-  <div id="libraryView">
-    <div class="topbar">
-      <input class="search" id="searchInput" placeholder="Поиск по названию или заметкам...">
-      <select class="filter" id="statusFilter">
-        <option value="">Все статусы</option>
-        <option value="planning">Запланировано</option>
-        <option value="progress">В процессе</option>
-        <option value="completed">Завершено</option>
-        <option value="hold">Отложено</option>
-        <option value="dropped">Брошено</option>
-      </select>
-      <select class="filter" id="sortBy">
-        <option value="updated">По обновлению</option>
-        <option value="title">По названию</option>
-        <option value="rating">По оценке</option>
-      </select>
-      <select class="filter" id="groupBy" onchange="setGroupBy(this.value)">
-        <option value="none">Без группировки</option>
-        <option value="year">Группировать по году</option>
-        <option value="status">Группировать по статусу</option>
-      </select>
-      <button class="btn-ghost" onclick="toggleFiltersPanel()">⚙ Фильтры</button>
-      <button class="btn-add" onclick="openModal()">+ Добавить</button>
+  <div id="homeScreen" class="screen">
+    <div id="heroArea"></div>
+    <div class="home-search-row">
+      <input class="home-search" id="searchInput" placeholder="Поиск в коллекции…" oninput="renderHomeContent()">
+      <div id="statusChips"></div>
+      <button class="nav-icon-btn" onclick="toggleFiltersPanel()">⚙ Фильтры</button>
     </div>
-    <div class="filters-panel" id="filtersPanel">
-      <div class="field">
-        <label>Год от</label>
-        <input type="number" id="fltYearFrom" placeholder="1980">
-      </div>
-      <div class="field">
-        <label>Год до</label>
-        <input type="number" id="fltYearTo" placeholder="2026">
-      </div>
-      <div class="field">
-        <label>Оценка от</label>
-        <input type="number" min="0" max="10" id="fltRatingFrom" placeholder="0">
-      </div>
-      <div class="field">
-        <label>Оценка до</label>
-        <input type="number" min="0" max="10" id="fltRatingTo" placeholder="10">
-      </div>
-      <div class="field">
-        <label>Страна</label>
-        <select id="fltCountry"><option value="">Все страны</option></select>
+    <div class="filters-panel" id="filtersPanel" style="display:none;margin:0 40px 6px;">
+      <div class="field"><label>Год от</label><input type="number" id="fltYearFrom" placeholder="1980" oninput="renderHomeContent()"></div>
+      <div class="field"><label>Год до</label><input type="number" id="fltYearTo" placeholder="2026" oninput="renderHomeContent()"></div>
+      <div class="field"><label>Оценка от</label><input type="number" min="0" max="10" id="fltRatingFrom" placeholder="0" oninput="renderHomeContent()"></div>
+      <div class="field"><label>Оценка до</label><input type="number" min="0" max="10" id="fltRatingTo" placeholder="10" oninput="renderHomeContent()"></div>
+      <div class="field"><label>Страна</label><select id="fltCountry" onchange="renderHomeContent()"><option value="">Все страны</option></select></div>
+      <div class="field"><label>Сортировка</label>
+        <select id="sortBy" onchange="renderHomeContent()">
+          <option value="updated">По обновлению</option>
+          <option value="title">По названию</option>
+          <option value="rating">По оценке</option>
+        </select>
       </div>
       <button class="btn-ghost" onclick="resetFilters()">Сбросить</button>
     </div>
-    <div id="content"></div>
+    <div id="shelvesArea"></div>
   </div>
-  <div id="statsView" style="display:none;"></div>
-  <div id="gamePage" style="display:none;"></div>
+  <div id="detailScreen" class="screen" style="display:none;"></div>
+  <div id="statsScreen" class="screen" style="display:none;"></div>
 </main>
 
 <div class="overlay" id="overlay">
@@ -161,31 +128,6 @@
       <button class="btn-danger" id="deleteBtn" style="display:none" onclick="deleteEntry()">Удалить</button>
       <button class="btn-ghost" id="saveMoreBtn" onclick="saveEntry(true)">Сохранить и добавить ещё</button>
       <button class="btn-primary" onclick="saveEntry(false)">Сохранить</button>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="viewOverlay">
-  <div class="modal">
-    <div class="cover-preview" id="viewCover" style="height:240px;"></div>
-    <h2 id="viewTitle"></h2>
-    <div class="view-row">
-      <span class="stamp" id="viewStamp"></span>
-      <span id="viewMeta" class="card-meta"></span>
-    </div>
-    <div id="viewFields"></div>
-    <div id="viewDescriptionWrap" style="margin-top:10px;">
-      <label>Описание</label>
-      <div id="viewDescription" class="import-hint" style="margin-top:4px;"></div>
-    </div>
-    <div id="viewNotesWrap" style="margin-top:10px;">
-      <label>Заметки</label>
-      <div id="viewNotes" class="import-hint" style="margin-top:4px;"></div>
-    </div>
-    <div id="viewAchievements" style="margin-top:14px;"></div>
-    <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeView()">Закрыть</button>
-      <button class="btn-primary" onclick="editFromView()">Редактировать</button>
     </div>
   </div>
 </div>
