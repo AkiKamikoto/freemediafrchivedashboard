@@ -58,6 +58,74 @@ async function load(){
   }catch(e){ /* offline cache unavailable — сбор базы вручную в Импорт/Экспорт → RetroAchievements */ }
   applyUiPrefs();
   render();
+  initCloudAuth();
+}
+
+/* ---------- ПРОФИЛЬ (GitHub OAuth + серверная синхронизация) ----------
+ * Работает только если на бэкенде настроены GITHUB_CLIENT_ID/SECRET,
+ * SESSION_SECRET и подключён Vercel Postgres (см. README). Если /api/auth/me
+ * недоступен (открыт локально файлом, бэкенд не настроен) — просто остаёмся
+ * в обычном локальном режиме, как раньше.
+ */
+let cloudUser = null;
+async function initCloudAuth(){
+  try{
+    const res = await fetch('/api/auth/me');
+    if(res.ok){
+      const data = await res.json();
+      if(data.loggedIn){
+        cloudUser = { login: data.login, avatarUrl: data.avatarUrl };
+        await syncFromCloudOnLogin();
+      }
+    }
+  }catch(e){ /* бэкенд недоступен — работаем локально */ }
+  renderAuthWidget();
+}
+async function syncFromCloudOnLogin(){
+  try{
+    const res = await fetch('/api/data');
+    if(!res.ok) return;
+    const cloud = await res.json();
+    const hasCloudData = cloud.entries && cloud.entries.length;
+    if(hasCloudData){
+      entries = cloud.entries;
+      uiPrefs = {...uiPrefs, ...(cloud.uiPrefs||{})};
+      await persist(false); await persistUiPrefs(false);
+      applyUiPrefs(); render();
+      showToast(`Загружено из профиля: ${entries.length} записей`);
+    } else if(entries.length){
+      if(confirm(`В профиле GitHub (${cloudUser.login}) пока нет данных. Загрузить туда текущую локальную библиотеку (${entries.length} записей)?`)){
+        await pushToCloud();
+        showToast('Библиотека загружена в профиль');
+      }
+    }
+  }catch(e){ /* остаёмся в локальном режиме для этой сессии */ }
+}
+let cloudPushTimer = null;
+function scheduleCloudPush(){
+  if(!cloudUser) return;
+  clearTimeout(cloudPushTimer);
+  cloudPushTimer = setTimeout(pushToCloud, 1200);
+}
+async function pushToCloud(){
+  if(!cloudUser) return;
+  try{
+    await fetch('/api/data', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ entries, uiPrefs })
+    });
+  }catch(e){ /* следующее изменение попробует запушить снова */ }
+}
+function renderAuthWidget(){
+  const el = document.getElementById('authWidget');
+  if(!el) return;
+  el.innerHTML = cloudUser ? `
+    <div class="auth-widget" title="Синхронизировано с профилем GitHub">
+      <img class="auth-avatar" src="${escapeHtml(cloudUser.avatarUrl||'')}">
+      <span class="auth-login">${escapeHtml(cloudUser.login)}</span>
+      <a class="auth-logout" href="/api/auth/logout" title="Выйти">⎋</a>
+    </div>` : `<a class="rail-btn" href="/api/auth/login">🔗 Войти через GitHub</a>`;
 }
 function downloadSteamDb(){
   if(!Object.keys(steamGamesDb).length){ showToast('База пуста — сначала нажми «Обогатить метаданные»'); return; }
@@ -69,13 +137,15 @@ function downloadSteamDb(){
   URL.revokeObjectURL(a.href);
   showToast(`Скачано записей: ${Object.keys(steamGamesDb).length}`);
 }
-async function persist(){
+async function persist(push){
   try{ await window.storage.set('archive-entries', JSON.stringify(entries)); }
   catch(e){ console.error('storage failed', e); }
+  if(push!==false) scheduleCloudPush();
 }
-async function persistUiPrefs(){
+async function persistUiPrefs(push){
   try{ await window.storage.set('archive-ui-prefs', JSON.stringify(uiPrefs)); }
   catch(e){ /* ignore */ }
+  if(push!==false) scheduleCloudPush();
 }
 function applyUiPrefs(){
   document.body.classList.toggle('theme-light', uiPrefs.theme==='light');
@@ -85,6 +155,11 @@ function applyUiPrefs(){
   if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
   if(uiPrefs.raUsername) document.getElementById('raUsername').value = uiPrefs.raUsername;
   if(uiPrefs.raApiKey) document.getElementById('raApiKey').value = uiPrefs.raApiKey;
+  if(uiPrefs.rawgApiKey) document.getElementById('rawgApiKey').value = uiPrefs.rawgApiKey;
+}
+function saveRawgApiKey(v){
+  uiPrefs.rawgApiKey = v.trim();
+  persistUiPrefs();
 }
 function saveSteamApiKey(v){
   uiPrefs.steamApiKey = v.trim();
@@ -287,6 +362,13 @@ function quickSetRating(ev, id, value){
   persist(); render();
 }
 
+function ratingTier(r){
+  if(!r) return 'none';
+  if(r>=8) return 'great';
+  if(r>=6) return 'good';
+  if(r>=4) return 'mixed';
+  return 'bad';
+}
 function cardHtml(e){
   const cat = CATS[e.category] || CATS.movies;
   const initials = e.title.slice(0,2).toUpperCase();
@@ -295,6 +377,7 @@ function cardHtml(e){
     <div class="cover">
       <div class="catbar"></div>
       ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}','<div class=&quot;catbar&quot;></div>')">` : `<div class="fallback">${initials}</div>`}
+      <input class="quick-rating rating-badge rating-${ratingTier(e.rating)}" type="number" min="0" max="10" placeholder="–" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
     </div>
     <div class="card-body">
       <div class="card-top">
@@ -303,10 +386,7 @@ function cardHtml(e){
       </div>
       <div class="card-meta">${cat.label}${e.year?' · '+e.year:''}${e.country?' · '+escapeHtml(e.country):''}${e.timesWatched>1?' · ×'+e.timesWatched:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</div>
       ${subLine(e) ? `<div class="card-sub">${escapeHtml(subLine(e))}</div>` : ''}
-      <div class="card-foot">
-        <input class="quick-rating" type="number" min="0" max="10" placeholder="—" value="${e.rating||''}" onclick="event.stopPropagation()" onchange="quickSetRating(event,'${e.id}',this.value)">
-        <span class="progress-txt">${escapeHtml(progressLine(e))}</span>
-      </div>
+      ${progressLine(e) ? `<div class="progress-txt">${escapeHtml(progressLine(e))}</div>` : ''}
     </div>
   </div>`;
 }
@@ -378,6 +458,35 @@ function searchRetroAchievements(q){
     meta: { platform: 'RetroAchievements', raGameId: g.id, consoleName: g.consoleName || '' }
   }));
 }
+async function searchRAWG(q){
+  const apiKey = uiPrefs.rawgApiKey;
+  if(!apiKey) return [];
+  const res = await fetch(`https://api.rawg.io/api/games?search=${encodeURIComponent(q)}&key=${encodeURIComponent(apiKey)}&page_size=6`);
+  const data = await res.json();
+  return (data.results||[]).map(g=>({
+    title: g.name,
+    year: g.released ? g.released.slice(0,4) : '',
+    cover: g.background_image || '',
+    source: 'RAWG',
+    rawgId: g.id,
+    extra: { genre: (g.genres||[]).map(x=>x.name).join(', ') }
+  }));
+}
+// Описание и разработчика RAWG отдаёт только в карточке конкретной игры
+// (не в поиске) — подтягиваем отдельным запросом сразу после выбора результата,
+// не блокируя основную подстановку полей.
+async function fetchRawgDetails(id){
+  const apiKey = uiPrefs.rawgApiKey;
+  if(!apiKey) return;
+  try{
+    const res = await fetch(`https://api.rawg.io/api/games/${id}?key=${encodeURIComponent(apiKey)}`);
+    const g = await res.json();
+    const descEl = document.getElementById('fDescription');
+    if(descEl && !descEl.value && g.description_raw) descEl.value = g.description_raw.slice(0,1000);
+    const devEl = document.getElementById('ex_developer');
+    if(devEl && !devEl.value && g.developers && g.developers.length) devEl.value = g.developers.map(d=>d.name).join(', ');
+  }catch(e){ /* базовые поля уже подставлены, описание — необязательный бонус */ }
+}
 async function runSearch(q){
   const cat = document.getElementById('fCategory').value;
   const box = document.getElementById('searchResults');
@@ -390,16 +499,18 @@ async function runSearch(q){
     else if(cat==='books') results = await searchOpenLibrary(q);
     else if(cat==='games'){
       const ra = searchRetroAchievements(q);
+      let rawg = [];
+      try{ rawg = await searchRAWG(q); }catch(e){ /* нет ключа или недоступен — пропускаем */ }
       let store = [];
-      try{ store = await searchCheapShark(q); }catch(e){ /* RA-результаты всё равно покажем */ }
-      results = [...ra, ...store].slice(0, 8);
+      try{ store = await searchCheapShark(q); }catch(e){ /* остальные результаты всё равно покажем */ }
+      results = [...ra, ...rawg, ...store].slice(0, 8);
     }
 
     if(!results.length){ box.innerHTML = `<div class="sr-status">ничего не найдено — заполни вручную</div>`; return; }
     box.innerHTML = results.map((r,i)=>`
       <div class="sr-item" onclick='applyResult(${i})'>
         <img class="sr-thumb" src="${r.cover||''}" onerror="this.style.visibility='hidden'">
-        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source==='RA' ? ' <span class="sr-badge">RA</span>' : ''}</div><div class="sr-year">${r.year||''}</div></div>
+        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source ? ` <span class="sr-badge">${r.source}</span>` : ''}</div><div class="sr-year">${r.year||''}</div></div>
       </div>`).join('');
     window.__searchCache = results;
   }catch(e){
@@ -421,6 +532,7 @@ function applyResult(i){
   pendingImportMeta = r.meta || null;
   clearSearch();
   showToast('Данные подставлены');
+  if(r.source==='RAWG' && r.rawgId) fetchRawgDetails(r.rawgId);
 }
 
 async function searchITunes(q, media){
@@ -730,10 +842,21 @@ function renderGamePage(){
   const cat = CATS[e.category] || CATS.games;
   const initials = e.title.slice(0,2).toUpperCase();
   const f = e.data || {};
-  const fieldsHtml = cat.fields
-    .filter(fd=>f[fd.k]!==undefined && f[fd.k]!==null && f[fd.k]!=='')
-    .map(fd=>`<div class="view-field"><span class="view-field-label">${escapeHtml(fd.l)}</span><span class="view-field-value">${escapeHtml(String(f[fd.k]))}</span></div>`)
-    .join('');
+
+  // Теги-пилюли вместо таблицы полей — жанр разбивается на отдельные теги,
+  // остальное (платформа/консоль/разработчик) идёт как есть, как ярлыки Steam.
+  const tags = [];
+  if(f.genre) f.genre.split(',').map(s=>s.trim()).filter(Boolean).forEach(g=>tags.push(g));
+  if(f.consoleName) tags.push(f.consoleName);
+  if(f.platform) tags.push(f.platform);
+  if(f.developer) tags.push(f.developer);
+
+  const metaBits = [
+    e.rating ? '★ '+e.rating+'/10' : '',
+    e.year || '',
+    f.hours ? f.hours+' ч.' : '',
+    e.watchDate ? formatDate(e.watchDate) : ''
+  ].filter(Boolean).join(' · ');
 
   document.getElementById('gamePage').innerHTML = `
     <div class="game-page">
@@ -741,19 +864,24 @@ function renderGamePage(){
         <button class="btn-ghost" onclick="closeGamePage()">← Назад к библиотеке</button>
         <button class="btn-primary" style="flex:none;" onclick="openModal('${e.id}')">✎ Редактировать запись</button>
       </div>
-      <div class="game-page-header">
-        <div class="game-cover">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
-        <div class="game-header-info">
-          <h1>${escapeHtml(e.title)}</h1>
-          <div class="view-row">
-            <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
-            <span class="card-meta">${cat.label}${e.rating?' · ★'+e.rating+'/10':''}${e.year?' · '+e.year:''}${e.watchDate?' · '+formatDate(e.watchDate):''}</span>
+
+      <div class="game-hero">
+        ${e.cover ? `<div class="game-hero-bg" style="background-image:url('${escapeHtml(e.cover)}')"></div>` : ''}
+        <div class="game-hero-scrim">
+          <div class="game-hero-cap">${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<div class="fallback">${initials}</div>`}</div>
+          <div class="game-hero-info">
+            <h1>${escapeHtml(e.title)}</h1>
+            <div class="view-row">
+              <span class="stamp ${STATUS_CLASS[e.status]}">${statusLabel(e)}</span>
+              <span class="card-meta">${cat.label}${metaBits ? ' · '+metaBits : ''}</span>
+            </div>
+            ${tags.length ? `<div class="game-tags">${tags.map(t=>`<span class="game-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
           </div>
-          <div class="game-page-fields">${fieldsHtml}</div>
         </div>
       </div>
-      ${e.description ? `<div class="game-page-block"><div class="view-field-label">Описание</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
-      <div class="game-page-block"><div class="view-field-label">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
+
+      ${e.description ? `<div class="game-page-block"><div class="game-section-title">Об игре</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.description)}</div></div>` : ''}
+      <div class="game-page-block"><div class="game-section-title">Заметки</div><div class="import-hint" style="margin-top:4px;">${escapeHtml(e.notes||'без заметок')}</div></div>
       <div id="gamePageAchievements"></div>
     </div>`;
   renderAchievementsInto('gamePageAchievements', e);
@@ -1238,11 +1366,13 @@ function switchImportTab(tab){
   document.getElementById('tabShiki').classList.toggle('active', tab==='shiki');
   document.getElementById('tabSteam').classList.toggle('active', tab==='steam');
   document.getElementById('tabRA').classList.toggle('active', tab==='ra');
+  document.getElementById('tabRAWG').classList.toggle('active', tab==='rawg');
   document.getElementById('panelExport').classList.toggle('active', tab==='export');
   document.getElementById('panelFile').classList.toggle('active', tab==='file');
   document.getElementById('panelShiki').classList.toggle('active', tab==='shiki');
   document.getElementById('panelSteam').classList.toggle('active', tab==='steam');
   document.getElementById('panelRA').classList.toggle('active', tab==='ra');
+  document.getElementById('panelRAWG').classList.toggle('active', tab==='rawg');
 }
 
 let importRows = [];
@@ -1510,6 +1640,39 @@ function backfillSteamDetFromEntry(e){
   };
 }
 
+async function enrichRawgGames(statusEl){
+  const apiKey = uiPrefs.rawgApiKey;
+  if(!apiKey){ statusEl.textContent = 'Сначала укажи RAWG API-ключ выше'; return; }
+  const targets = entries.filter(e=>e.category==='games' && (!e.data.developer || !e.data.genre || !e.description));
+  if(!targets.length){ statusEl.textContent = 'Все игры уже обогащены'; return; }
+
+  let done = 0, failed = 0;
+  for(let i=0;i<targets.length;i++){
+    const entry = targets[i];
+    statusEl.textContent = `Обогащение: ${i+1}/${targets.length}...`;
+    try{
+      const searchRes = await fetch(`https://api.rawg.io/api/games?search=${encodeURIComponent(entry.title)}&key=${encodeURIComponent(apiKey)}&page_size=1`);
+      const searchData = await searchRes.json();
+      const match = searchData.results && searchData.results[0];
+      if(match){
+        const detRes = await fetch(`https://api.rawg.io/api/games/${match.id}?key=${encodeURIComponent(apiKey)}`);
+        const det = await detRes.json();
+        if(!entry.data.genre && det.genres && det.genres.length) entry.data.genre = det.genres.map(g=>g.name).join(', ');
+        if(!entry.data.developer && det.developers && det.developers.length) entry.data.developer = det.developers.map(d=>d.name).join(', ');
+        if(!entry.description && det.description_raw) entry.description = det.description_raw.slice(0,1000);
+        if(!entry.year && det.released) entry.year = parseInt(det.released.slice(0,4));
+        if(!entry.cover && det.background_image) entry.cover = det.background_image;
+        entry.updated = Date.now();
+        done++;
+      } else failed++;
+    }catch(e){ failed++; }
+    await new Promise(r=>setTimeout(r, 300));
+  }
+  await persist();
+  render();
+  statusEl.textContent = `Готово — обогащено ${done}${failed?`, не найдено ${failed}`:''}`;
+  showToast(`RAWG: обогащено ${done}`);
+}
 async function enrichSteamGames(statusEl){
   // Восстанавливаем уже обогащённые локально записи, которых ещё нет в offline-базе
   // (например, обогащённые до того, как появилась сама база).
@@ -1799,7 +1962,16 @@ function mergeRaAchievements(list){
     };
   });
 }
-async function commitRaGames(games, statusEl){
+async function fetchRaWantToPlay(username, apiKey, proxies){
+  const url = buildRaUrl('API_GetUserWantToPlayList.php', username, apiKey, { u: username, c: 500 });
+  const raw = await fetchViaProxies(url, proxies);
+  if(!raw) return [];
+  try{
+    const data = JSON.parse(raw);
+    return data.Results || [];
+  }catch(e){ return []; }
+}
+async function commitRaGames(games, statusEl, wantToPlay){
   // API отдаёт по 2 записи на игру (softcore/hardcore) — берём softcore, там уже
   // учтены все ачивки, включая хардкорные.
   const byGame = {};
@@ -1831,11 +2003,31 @@ async function commitRaGames(games, statusEl){
       added++;
     }
   });
+
+  // Список "Хочу сыграть" — только те, которых ещё нет в архиве вообще
+  // (не понижаем статус уже начатых/пройденных игр до "план").
+  let wishlisted = 0;
+  (wantToPlay||[]).forEach(g=>{
+    const gameId = g.ID;
+    if(entries.find(x=>x.category==='games' && x.data && x.data.platform==='RetroAchievements' && x.data.raGameId===gameId)) return;
+    const cover = g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : '';
+    entries.push({
+      id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
+      title: g.Title, category: 'games', status: 'planning',
+      rating: null, year: null, cover, notes: '', watchDate: null,
+      data: { platform: 'RetroAchievements', raGameId: gameId, consoleName: g.ConsoleName },
+      updated: Date.now()
+    });
+    wishlisted++;
+  });
+
   await persist();
   render();
-  const msg = added && updated ? `Готово — добавлено ${added}, обновлено ${updated}`
-    : updated ? `Готово — обновлено ${updated} игр`
-    : `Готово — импортировано ${added} игр`;
+  const parts = [];
+  if(added) parts.push(`добавлено ${added}`);
+  if(updated) parts.push(`обновлено ${updated}`);
+  if(wishlisted) parts.push(`из "хочу сыграть" ${wishlisted}`);
+  const msg = parts.length ? `Готово — ${parts.join(', ')}` : 'Готово — новых игр нет';
   statusEl.textContent = msg;
   showToast(msg);
 }
@@ -1849,8 +2041,9 @@ async function autoImportRA(){
   statusEl.textContent = 'пробую забрать автоматически...';
   try{
     const games = await fetchRaCompletedGames(username, apiKey, RA_PROXIES);
-    if(games.length){
-      await commitRaGames(games, statusEl);
+    const wantToPlay = await fetchRaWantToPlay(username, apiKey, RA_PROXIES);
+    if(games.length || wantToPlay.length){
+      await commitRaGames(games, statusEl, wantToPlay);
       return;
     }
   }catch(e){ /* handled below */ }

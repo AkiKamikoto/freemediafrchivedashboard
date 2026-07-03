@@ -9,6 +9,7 @@
 
 <aside class="rail">
   <div class="brand">Архив <small>каталог</small></div>
+  <div id="authWidget"></div>
   <div id="tabs"></div>
   <div class="rail-divider"></div>
   <div class="rail-bottom">
@@ -198,6 +199,7 @@
       <button class="imp-tab" id="tabFile" onclick="switchImportTab('file')">Файл</button>
       <button class="imp-tab" id="tabSteam" onclick="switchImportTab('steam')">Steam</button>
       <button class="imp-tab" id="tabRA" onclick="switchImportTab('ra')">RetroAchievements</button>
+      <button class="imp-tab" id="tabRAWG" onclick="switchImportTab('rawg')">RAWG</button>
       <button class="imp-tab" id="tabShiki" onclick="switchImportTab('shiki')">Shikimori</button>
     </div>
 
@@ -268,7 +270,7 @@
         <input id="raApiKey" placeholder="вставь ключ" type="password" onchange="syncRaCreds()">
         <div class="import-hint" style="margin-top:4px;">В <a href="https://retroachievements.org/controlpanel.php" target="_blank" style="color:var(--brass);">панели управления</a>, раздел «Keys».</div>
       </div>
-      <button class="btn-primary" style="width:100%" onclick="autoImportRA()">Импортировать пройденные игры</button>
+      <button class="btn-primary" style="width:100%" onclick="autoImportRA()">Импортировать игры и список «хочу сыграть»</button>
       <div id="raStatus" class="import-hint"></div>
 
       <div class="subhead">База игр для поиска (офлайн)</div>
@@ -279,6 +281,18 @@
       </div>
       <div id="raDbStatus" class="import-hint"></div>
       <div class="import-hint">Скачанный файл — в репозиторий как <code>data/retroachievements-games-db.json</code>.</div>
+    </div>
+
+    <div class="import-panel" id="panelRAWG">
+      <div class="subhead" style="margin-top:0;padding-top:0;border-top:none;">Метаданные игр</div>
+      <div class="field" style="margin-top:0;">
+        <label>RAWG API-ключ</label>
+        <input id="rawgApiKey" placeholder="вставь ключ" type="password" onchange="saveRawgApiKey(this.value)">
+        <div class="import-hint" style="margin-top:4px;">Бесплатно на <a href="https://rawg.io/apidocs" target="_blank" style="color:var(--brass);">rawg.io/apidocs</a> — без OAuth, просто ключ.</div>
+      </div>
+      <div class="import-hint">После сохранения ключа RAWG-результаты сами появятся в поиске при добавлении новой игры (описание, жанр, разработчик).</div>
+      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="enrichRawgGames(document.getElementById('rawgStatus'))">🔍 Обогатить уже добавленные игры</button>
+      <div id="rawgStatus" class="import-hint"></div>
     </div>
 
     <div class="import-panel" id="panelShiki">
