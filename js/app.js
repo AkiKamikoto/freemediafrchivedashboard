@@ -234,13 +234,51 @@ function posterHtml(e){
   const initials = e.title.slice(0,2).toUpperCase();
   return `<div class="poster" onclick="openDetail('${e.id}')">
     <div class="poster-art" style="background:${catGradient(e.category)};">
-      ${e.cover ? `<img src="${escapeHtml(e.cover)}" onerror="onCoverError(this,'${initials}')">` : `<span class="poster-fallback" style="color:${cat.color}">${initials}</span>`}
+      ${e.cover ? `<img src="${escapeHtml(e.cover)}" loading="lazy" onerror="onCoverError(this,'${initials}')">` : `<span class="poster-fallback" style="color:${cat.color}">${initials}</span>`}
       <span class="poster-status" style="color:${cat.color};border-color:${cat.color};">${statusLabel(e)}</span>
       ${e.rating ? `<span class="poster-rating">${e.rating}/10</span>` : ''}
     </div>
     <div class="poster-title">${escapeHtml(e.title)}</div>
     <div class="poster-meta">${cat.label}${e.year?' · '+e.year:''}</div>
   </div>`;
+}
+
+const SHELF_LIMIT = 14;
+let expandedShelves = new Set();
+function toggleShelf(key){
+  if(expandedShelves.has(key)) expandedShelves.delete(key);
+  else expandedShelves.add(key);
+  renderHomeContent();
+}
+function scrollShelf(btn, dir){
+  const row = btn.parentElement.querySelector('.shelf-row');
+  row.scrollBy({left: dir * row.clientWidth * 0.85, behavior:'smooth'});
+}
+
+function shelfHtml(key, name, items){
+  const expanded = expandedShelves.has(key);
+  const head = `
+    <div class="shelf-head">
+      <h2>${escapeHtml(name)}</h2>
+      <span class="shelf-count">${items.length}</span>
+      ${items.length > SHELF_LIMIT ? `<button class="shelf-toggle" onclick="toggleShelf('${key}')">${expanded ? 'Свернуть ↑' : 'Показать все →'}</button>` : ''}
+    </div>`;
+  if(expanded){
+    return `<section class="shelf">${head}<div class="poster-grid">${items.map(posterHtml).join('')}</div></section>`;
+  }
+  const visible = items.slice(0, SHELF_LIMIT);
+  const restCount = items.length - visible.length;
+  const moreTile = restCount > 0 ? `
+    <div class="poster" onclick="toggleShelf('${key}')">
+      <div class="poster-art more-tile"><span class="more-tile-num">+${restCount}</span><span class="more-tile-lbl">показать все</span></div>
+    </div>` : '';
+  return `<section class="shelf">${head}
+    <div class="shelf-wrap">
+      <button class="shelf-arrow shelf-arrow-l" onclick="scrollShelf(this,-1)">‹</button>
+      <div class="shelf-row">${visible.map(posterHtml).join('')}${moreTile}</div>
+      <button class="shelf-arrow shelf-arrow-r" onclick="scrollShelf(this,1)">›</button>
+    </div>
+  </section>`;
 }
 
 function renderHomeContent(){
@@ -287,21 +325,17 @@ function renderHomeContent(){
   }
   const shelves = [];
   const progress = list.filter(e=>e.status==='progress');
-  if(progress.length) shelves.push(['Продолжаю', progress]);
+  if(progress.length) shelves.push(['progress', 'Продолжаю', progress]);
   if(activeCat==='all'){
     Object.keys(CATS).forEach(k=>{
       const g = list.filter(e=>e.category===k && e.status!=='progress');
-      if(g.length) shelves.push([CATS[k].label, g]);
+      if(g.length) shelves.push([k, CATS[k].label, g]);
     });
   } else {
     const rest = list.filter(e=>e.status!=='progress');
-    if(rest.length) shelves.push([CATS[activeCat].label, rest]);
+    if(rest.length) shelves.push([activeCat, CATS[activeCat].label, rest]);
   }
-  shelvesArea.innerHTML = shelves.map(([name, items])=>`
-    <section class="shelf">
-      <div class="shelf-head"><h2>${escapeHtml(name)}</h2><span class="shelf-count">${items.length}</span></div>
-      <div class="shelf-row">${items.map(posterHtml).join('')}</div>
-    </section>`).join('');
+  shelvesArea.innerHTML = shelves.map(([key, name, items])=>shelfHtml(key, name, items)).join('');
 }
 
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
