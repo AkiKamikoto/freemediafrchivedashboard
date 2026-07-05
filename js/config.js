@@ -4,5 +4,5 @@
 // (доступ к данным ограничивает row-level security), его можно коммитить.
 window.ARCHIVE_CONFIG = {
   supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseAnonKey: 'sb_publishable_IyAKKRvEgRR-8EBSENGCxQ__d2afWIk'
 };
