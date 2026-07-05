@@ -33,6 +33,9 @@ function statusLabel(e){
 }
 
 let entries = [];
+// Тумбстоуны удалённых записей {id: timestamp} — нужны облачной синхронизации,
+// чтобы запись, стёртая здесь, не возвращалась из архива другого устройства.
+let deletedIds = {};
 let activeCat = 'all';
 let screen = 'home'; // 'home' | 'detail' | 'stats'
 let detailId = null;
@@ -45,6 +48,10 @@ async function load(){
     const res = await window.storage.get('archive-entries');
     entries = res ? JSON.parse(res.value) : [];
   }catch(e){ entries = []; }
+  try{
+    const d = await window.storage.get('archive-deleted');
+    if(d) deletedIds = JSON.parse(d.value);
+  }catch(e){ deletedIds = {}; }
   try{
     const p = await window.storage.get('archive-ui-prefs');
     if(p) uiPrefs = JSON.parse(p.value);
@@ -71,8 +78,13 @@ function downloadSteamDb(){
   showToast(`Скачано записей: ${Object.keys(steamGamesDb).length}`);
 }
 async function persist(){
-  try{ await window.storage.set('archive-entries', JSON.stringify(entries)); }
+  try{
+    await window.storage.set('archive-entries', JSON.stringify(entries));
+    await window.storage.set('archive-deleted', JSON.stringify(deletedIds));
+  }
   catch(e){ console.error('storage failed', e); }
+  // Облачная синхронизация (js/auth.js) подхватывает каждое сохранение
+  if(typeof scheduleCloudPush==='function') scheduleCloudPush();
 }
 async function persistUiPrefs(){
   try{ await window.storage.set('archive-ui-prefs', JSON.stringify(uiPrefs)); }
@@ -942,6 +954,7 @@ document.addEventListener('mouseout', e=>{
 async function deleteEntry(){
   const id = document.getElementById('editId').value;
   entries = entries.filter(x=>x.id!==id);
+  deletedIds[id] = Date.now();
   await persist();
   closeModal();
   render();
@@ -1300,6 +1313,7 @@ async function dedupeEntries(){
   });
   const dupIds = new Set(dupGroups.flatMap(g=>g.slice(1).map(x=>x.id)));
   entries = entries.filter(e=>!dupIds.has(e.id));
+  dupIds.forEach(id=>{ deletedIds[id] = Date.now(); });
   await persist();
   render();
   showToast(`Удалено дубликатов: ${removedCount}`);
@@ -2292,4 +2306,6 @@ document.addEventListener('click', e=>{
   }
 });
 
-load();
+// Промис первичной загрузки: облачная синхронизация (js/auth.js) ждёт его,
+// чтобы не сливать пустой список с облаком до чтения localStorage.
+const appReady = load();

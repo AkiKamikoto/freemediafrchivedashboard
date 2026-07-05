@@ -14,6 +14,7 @@
   <button class="nav-icon-btn" onclick="pickForMe()">🎲 ВЫБРАТЬ</button>
   <button class="nav-icon-btn" id="importNavBtn" onclick="openImportModal()">ИМПОРТ / ЭКСПОРТ</button>
   <button class="nav-icon-btn" id="statsBtn" onclick="goStats()">СТАТИСТИКА</button>
+  <span id="authArea"></span>
   <button class="btn-add" onclick="openModal()">+ Добавить</button>
 </header>
 
@@ -313,6 +314,55 @@
   </div>
 </div>
 
+<div class="overlay" id="authOverlay">
+  <div class="modal" style="max-width:380px;">
+    <h2 id="authTitle">Вход</h2>
+
+    <div id="authSetupHint" class="import-hint" style="display:none;margin-top:0;">
+      Вход и синхронизация архива между устройствами работают через бесплатный Supabase:
+      <div class="svc-list" style="margin-top:8px;">
+        <div class="svc-item">1. Создай проект на <a href="https://supabase.com" target="_blank" style="color:var(--brass);">supabase.com</a></div>
+        <div class="svc-item">2. В SQL Editor выполни скрипт из <code>db/supabase-setup.sql</code></div>
+        <div class="svc-item">3. Скопируй Project URL и anon-ключ (Settings → API) в <code>js/config.js</code></div>
+      </div>
+      Пока аккаунт не настроен, все данные хранятся локально в этом браузере — как раньше.
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="closeAuthModal()">Понятно</button>
+      </div>
+    </div>
+
+    <div id="authForm">
+      <div class="pill-group" id="authModePills" style="margin-bottom:6px;">
+        <button type="button" class="pill active" data-v="login" onclick="switchAuthMode('login')">Вход</button>
+        <button type="button" class="pill" data-v="register" onclick="switchAuthMode('register')">Регистрация</button>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input id="authPassword" type="password" placeholder="минимум 6 символов" autocomplete="current-password">
+      </div>
+      <div id="authStatus" class="import-hint"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeAuthModal()">Отмена</button>
+        <button class="btn-primary" id="authSubmitBtn" onclick="submitAuth()">Войти</button>
+      </div>
+      <div class="import-hint">После входа архив автоматически синхронизируется между всеми устройствами, где ты вошёл.</div>
+    </div>
+
+    <div id="authAccount" style="display:none;">
+      <div id="authAccountInfo"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="pullCloudArchive()">🔄 Синхронизировать</button>
+        <button class="btn-danger" onclick="signOutAuth()">Выйти</button>
+        <button class="btn-primary" onclick="closeAuthModal()">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <div class="overlay" id="pickOverlay">
@@ -326,7 +376,10 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
 <script src="js/worldmap.js"></script>
 <script src="js/app.js"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>
