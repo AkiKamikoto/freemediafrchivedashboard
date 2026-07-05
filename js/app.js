@@ -82,9 +82,19 @@ function applyUiPrefs(){
   if(uiPrefs.steamApiKey) document.getElementById('steamApiKey').value = uiPrefs.steamApiKey;
   if(uiPrefs.raUsername) document.getElementById('raUsername').value = uiPrefs.raUsername;
   if(uiPrefs.raApiKey) document.getElementById('raApiKey').value = uiPrefs.raApiKey;
+  if(uiPrefs.tmdbApiKey) document.getElementById('tmdbApiKey').value = uiPrefs.tmdbApiKey;
+  if(uiPrefs.rawgApiKey) document.getElementById('rawgApiKey').value = uiPrefs.rawgApiKey;
 }
 function saveSteamApiKey(v){
   uiPrefs.steamApiKey = v.trim();
+  persistUiPrefs();
+}
+function saveTmdbApiKey(v){
+  uiPrefs.tmdbApiKey = v.trim();
+  persistUiPrefs();
+}
+function saveRawgApiKey(v){
+  uiPrefs.rawgApiKey = v.trim();
   persistUiPrefs();
 }
 
@@ -381,15 +391,16 @@ async function runSearch(q){
   const box = document.getElementById('searchResults');
   try{
     let results = [];
-    if(cat==='movies') results = await searchITunes(q,'movie');
-    else if(cat==='series') results = await searchTVmaze(q);
+    if(cat==='movies') results = uiPrefs.tmdbApiKey ? await searchTMDB(q,'movie') : await searchITunes(q,'movie');
+    else if(cat==='series') results = uiPrefs.tmdbApiKey ? await searchTMDB(q,'tv') : await searchTVmaze(q);
     else if(cat==='anime') results = await searchJikan(q,'anime');
     else if(cat==='manga') results = await searchJikan(q,'manga');
     else if(cat==='books') results = await searchOpenLibrary(q);
     else if(cat==='games'){
       const ra = searchRetroAchievements(q);
       let store = [];
-      try{ store = await searchCheapShark(q); }catch(e){ /* RA-результаты всё равно покажем */ }
+      // RAWG (с ключом) знает игры всех платформ с обложками; CheapShark — запасной без ключа
+      try{ store = uiPrefs.rawgApiKey ? await searchRAWG(q) : await searchCheapShark(q); }catch(e){ /* RA-результаты всё равно покажем */ }
       results = [...ra, ...store].slice(0, 8);
     }
 
@@ -419,6 +430,8 @@ function applyResult(i){
   pendingImportMeta = r.meta || null;
   clearSearch();
   showToast('Данные подставлены');
+  // TMDB отдаёт режиссёра/каст/страну отдельным запросом деталей — дозаполняем асинхронно
+  if(r.tmdbId) fillTmdbDetails(r);
 }
 
 async function searchITunes(q, media){
@@ -480,6 +493,56 @@ async function searchCheapShark(q){
     year: '',
     cover: x.thumb || '',
     extra:{}
+  }));
+}
+
+/* ---------- TMDB (фильмы и сериалы, нужен бесплатный ключ) ---------- */
+function tmdbUrl(path, params){
+  const qs = new URLSearchParams({api_key: uiPrefs.tmdbApiKey, language: 'ru-RU', ...params});
+  return `https://api.themoviedb.org/3/${path}?${qs.toString()}`;
+}
+async function searchTMDB(q, type){
+  const res = await fetch(tmdbUrl(`search/${type}`, {query: q, include_adult: 'false'}));
+  const data = await res.json();
+  return (data.results||[]).slice(0,6).map(x=>({
+    title: x.title || x.name,
+    year: (x.release_date || x.first_air_date || '').slice(0,4),
+    cover: x.poster_path ? `https://image.tmdb.org/t/p/w500${x.poster_path}` : '',
+    description: (x.overview||'').slice(0,500),
+    tmdbId: x.id, tmdbType: type,
+    extra:{}
+  }));
+}
+async function fillTmdbDetails(r){
+  if(!uiPrefs.tmdbApiKey) return;
+  try{
+    const res = await fetch(tmdbUrl(`${r.tmdbType}/${r.tmdbId}`, {append_to_response:'credits'}));
+    const d = await res.json();
+    const setIf = (id, v)=>{ const el = document.getElementById(id); if(el && !el.value && v) el.value = v; };
+    const cast = (d.credits && d.credits.cast || []).slice(0,5).map(c=>c.name).join(', ');
+    if(r.tmdbType==='movie'){
+      setIf('ex_director', (d.credits && d.credits.crew || []).filter(c=>c.job==='Director').map(c=>c.name).join(', '));
+      setIf('ex_runtime', d.runtime || '');
+    } else {
+      setIf('ex_creator', (d.created_by||[]).map(c=>c.name).join(', '));
+      setIf('ex_totalEp', d.number_of_episodes || '');
+    }
+    setIf('ex_cast', cast);
+    // Английское название страны — так же его понимает карта мира в статистике
+    setIf('fCountry', (d.production_countries && d.production_countries[0] && d.production_countries[0].name) || '');
+    setIf('fDescription', (d.overview||'').slice(0,500));
+  }catch(e){ /* базовые поля уже подставлены из поиска */ }
+}
+
+/* ---------- RAWG (игры всех платформ, нужен бесплатный ключ) ---------- */
+async function searchRAWG(q){
+  const res = await fetch(`https://api.rawg.io/api/games?key=${encodeURIComponent(uiPrefs.rawgApiKey)}&search=${encodeURIComponent(q)}&page_size=6`);
+  const data = await res.json();
+  return (data.results||[]).map(x=>({
+    title: x.name,
+    year: x.released ? x.released.slice(0,4) : '',
+    cover: x.background_image || '',
+    extra:{ genre: (x.genres||[]).map(g=>g.name).join(', ') }
   }));
 }
 
@@ -1268,39 +1331,39 @@ function exportData(format){
 /* ---------- IMPORT ---------- */
 function openImportModal(){ document.getElementById('importOverlay').classList.add('show'); renderNav(); }
 function closeImportModal(){ document.getElementById('importOverlay').classList.remove('show'); renderNav(); }
+const IMPORT_TABS = {export:'Export', file:'File', cinema:'Cinema', books:'Books', shiki:'Shiki', steam:'Steam', ra:'RA'};
 function switchImportTab(tab){
-  document.getElementById('tabExport').classList.toggle('active', tab==='export');
-  document.getElementById('tabFile').classList.toggle('active', tab==='file');
-  document.getElementById('tabShiki').classList.toggle('active', tab==='shiki');
-  document.getElementById('tabSteam').classList.toggle('active', tab==='steam');
-  document.getElementById('tabRA').classList.toggle('active', tab==='ra');
-  document.getElementById('panelExport').classList.toggle('active', tab==='export');
-  document.getElementById('panelFile').classList.toggle('active', tab==='file');
-  document.getElementById('panelShiki').classList.toggle('active', tab==='shiki');
-  document.getElementById('panelSteam').classList.toggle('active', tab==='steam');
-  document.getElementById('panelRA').classList.toggle('active', tab==='ra');
+  Object.entries(IMPORT_TABS).forEach(([key,suffix])=>{
+    document.getElementById('tab'+suffix).classList.toggle('active', tab===key);
+    document.getElementById('panel'+suffix).classList.toggle('active', tab===key);
+  });
 }
 
 let importRows = [];
 let importHeaders = [];
 
+// Полноценный разбор с учётом кавычек: значения могут содержать запятые
+// и переводы строк (например, рецензии в экспорте Goodreads).
 function parseCSV(text){
-  const lines = text.split(/\r?\n/).filter(l=>l.trim().length);
-  if(!lines.length) return {headers:[],rows:[]};
-  const splitLine = (line)=>{
-    const out=[]; let cur=''; let inQ=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(ch==='"'){ if(inQ && line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
-      else if(ch===',' && !inQ){ out.push(cur); cur=''; }
+  const rawRows = []; let row = []; let cur = ''; let inQ = false;
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    if(inQ){
+      if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else inQ=false; }
       else cur+=ch;
-    }
-    out.push(cur);
-    return out;
-  };
-  const headers = splitLine(lines[0]).map(h=>h.trim());
-  const rows = lines.slice(1).map(l=>{
-    const vals = splitLine(l);
+    } else if(ch==='"'){ inQ=true; }
+    else if(ch===','){ row.push(cur); cur=''; }
+    else if(ch==='\n' || ch==='\r'){
+      if(ch==='\r' && text[i+1]==='\n') i++;
+      row.push(cur); cur='';
+      if(row.length>1 || row[0].trim()!=='') rawRows.push(row);
+      row = [];
+    } else cur+=ch;
+  }
+  if(cur!=='' || row.length){ row.push(cur); if(row.length>1 || row[0].trim()!=='') rawRows.push(row); }
+  if(!rawRows.length) return {headers:[],rows:[]};
+  const headers = rawRows[0].map(h=>h.trim());
+  const rows = rawRows.slice(1).map(vals=>{
     const obj={};
     headers.forEach((h,i)=>obj[h]=(vals[i]||'').trim());
     return obj;
@@ -1445,6 +1508,271 @@ async function importShikimori(type){
   }catch(e){
     statusEl.textContent = 'Не удалось получить данные (открой файл напрямую в браузере, не в превью чата)';
   }
+}
+
+function newId(){ return 'e'+Date.now()+Math.random().toString(36).slice(2,7); }
+// Совпадение для слияния: та же категория + то же название (+ год, если известен у обоих)
+function findEntryByTitle(category, title, year){
+  const t = title.trim().toLowerCase();
+  return entries.find(e=>e.category===category && e.title.trim().toLowerCase()===t && (!year || !e.year || e.year===year));
+}
+
+/* ---------- КИНО: Letterboxd / IMDb ---------- */
+function handleCinemaFile(file){
+  if(!file) return;
+  const statusEl = document.getElementById('cinemaStatus');
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    const {headers, rows} = parseCSV(e.target.result);
+    if(!rows.length){ statusEl.textContent = 'Файл пуст или не распознан'; return; }
+    if(headers.includes('Const') && headers.includes('Title Type')) await importImdbRows(rows, statusEl);
+    else if(headers.includes('Name') && headers.includes('Year')) await importLetterboxdRows(rows, file.name, statusEl);
+    else statusEl.textContent = 'Не похоже на экспорт Letterboxd или IMDb — попробуй вкладку «Файл» с ручным сопоставлением колонок';
+  };
+  reader.readAsText(file);
+}
+
+async function importLetterboxdRows(rows, filename, statusEl){
+  // Тип списка (watched/ratings/diary/watchlist) в самих колонках не закодирован —
+  // определяем по имени файла из архива экспорта.
+  const isWatchlist = /watchlist/i.test(filename);
+  let added=0, updated=0;
+  rows.forEach(row=>{
+    const title = (row['Name']||'').trim();
+    if(!title) return;
+    const year = parseInt(row['Year'])||null;
+    const rating = row['Rating'] ? Math.round(parseFloat(row['Rating'])*2*10)/10 : null; // 0.5–5 → 1–10
+    const watchDate = ((row['Watched Date'] || (!isWatchlist ? row['Date'] : '')) || '').slice(0,10) || null;
+    const status = isWatchlist ? 'planning' : 'completed';
+    const existing = findEntryByTitle('movies', title, year);
+    if(existing){
+      if(rating && !existing.rating) existing.rating = rating;
+      if(watchDate && !existing.watchDate) existing.watchDate = watchDate;
+      if(year && !existing.year) existing.year = year;
+      if(status==='completed' && (existing.status==='planning')) existing.status = 'completed';
+      existing.updated = Date.now(); updated++;
+    } else {
+      entries.push({id:newId(), title, category:'movies', status, rating, year,
+        country:'', cover:'', description:'', notes:'', watchDate, data:{}, updated:Date.now()});
+      added++;
+    }
+  });
+  await persist(); render();
+  const msg = `Letterboxd: добавлено ${added}, обновлено ${updated}. Постеры — кнопкой «Подтянуть постеры» ниже.`;
+  statusEl.textContent = msg; showToast(msg);
+}
+
+async function importImdbRows(rows, statusEl){
+  let added=0, updated=0;
+  rows.forEach(row=>{
+    const title = (row['Title']||row['Original Title']||'').trim();
+    if(!title) return;
+    const tt = (row['Title Type']||'').toLowerCase().replace(/\s/g,'');
+    if(tt==='tvepisode') return; // отдельные эпизоды не тащим
+    const category = tt.includes('series') ? 'series' : 'movies';
+    const year = parseInt(row['Year'])||null;
+    const rating = parseFloat(row['Your Rating'])||null;
+    const watchDate = (row['Date Rated']||'').slice(0,10) || null;
+    const data = {};
+    if(category==='movies'){
+      if(row['Directors']) data.director = row['Directors'];
+      if(parseInt(row['Runtime (mins)'])) data.runtime = parseInt(row['Runtime (mins)']);
+    } else if(row['Directors']) data.creator = row['Directors'];
+    const existing = findEntryByTitle(category, title, year);
+    if(existing){
+      if(rating && !existing.rating) existing.rating = rating;
+      if(watchDate && !existing.watchDate) existing.watchDate = watchDate;
+      if(year && !existing.year) existing.year = year;
+      if(existing.status==='planning') existing.status = 'completed';
+      existing.data = {...data, ...existing.data};
+      existing.updated = Date.now(); updated++;
+    } else {
+      entries.push({id:newId(), title, category, status:'completed', rating, year,
+        country:'', cover:'', description:'', notes:'', watchDate, data, updated:Date.now()});
+      added++;
+    }
+  });
+  await persist(); render();
+  const msg = `IMDb: добавлено ${added}, обновлено ${updated}. Постеры — кнопкой «Подтянуть постеры» ниже.`;
+  statusEl.textContent = msg; showToast(msg);
+}
+
+// Дозаполнение постеров/описаний у фильмов и сериалов без обложки — по TMDB
+async function enrichCinemaEntries(statusEl){
+  if(!uiPrefs.tmdbApiKey){ statusEl.textContent = 'Сначала вставь ключ TMDB выше'; return; }
+  const targets = entries.filter(e=>(e.category==='movies'||e.category==='series') && !e.cover);
+  if(!targets.length){ statusEl.textContent = 'У всех фильмов и сериалов уже есть обложки'; return; }
+  let done=0, missed=0;
+  for(let i=0;i<targets.length;i++){
+    const e = targets[i];
+    statusEl.textContent = `Ищу постеры: ${i+1}/${targets.length}...`;
+    const type = e.category==='movies' ? 'movie' : 'tv';
+    const yearParam = e.year ? (type==='movie' ? {primary_release_year:e.year} : {first_air_date_year:e.year}) : {};
+    try{
+      const res = await fetch(tmdbUrl(`search/${type}`, {query:e.title, include_adult:'false', ...yearParam}));
+      const data = await res.json();
+      const hit = (data.results||[])[0];
+      if(hit){
+        if(hit.poster_path) e.cover = `https://image.tmdb.org/t/p/w500${hit.poster_path}`;
+        if(!e.description && hit.overview) e.description = hit.overview.slice(0,500);
+        if(!e.year){ const y = parseInt((hit.release_date||hit.first_air_date||'').slice(0,4)); if(y) e.year = y; }
+        e.updated = Date.now(); done++;
+      } else missed++;
+    }catch(err){ missed++; }
+    await new Promise(r=>setTimeout(r, 120));
+  }
+  await persist(); render();
+  statusEl.textContent = `Готово — найдено ${done}${missed?`, не найдено ${missed}`:''}`;
+  showToast(`Постеры: ${done}`);
+}
+
+/* ---------- КНИГИ: Goodreads ---------- */
+function handleGoodreadsFile(file){
+  if(!file) return;
+  const statusEl = document.getElementById('booksStatus');
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    const {headers, rows} = parseCSV(e.target.result);
+    if(!headers.includes('Title') || !headers.includes('Exclusive Shelf')){
+      statusEl.textContent = 'Не похоже на экспорт Goodreads — попробуй вкладку «Файл»'; return;
+    }
+    const shelfMap = {'read':'completed','currently-reading':'progress','to-read':'planning'};
+    let added=0, updated=0;
+    rows.forEach(row=>{
+      const title = (row['Title']||'').trim();
+      if(!title) return;
+      const rating = parseInt(row['My Rating'])>0 ? parseInt(row['My Rating'])*2 : null; // 1–5 → 2–10
+      const status = shelfMap[(row['Exclusive Shelf']||'').toLowerCase()] || 'completed';
+      const year = parseInt(row['Original Publication Year'])||parseInt(row['Year Published'])||null;
+      const watchDate = (row['Date Read']||'').replace(/\//g,'-') || null;
+      // Goodreads оборачивает ISBN в ="...", чтобы Excel не съел нули
+      const isbn = (row['ISBN13']||row['ISBN']||'').replace(/[^0-9Xx]/g,'');
+      const data = {};
+      if(row['Author']) data.author = row['Author'];
+      if(parseInt(row['Number of Pages'])) data.totalPages = parseInt(row['Number of Pages']);
+      const timesWatched = parseInt(row['Read Count'])>1 ? parseInt(row['Read Count']) : null;
+      // default=false — без обложки Open Library вернёт 404, сработает фолбэк с инициалами
+      const cover = isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false` : '';
+      const existing = findEntryByTitle('books', title, year);
+      if(existing){
+        if(rating && !existing.rating) existing.rating = rating;
+        if(watchDate && !existing.watchDate) existing.watchDate = watchDate;
+        if(cover && !existing.cover) existing.cover = cover;
+        if(year && !existing.year) existing.year = year;
+        existing.data = {...data, ...existing.data};
+        existing.updated = Date.now(); updated++;
+      } else {
+        entries.push({id:newId(), title, category:'books', status, rating, year,
+          country:'', cover, description:'', notes:(row['My Review']||'').slice(0,2000),
+          watchDate, timesWatched, data, updated:Date.now()});
+        added++;
+      }
+    });
+    await persist(); render();
+    const msg = `Goodreads: добавлено ${added}, обновлено ${updated}`;
+    statusEl.textContent = msg; showToast(msg);
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- АНИМЕ: AniList / MyAnimeList ---------- */
+async function importAniList(type){
+  const user = document.getElementById('anilistUser').value.trim();
+  const statusEl = document.getElementById('anilistStatus');
+  if(!user){ statusEl.textContent = 'Введи ник'; return; }
+  statusEl.textContent = 'загружаю...';
+  const query = `query($user:String,$type:MediaType){
+    MediaListCollection(userName:$user,type:$type){
+      lists{entries{status score(format:POINT_10_DECIMAL) progress
+        media{title{romaji english} episodes chapters startDate{year} coverImage{large} description}}}}}`;
+  try{
+    const res = await fetch('https://graphql.anilist.co', {
+      method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify({query, variables:{user, type:type.toUpperCase()}})
+    });
+    const data = await res.json();
+    const lists = (data.data && data.data.MediaListCollection && data.data.MediaListCollection.lists) || [];
+    const items = lists.flatMap(l=>l.entries||[]);
+    if(!items.length){ statusEl.textContent = 'Список пуст, профиль закрыт или ник не найден'; return; }
+    const stMap = {CURRENT:'progress', REPEATING:'progress', PLANNING:'planning', COMPLETED:'completed', PAUSED:'hold', DROPPED:'dropped'};
+    let added=0, updated=0;
+    items.forEach(it=>{
+      const m = it.media;
+      if(!m) return;
+      const title = (m.title && (m.title.english || m.title.romaji)) || '';
+      if(!title) return;
+      const year = (m.startDate && m.startDate.year) || null;
+      const rating = it.score>0 ? Math.round(it.score*10)/10 : null;
+      const status = stMap[it.status] || 'planning';
+      const extra = type==='anime'
+        ? {epWatched: it.progress||'', totalEp: m.episodes||''}
+        : {chRead: it.progress||'', totalCh: m.chapters||''};
+      const cover = (m.coverImage && m.coverImage.large) || '';
+      const description = m.description ? m.description.replace(/<[^>]+>/g,'').slice(0,500) : '';
+      const existing = findEntryByTitle(type, title, year);
+      if(existing){
+        if(rating && !existing.rating) existing.rating = rating;
+        if(cover && !existing.cover) existing.cover = cover;
+        if(description && !existing.description) existing.description = description;
+        if(year && !existing.year) existing.year = year;
+        existing.data = {...extra, ...existing.data};
+        existing.updated = Date.now(); updated++;
+      } else {
+        entries.push({id:newId(), title, category:type, status, rating, year,
+          country:'', cover, description, notes:'', data:extra, updated:Date.now()});
+        added++;
+      }
+    });
+    await persist(); render();
+    const msg = `AniList: добавлено ${added}, обновлено ${updated}`;
+    statusEl.textContent = msg; showToast(msg);
+  }catch(e){
+    statusEl.textContent = 'Не удалось получить данные — проверь ник и что список публичный';
+  }
+}
+
+function handleMalFile(file){
+  if(!file) return;
+  const statusEl = document.getElementById('malStatus');
+  if(/\.gz$/i.test(file.name)){ statusEl.textContent = 'Сначала распакуй архив — нужен сам .xml'; return; }
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    const doc = new DOMParser().parseFromString(e.target.result, 'text/xml');
+    const txt = (node, tag)=>{ const el = node.querySelector(tag); return el ? el.textContent.trim() : ''; };
+    const stMap = {'watching':'progress','reading':'progress','completed':'completed','on-hold':'hold','dropped':'dropped','plan to watch':'planning','plan to read':'planning'};
+    let added=0, updated=0;
+    const importNodes = (nodes, category)=>{
+      nodes.forEach(n=>{
+        const isAnime = category==='anime';
+        const title = txt(n, isAnime ? 'series_title' : 'manga_title');
+        if(!title) return;
+        const rating = parseInt(txt(n, 'my_score'))||null;
+        const status = stMap[txt(n, 'my_status').toLowerCase()] || 'planning';
+        const extra = isAnime
+          ? {epWatched: parseInt(txt(n,'my_watched_episodes'))||'', totalEp: parseInt(txt(n,'series_episodes'))||''}
+          : {chRead: parseInt(txt(n,'my_read_chapters'))||'', totalCh: parseInt(txt(n,'manga_chapters'))||''};
+        const watchDate = /^\d{4}-\d{2}-\d{2}$/.test(txt(n,'my_finish_date')) && txt(n,'my_finish_date')!=='0000-00-00' ? txt(n,'my_finish_date') : null;
+        const existing = findEntryByTitle(category, title, null);
+        if(existing){
+          if(rating && !existing.rating) existing.rating = rating;
+          if(watchDate && !existing.watchDate) existing.watchDate = watchDate;
+          existing.data = {...extra, ...existing.data};
+          existing.updated = Date.now(); updated++;
+        } else {
+          entries.push({id:newId(), title, category, status, rating, year:null,
+            country:'', cover:'', description:'', notes:'', watchDate, data:extra, updated:Date.now()});
+          added++;
+        }
+      });
+    };
+    importNodes([...doc.querySelectorAll('anime')], 'anime');
+    importNodes([...doc.querySelectorAll('manga')], 'manga');
+    if(!added && !updated){ statusEl.textContent = 'В файле не нашлось записей — это точно XML-экспорт MAL?'; return; }
+    await persist(); render();
+    const msg = `MyAnimeList: добавлено ${added}, обновлено ${updated}`;
+    statusEl.textContent = msg; showToast(msg);
+  };
+  reader.readAsText(file);
 }
 
 function parseSteamGames(raw){
@@ -1942,12 +2270,19 @@ function downloadRaGamesDb(){
   showToast(`Скачано игр: ${raGamesDb.games.length}`);
 }
 
-document.getElementById('dropzone').addEventListener('dragover', e=>{e.preventDefault(); e.currentTarget.classList.add('drag');});
-document.getElementById('dropzone').addEventListener('dragleave', e=>{e.currentTarget.classList.remove('drag');});
-document.getElementById('dropzone').addEventListener('drop', e=>{
-  e.preventDefault(); e.currentTarget.classList.remove('drag');
-  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-});
+function wireDropzone(id, handler){
+  const el = document.getElementById(id);
+  el.addEventListener('dragover', e=>{e.preventDefault(); e.currentTarget.classList.add('drag');});
+  el.addEventListener('dragleave', e=>{e.currentTarget.classList.remove('drag');});
+  el.addEventListener('drop', e=>{
+    e.preventDefault(); e.currentTarget.classList.remove('drag');
+    if(e.dataTransfer.files[0]) handler(e.dataTransfer.files[0]);
+  });
+}
+wireDropzone('dropzone', handleFile);
+wireDropzone('cinemaDropzone', handleCinemaFile);
+wireDropzone('booksDropzone', handleGoodreadsFile);
+wireDropzone('malDropzone', handleMalFile);
 document.getElementById('importOverlay').addEventListener('click', e=>{ if(e.target.id==='importOverlay') closeImportModal(); });
 document.getElementById('pickOverlay').addEventListener('click', e=>{ if(e.target.id==='pickOverlay') closePickModal(); });
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
