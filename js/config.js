@@ -3,6 +3,6 @@
 // Supabase — и в шапке заработает «Войти». anon-ключ публичный по дизайну
 // (доступ к данным ограничивает row-level security), его можно коммитить.
 window.ARCHIVE_CONFIG = {
-  supabaseUrl: '',
+  supabaseUrl: 'https://wyucolpzrncoimapnojc.supabase.co',
   supabaseAnonKey: 'sb_publishable_IyAKKRvEgRR-8EBSENGCxQ__d2afWIk'
 };
