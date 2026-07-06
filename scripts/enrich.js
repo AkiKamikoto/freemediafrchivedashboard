@@ -3,14 +3,16 @@
  * 
  * Особенности:
  * - Не требует внешних зависимостей (использует нативный Node.js fetch).
- * - Обогащает категории: Фильмы/Сериалы (TMDB), Аниме/Манга (Shikimori), Книги (Google Books), Игры (RAWG).
- * - Скачивает внешние обложки локально в data/covers/ и переводит пути на локальные.
+ * - Поддерживает два режима работы:
+ *   1. Облачный режим (автоматический): напрямую скачивает данные из Supabase,
+ *      обогащает их, загружает обложки в data/covers/ и отправляет обновленную
+ *      базу обратно в Supabase. При обновлении страницы в браузере изменения
+ *      подтянутся автоматически.
+ *   2. Файловый режим (ручной): работает с локальным `archive-export.json` в корне.
  * 
  * Запуск:
- * 1. Экспортируйте ваш архив из приложения в формате JSON и положите в корень как `archive-export.json`.
- * 2. Создайте в корне файл `.env` и впишите API-ключи (пример в README).
- * 3. Запустите: `node scripts/enrich.js`
- * 4. Импортируйте обновленный `archive-export.json` обратно в приложение через Импорт/Экспорт → Файл.
+ * 1. Создайте в корне файл `.env` и впишите API-ключи (пример в README).
+ * 2. Запустите: `node scripts/enrich.js`
  */
 
 const fs = require('fs');
@@ -34,23 +36,12 @@ Object.assign(env, process.env);
 
 const TMDB_KEY = env.TMDB_API_KEY || '';
 const RAWG_KEY = env.RAWG_API_KEY || '';
+const SUPABASE_URL = env.SUPABASE_URL || '';
+const SUPABASE_SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_USER_ID = env.SUPABASE_USER_ID || '';
 
 const ARCHIVE_FILE = 'archive-export.json';
 const COVERS_DIR = path.join('data', 'covers');
-
-if (!fs.existsSync(ARCHIVE_FILE)) {
-  console.error(`❌ Ошибка: Файл '${ARCHIVE_FILE}' не найден в корневой директории.`);
-  console.error(`Пожалуйста, экспортируйте архив (JSON) из веб-интерфейса и сохраните под именем '${ARCHIVE_FILE}'.\n`);
-  process.exit(1);
-}
-
-let entries = [];
-try {
-  entries = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
-} catch (e) {
-  console.error(`❌ Ошибка при чтении/парсинге ${ARCHIVE_FILE}:`, e.message);
-  process.exit(1);
-}
 
 if (!fs.existsSync(COVERS_DIR)) {
   fs.mkdirSync(COVERS_DIR, { recursive: true });
@@ -194,13 +185,11 @@ async function enrichShikimori(title, category) {
 // Google Books (Книги)
 async function enrichBooks(title) {
   try {
-    // Сначала ищем русские издания
     let searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}&maxResults=1&langRestrict=ru`;
     let res = await fetch(searchUrl);
     let data = await res.json();
     let item = data.items && data.items[0];
 
-    // Если на русском ничего не нашли, повторяем без ограничений по языку
     if (!item) {
       searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(title)}&maxResults=1`;
       res = await fetch(searchUrl);
@@ -237,7 +226,6 @@ async function enrichRAWG(title) {
     const hit = data.results && data.results[0];
     if (!hit) return null;
 
-    // Детальный запрос для получения описания и разработчика
     const detailUrl = `https://api.rawg.io/api/games/${hit.id}?key=${RAWG_KEY}`;
     const dRes = await fetch(detailUrl);
     if (!dRes.ok) return null;
@@ -260,13 +248,113 @@ async function enrichRAWG(title) {
   }
 }
 
-/* --- Главный цикл обогащения --- */
+/* --- Логика загрузки и сохранения архива --- */
+
+// Загрузка архива из Supabase
+async function fetchSupabaseArchive() {
+  const url = `${SUPABASE_URL}/rest/v1/archives?select=user_id,payload`;
+  const headers = {
+    'apikey': SUPABASE_SERVICE_ROLE_KEY,
+    'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+  };
+
+  const res = await fetch(url, { headers });
+  if (!res.ok) {
+    throw new Error(`Не удалось загрузить данные из Supabase. HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  if (!data || data.length === 0) {
+    throw new Error('В таблице archives не найдено записей. Сохраните архив хотя бы один раз из браузера.');
+  }
+
+  let selectedRow = data[0];
+  if (data.length > 1) {
+    if (SUPABASE_USER_ID) {
+      selectedRow = data.find(row => row.user_id === SUPABASE_USER_ID);
+      if (!selectedRow) {
+        throw new Error(`В базе несколько записей, но пользователя с ID '${SUPABASE_USER_ID}' нет.`);
+      }
+    } else {
+      console.warn('⚠️ В базе найдено несколько архивов разных пользователей.');
+      console.warn('Будет использован первый найденный архив. Вы можете указать SUPABASE_USER_ID в файле .env.');
+    }
+  }
+
+  return {
+    userId: selectedRow.user_id,
+    entries: selectedRow.payload.entries || [],
+    deletedIds: selectedRow.payload.deleted || {}
+  };
+}
+
+// Отправка архива обратно в Supabase (UPSERT)
+async function saveSupabaseArchive(userId, entries, deletedIds) {
+  const url = `${SUPABASE_URL}/rest/v1/archives`;
+  const headers = {
+    'apikey': SUPABASE_SERVICE_ROLE_KEY,
+    'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  };
+
+  const body = {
+    user_id: userId,
+    payload: { entries, deleted: deletedIds },
+    updated_at: new Date().toISOString()
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Не удалось отправить архив в Supabase. HTTP ${res.status}: ${errText}`);
+  }
+}
+
+/* --- Главный цикл --- */
 
 async function main() {
+  const isCloudMode = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY;
+  let entries = [];
+  let deletedIds = {};
+  let userId = null;
+
   console.log('🚀 Старт обогащения базы данных...');
-  console.log(`📦 Загружено записей: ${entries.length}`);
   console.log(`🔑 TMDB Ключ: ${TMDB_KEY ? 'Есть' : 'Нет (фильмы не обогащаются)'}`);
-  console.log(`🔑 RAWG Ключ: ${RAWG_KEY ? 'Есть' : 'Нет (игры не обогащаются)'}\n`);
+  console.log(`🔑 RAWG Ключ: ${RAWG_KEY ? 'Есть' : 'Нет (игры не обогащаются)'}`);
+
+  if (isCloudMode) {
+    console.log('🌐 Режим: ОБЛАЧНЫЙ (Supabase)');
+    try {
+      const data = await fetchSupabaseArchive();
+      userId = data.userId;
+      entries = data.entries;
+      deletedIds = data.deletedIds;
+      console.log(`📡 Архив успешно загружен из Supabase (Пользователь UUID: ${userId})`);
+      console.log(`📦 Всего записей в облаке: ${entries.length}\n`);
+    } catch (e) {
+      console.error(`❌ Ошибка загрузки из Supabase: ${e.message}`);
+      process.exit(1);
+    }
+  } else {
+    console.log('📂 Режим: ЛОКАЛЬНЫЙ ФАЙЛ (archive-export.json)');
+    if (!fs.existsSync(ARCHIVE_FILE)) {
+      console.error(`❌ Ошибка: Файл '${ARCHIVE_FILE}' не найден в корневой директории.`);
+      console.error(`Пожалуйста, экспортируйте архив (JSON) из веб-интерфейса или настройте Supabase в .env для авто-режима.\n`);
+      process.exit(1);
+    }
+    try {
+      entries = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
+      console.log(`📦 Всего локальных записей: ${entries.length}\n`);
+    } catch (e) {
+      console.error(`❌ Ошибка при чтении ${ARCHIVE_FILE}:`, e.message);
+      process.exit(1);
+    }
+  }
 
   let enrichedCount = 0;
   let downloadedCovers = 0;
@@ -294,7 +382,6 @@ async function main() {
     }
 
     if (details) {
-      // Заполняем только те поля, которых нет
       if (!e.description) e.description = details.description;
       if (!e.year) e.year = details.year;
       if (!e.country && details.country) e.country = details.country;
@@ -324,16 +411,30 @@ async function main() {
     }
   }
 
-  // Запись результатов обратно в файл
-  try {
-    fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(entries, null, 2), 'utf8');
-    console.log(`\n🎉 Все готово! Результаты сохранены в '${ARCHIVE_FILE}'`);
-    console.log(`📊 Статистика:`);
-    console.log(`   - Обогащено записей метаданными: ${enrichedCount}`);
-    console.log(`   - Скачано обложек в data/covers/: ${downloadedCovers}`);
-    console.log(`\n👉 Теперь импортируйте файл '${ARCHIVE_FILE}' обратно в приложение через меню «Импорт / Экспорт» → «Файл».`);
-  } catch (e) {
-    console.error('❌ Ошибка при сохранении результатов в файл:', e.message);
+  // Запись результатов
+  if (isCloudMode) {
+    try {
+      console.log('\n📤 Отправка обновленного архива в Supabase...');
+      await saveSupabaseArchive(userId, entries, deletedIds);
+      console.log('🎉 Все готово! Облачная база Supabase обновлена.');
+      console.log(`📊 Статистика:`);
+      console.log(`   - Обогащено записей метаданными: ${enrichedCount}`);
+      console.log(`   - Скачано обложек в data/covers/: ${downloadedCovers}`);
+      console.log('\n👉 Просто обновите страницу в браузере — новые данные загрузятся автоматически!');
+    } catch (e) {
+      console.error(`❌ Ошибка отправки в Supabase: ${e.message}`);
+    }
+  } else {
+    try {
+      fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(entries, null, 2), 'utf8');
+      console.log(`\n🎉 Все готово! Результаты сохранены в '${ARCHIVE_FILE}'`);
+      console.log(`📊 Статистика:`);
+      console.log(`   - Обогащено записей метаданными: ${enrichedCount}`);
+      console.log(`   - Скачано обложек в data/covers/: ${downloadedCovers}`);
+      console.log(`\n👉 Теперь импортируйте файл '${ARCHIVE_FILE}' обратно в приложение через меню «Импорт / Экспорт» → «Файл».`);
+    } catch (e) {
+      console.error('❌ Ошибка при сохранении результатов в файл:', e.message);
+    }
   }
 }
 
