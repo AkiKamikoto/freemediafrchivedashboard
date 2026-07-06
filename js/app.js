@@ -1294,36 +1294,118 @@ function renderStats(){
 async function dedupeEntries(){
   const groups = {};
   entries.forEach(e=>{
-    const key = e.category+'::'+e.title.trim().toLowerCase();
+    const key = e.title.trim().toLowerCase();
     (groups[key] = groups[key] || []).push(e);
   });
+  
   const dupGroups = Object.values(groups).filter(g=>g.length>1);
-  const removedCount = dupGroups.reduce((sum,g)=>sum+g.length-1, 0);
-  if(!removedCount){ showToast('Дубликатов не найдено'); return; }
-  if(!confirm(`Найдено ${removedCount} дублирующих записей (по названию и категории). Склеить и удалить лишние?`)) return;
+  if(!dupGroups.length){ showToast('Дубликатов не найдено'); return; }
 
-  const score = x => (x.rating?2:0) + (x.cover?1:0);
-  const kept = [];
-  dupGroups.forEach(group=>{
-    group.sort((a,b)=> score(b)-score(a) || b.updated-a.updated);
-    const primary = group[0];
-    group.slice(1).forEach(dup=>{
-      if(!primary.cover && dup.cover) primary.cover = dup.cover;
-      if(!primary.rating && dup.rating) primary.rating = dup.rating;
-      if(!primary.notes && dup.notes) primary.notes = dup.notes;
-      if(!primary.description && dup.description) primary.description = dup.description;
-      if(!primary.watchDate && dup.watchDate) primary.watchDate = dup.watchDate;
-      if(!primary.year && dup.year) primary.year = dup.year;
-      if(dup.data && dup.data.hours && !(primary.data && primary.data.hours)) primary.data = {...primary.data, hours: dup.data.hours};
+  let sameCategoryDupsCount = 0;
+  let crossCategoryDupsCount = 0;
+  const dupIds = new Set();
+  let removedCount = 0;
+
+  // Предварительный подсчет для сообщения пользователю
+  dupGroups.forEach(group => {
+    const catGroups = {};
+    group.forEach(e => {
+      catGroups[e.category] = (catGroups[e.category] || []);
+      catGroups[e.category].push(e);
     });
-    kept.push(primary);
+
+    // Считаем дубликаты внутри одной категории
+    Object.values(catGroups).forEach(list => {
+      if (list.length > 1) sameCategoryDupsCount += list.length - 1;
+    });
+
+    // Считаем кросс-категорийные дубликаты (заглушка в Фильмах против корректной категории)
+    const moviesList = catGroups['movies'];
+    if (moviesList) {
+      const otherCats = Object.keys(catGroups).filter(c => c !== 'movies');
+      if (otherCats.length === 1) {
+        moviesList.forEach(m => {
+          const isStub = m.status === 'planning' && m.rating === null && m.cover === '' && (!m.data || Object.keys(m.data).length === 0);
+          if (isStub) crossCategoryDupsCount++;
+        });
+      }
+    }
   });
-  const dupIds = new Set(dupGroups.flatMap(g=>g.slice(1).map(x=>x.id)));
+
+  const totalDups = sameCategoryDupsCount + crossCategoryDupsCount;
+  if(!totalDups){ showToast('Дубликатов не найдено'); return; }
+
+  if(!confirm(`Найдено дубликатов: ${sameCategoryDupsCount} (внутри одной категории) и ${crossCategoryDupsCount} (ошибочные дубликаты в «Фильмах»). Склеить и удалить лишние?`)) return;
+
+  const score = x => (x.rating?2:0) + (x.cover?1:0) + (x.description?1:0);
+
+  dupGroups.forEach(group => {
+    const catGroups = {};
+    group.forEach(e => {
+      catGroups[e.category] = (catGroups[e.category] || []);
+      catGroups[e.category].push(e);
+    });
+
+    const categoryWinners = {};
+
+    // 1. Сначала склеиваем дубликаты внутри каждой категории
+    Object.entries(catGroups).forEach(([cat, list]) => {
+      if (list.length > 1) {
+        list.sort((a,b)=> score(b)-score(a) || b.updated-a.updated);
+        const primary = list[0];
+        list.slice(1).forEach(dup => {
+          if(!primary.cover && dup.cover) primary.cover = dup.cover;
+          if(!primary.rating && dup.rating) primary.rating = dup.rating;
+          if(!primary.notes && dup.notes) primary.notes = dup.notes;
+          if(!primary.description && dup.description) primary.description = dup.description;
+          if(!primary.watchDate && dup.watchDate) primary.watchDate = dup.watchDate;
+          if(!primary.year && dup.year) primary.year = dup.year;
+          if(dup.data) primary.data = {...dup.data, ...primary.data};
+          dupIds.add(dup.id);
+          removedCount++;
+        });
+        categoryWinners[cat] = primary;
+      } else {
+        categoryWinners[cat] = list[0];
+      }
+    });
+
+    // 2. Склеиваем кросс-категорийные дубликаты (заглушка в Фильмах против корректной категории)
+    const moviesWinner = categoryWinners['movies'];
+    if (moviesWinner) {
+      const otherCats = Object.keys(categoryWinners).filter(c => c !== 'movies');
+      if (otherCats.length === 1) {
+        const correctWinner = categoryWinners[otherCats[0]];
+        const isStub = moviesWinner.status === 'planning' && 
+                       moviesWinner.rating === null && 
+                       moviesWinner.cover === '' && 
+                       (!moviesWinner.data || Object.keys(moviesWinner.data).length === 0);
+        
+        if (isStub) {
+          if (moviesWinner.notes && !correctWinner.notes) correctWinner.notes = moviesWinner.notes;
+          if (moviesWinner.description && !correctWinner.description) correctWinner.description = moviesWinner.description;
+          
+          dupIds.add(moviesWinner.id);
+          removedCount++;
+        }
+      }
+    }
+  });
+
   entries = entries.filter(e=>!dupIds.has(e.id));
   dupIds.forEach(id=>{ deletedIds[id] = Date.now(); });
   await persist();
   render();
-  showToast(`Удалено дубликатов: ${removedCount}`);
+  showToast(`Склеено и удалено дубликатов: ${removedCount}`);
+}
+
+async function clearDatabase() {
+  if(!confirm('Вы уверены, что хотите полностью стереть все записи? Это действие сотрет локальную копию данных.')) return;
+  entries = [];
+  deletedIds = {};
+  await persist();
+  render();
+  showToast('База данных очищена');
 }
 
 function exportData(format){
@@ -1692,6 +1774,131 @@ async function enrichCinemaEntries(statusEl){
   await persist(); render();
   statusEl.textContent = `Готово — найдено ${done}${missed?`, не найдено ${missed}`:''}`;
   showToast(`Постеры: ${done}`);
+}
+
+async function enrichAllEntries(statusEl){
+  const targets = entries.filter(e=>{
+    const hasBasic = e.cover && e.description;
+    const hasData = e.category==='movies' ? (e.data && e.data.director) : true;
+    return !hasBasic || !hasData;
+  });
+  if(!targets.length){ statusEl.textContent = 'Все записи уже имеют обложки и описание!'; return; }
+  
+  let done=0, missed=0;
+  for(let i=0;i<targets.length;i++){
+    const e = targets[i];
+    statusEl.textContent = `Обогащение базы: ${i+1}/${targets.length} ("${e.title}")...`;
+    
+    try{
+      if(e.category==='movies' || e.category==='series'){
+        if(!uiPrefs.tmdbApiKey) { missed++; continue; }
+        const type = e.category==='movies' ? 'movie' : 'tv';
+        const yearParam = e.year ? (type==='movie' ? {primary_release_year:e.year} : {first_air_date_year:e.year}) : {};
+        const sRes = await fetch(tmdbUrl(`search/${type}`, {query:e.title, include_adult:'false', ...yearParam}));
+        const sData = await sRes.json();
+        const hit = (sData.results||[])[0];
+        if(hit){
+          if(!e.cover && hit.poster_path) e.cover = `https://image.tmdb.org/t/p/w500${hit.poster_path}`;
+          if(!e.description && hit.overview) e.description = hit.overview.slice(0,500);
+          if(!e.year){ const y = parseInt((hit.release_date||hit.first_air_date||'').slice(0,4)); if(y) e.year = y; }
+          
+          // Детали
+          const dRes = await fetch(tmdbUrl(`${type}/${hit.id}`, {append_to_response:'credits'}));
+          const d = await dRes.json();
+          if(!e.data) e.data = {};
+          if(d.credits && d.credits.cast) {
+            e.data.cast = d.credits.cast.slice(0,5).map(c=>c.name).join(', ');
+          }
+          if(type==='movie'){
+            if(d.credits && d.credits.crew) {
+              e.data.director = d.credits.crew.filter(c=>c.job==='Director').map(c=>c.name).join(', ');
+            }
+            if(d.runtime) e.data.runtime = d.runtime;
+          } else {
+            if(d.created_by) e.data.creator = d.created_by.map(c=>c.name).join(', ');
+            if(d.number_of_episodes) e.data.totalEp = d.number_of_episodes;
+          }
+          if(!e.country && d.production_countries && d.production_countries[0]){
+            e.country = d.production_countries[0].name;
+          }
+          e.updated = Date.now(); done++;
+        } else missed++;
+      }
+      else if(e.category==='games'){
+        if(!uiPrefs.rawgApiKey) { missed++; continue; }
+        const sRes = await fetch(`https://api.rawg.io/api/games?key=${encodeURIComponent(uiPrefs.rawgApiKey)}&search=${encodeURIComponent(e.title)}&page_size=1`);
+        const sData = await sRes.json();
+        const hit = (sData.results||[])[0];
+        if(hit){
+          if(!e.cover) e.cover = hit.background_image || '';
+          if(!e.year && hit.released) e.year = parseInt(hit.released.slice(0,4))||null;
+          
+          // Детали
+          const dRes = await fetch(`https://api.rawg.io/api/games/${hit.id}?key=${encodeURIComponent(uiPrefs.rawgApiKey)}`);
+          const d = await dRes.json();
+          if(!e.data) e.data = {};
+          if(!e.description && d.description) {
+            e.description = d.description.replace(/<[^>]+>/g, '').trim().slice(0,500);
+          }
+          if(d.developers && d.developers.length) e.data.developer = d.developers.map(dev=>dev.name).join(', ');
+          if(d.genres && d.genres.length && !e.data.genre) e.data.genre = d.genres.map(g=>g.name).join(', ');
+          e.updated = Date.now(); done++;
+        } else missed++;
+      }
+      else if(e.category==='anime' || e.category==='manga'){
+        const kind = e.category==='anime' ? 'animes' : 'mangas';
+        const sRes = await fetch(`https://shikimori.one/api/${kind}?search=${encodeURIComponent(e.title)}&limit=1`);
+        const sData = await sRes.json();
+        const hit = (sData||[])[0];
+        if(hit){
+          if(!e.cover && hit.image) e.cover = 'https://shikimori.one'+(hit.image.original||hit.image.preview);
+          if(!e.year && (hit.aired_on || hit.released_on)) e.year = parseInt((hit.aired_on || hit.released_on).slice(0,4))||null;
+          
+          // Детали
+          const dRes = await fetch(`https://shikimori.one/api/${kind}/${hit.id}`);
+          const d = await dRes.json();
+          if(!e.data) e.data = {};
+          if(!e.description && d.description) {
+            e.description = d.description.replace(/<[^>]+>/g, '').trim().slice(0,500);
+          }
+          if(e.category==='anime'){
+            if(d.studios && d.studios[0]) e.data.studio = d.studios[0].name;
+            if(d.episodes && !e.data.totalEp) e.data.totalEp = d.episodes;
+          } else {
+            if(d.authors && d.authors.length) e.data.author = d.authors.map(a=>a.name).join(', ');
+            if(d.chapters && !e.data.totalCh) e.data.totalCh = d.chapters;
+          }
+          e.updated = Date.now(); done++;
+        } else missed++;
+      }
+      else if(e.category==='books'){
+        const sRes = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(e.title)}&maxResults=1&langRestrict=ru`);
+        const sData = await sRes.json();
+        let item = (sData.items||[])[0];
+        if(!item){
+          const sRes2 = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(e.title)}&maxResults=1`);
+          const sData2 = await sRes2.json();
+          item = (sData2.items||[])[0];
+        }
+        if(item && item.volumeInfo){
+          const v = item.volumeInfo;
+          if(!e.cover && v.imageLinks) e.cover = (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail || '').replace('http://','https://');
+          if(!e.description && v.description) e.description = v.description.slice(0,500);
+          if(!e.year && v.publishedDate) e.year = parseInt(v.publishedDate.slice(0,4))||null;
+          if(!e.data) e.data = {};
+          if(v.authors && !e.data.author) e.data.author = v.authors.join(', ');
+          if(v.pageCount && !e.data.totalPages) e.data.totalPages = v.pageCount;
+          e.updated = Date.now(); done++;
+        } else missed++;
+      }
+    }catch(err){ missed++; }
+    
+    await new Promise(r=>setTimeout(r, 150));
+  }
+  
+  await persist(); render();
+  statusEl.textContent = `Готово — обогащено записей: ${done}${missed?`, пропущено/не найдено: ${missed}`:''}`;
+  showToast(`Обогащено: ${done}`);
 }
 
 /* ---------- КНИГИ: Goodreads ---------- */
