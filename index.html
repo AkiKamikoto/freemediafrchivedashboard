@@ -52,36 +52,52 @@
 </main>
 
 <div class="overlay" id="overlay">
-  <div class="modal">
-    <h2 id="modalTitle">Новая запись</h2>
+  <div class="modal modal-wizard">
+    <div class="wizard-head">
+      <div class="wizard-steps">
+        <button type="button" class="wstep active" id="wstep1" onclick="goAddStep(1)"><span class="wstep-num">1</span>Поиск</button>
+        <span class="wstep-line"></span>
+        <button type="button" class="wstep" id="wstep2" onclick="goAddStep(2)"><span class="wstep-num">2</span>Детали</button>
+      </div>
+      <span id="modalTitle" class="wizard-mode"></span>
+      <button type="button" class="wizard-close" onclick="closeModal()">✕</button>
+    </div>
     <input type="hidden" id="editId">
-    <div class="field">
-      <label>Категория</label>
-      <select id="fCategory" onchange="onCategoryChange()">
-        <option value="movies">Фильм</option>
-        <option value="series">Сериал</option>
-        <option value="anime">Аниме</option>
-        <option value="books">Книга</option>
-        <option value="manga">Манга</option>
-        <option value="games">Игра</option>
-      </select>
+
+    <div id="addStep1">
+      <div class="add-search-row">
+        <span class="add-search-icon">⌕</span>
+        <input id="fSearchQuery" placeholder="Что добавить? Начни вводить название..." oninput="onSearchInput()" autocomplete="off">
+        <span class="esc-badge">ESC</span>
+      </div>
+      <div class="add-chips" id="addCatChips"></div>
+      <div class="add-results" id="searchResults"></div>
+      <div class="add-foot">
+        <span class="add-foot-hint">Не нашлось?</span>
+        <button type="button" class="add-manual" onclick="goAddStep(2)">Заполнить вручную →</button>
+      </div>
     </div>
-    <div class="field search-wrap">
-      <label>Поиск в базе (автозаполнение)</label>
-      <input id="fSearchQuery" placeholder="Начни вводить название..." oninput="onSearchInput()" autocomplete="off">
-      <div class="search-results" id="searchResults"></div>
-    </div>
-    <div class="cover-preview" id="coverPreview">нет обложки</div>
-    <div class="field">
-      <label>Ссылка на обложку (URL)</label>
-      <input id="fCover" placeholder="https://..." oninput="updateCoverPreview()">
-    </div>
-    <div class="field">
-      <label>Название</label>
-      <input id="fTitle" placeholder="Название">
-    </div>
-    <div class="field">
-      <label>Статус</label>
+
+    <div id="addStep2" style="display:none;">
+      <div class="step2-head">
+        <div class="cover-preview step2-cover" id="coverPreview">нет обложки</div>
+        <div class="step2-head-fields">
+          <input id="fTitle" class="step2-title" placeholder="Название">
+          <div class="step2-catyear">
+            <select id="fCategory" onchange="onCategoryChange()">
+              <option value="movies">Фильмы</option>
+              <option value="series">Сериалы</option>
+              <option value="anime">Аниме</option>
+              <option value="books">Книги</option>
+              <option value="manga">Манга</option>
+              <option value="games">Игры</option>
+            </select>
+            <input id="fYear" type="number" placeholder="2026">
+          </div>
+        </div>
+      </div>
+
+      <div class="section-cap" style="margin-top:20px;">Статус</div>
       <input type="hidden" id="fStatus" value="planning">
       <div class="pill-group" id="statusPills">
         <button type="button" class="pill" data-v="planning" onclick="setStatusPill(this)">План</button>
@@ -90,49 +106,45 @@
         <button type="button" class="pill" data-v="hold" onclick="setStatusPill(this)">Отложено</button>
         <button type="button" class="pill" data-v="dropped" onclick="setStatusPill(this)">Брошено</button>
       </div>
-    </div>
-    <div class="field">
-      <label>Оценка <span id="ratingReadout" class="rating-readout">—</span></label>
+
+      <div class="section-cap" style="margin-top:18px;">Оценка <span id="ratingReadout" class="rating-readout">—</span></div>
       <input id="fRating" type="range" min="0" max="10" step="1" value="0" class="rating-slider" oninput="updateRatingReadout()">
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Год</label>
-        <input id="fYear" type="number" placeholder="2024">
+
+      <div class="section-cap" style="margin-top:18px;">Детали</div>
+      <div class="row2">
+        <div class="field">
+          <label>Страна</label>
+          <input id="fCountry" placeholder="напр. Япония" list="dl_country">
+          <datalist id="dl_country"></datalist>
+        </div>
+        <div class="field">
+          <label>Сколько раз</label>
+          <input id="fTimesWatched" type="number" min="1" placeholder="1">
+        </div>
       </div>
       <div class="field">
-        <label>Страна</label>
-        <input id="fCountry" placeholder="напр. Япония" list="dl_country">
-        <datalist id="dl_country"></datalist>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Дата просмотра/прохождения</label>
+        <label>Дата просмотра / прохождения</label>
         <input id="fWatchDate" type="date">
       </div>
+      <div id="extraFields"></div>
       <div class="field">
-        <label>Сколько раз</label>
-        <input id="fTimesWatched" type="number" min="1" placeholder="1">
+        <label>Ссылка на обложку (URL)</label>
+        <input id="fCover" placeholder="https://..." oninput="updateCoverPreview()">
       </div>
-    </div>
-
-    <div class="subhead">Детали</div>
-    <div id="extraFields"></div>
-
-    <div class="field">
-      <label>Описание</label>
-      <textarea id="fDescription" placeholder="Синопсис/описание (обычно подтягивается автоматически при импорте)"></textarea>
-    </div>
-    <div class="field">
-      <label>Заметки</label>
-      <textarea id="fNotes" placeholder="Впечатления, где остановился..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal()">Отмена</button>
-      <button class="btn-danger" id="deleteBtn" style="display:none" onclick="deleteEntry()">Удалить</button>
-      <button class="btn-ghost" id="saveMoreBtn" onclick="saveEntry(true)">Сохранить и добавить ещё</button>
-      <button class="btn-primary" onclick="saveEntry(false)">Сохранить</button>
+      <div class="field">
+        <label>Описание</label>
+        <textarea id="fDescription" placeholder="Синопсис/описание (обычно подтягивается автоматически при поиске)"></textarea>
+      </div>
+      <div class="field">
+        <label>Заметки</label>
+        <textarea id="fNotes" placeholder="Впечатления, где остановился..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal()">Отмена</button>
+        <button class="btn-danger" id="deleteBtn" style="display:none" onclick="deleteEntry()">Удалить</button>
+        <button class="btn-ghost" id="saveMoreBtn" onclick="saveEntry(true)">Сохранить и добавить ещё</button>
+        <button class="btn-primary" onclick="saveEntry(false)">Сохранить</button>
+      </div>
     </div>
   </div>
 </div>

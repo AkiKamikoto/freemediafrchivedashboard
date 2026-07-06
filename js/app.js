@@ -406,42 +406,92 @@ function formatDate(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `
 /* ---------- SMART SEARCH / AUTOFILL ---------- */
 let searchTimer = null;
 let pendingImportMeta = null;
+let addStep = 1;
+let addSearchCat = 'all';
+let addSearchToken = 0;
+const CAT_SINGULAR = {movies:'Фильм', series:'Сериал', anime:'Аниме', manga:'Манга', books:'Книга', games:'Игра'};
+
+function goAddStep(n){
+  addStep = n;
+  document.getElementById('addStep1').style.display = n===1 ? '' : 'none';
+  document.getElementById('addStep2').style.display = n===2 ? '' : 'none';
+  document.getElementById('wstep1').classList.toggle('active', n===1);
+  document.getElementById('wstep2').classList.toggle('active', n===2);
+  if(n===1) setTimeout(()=>document.getElementById('fSearchQuery').focus(), 40);
+  else setTimeout(()=>document.getElementById('fTitle').focus(), 40);
+}
+function renderAddChips(){
+  const defs = [['all','Всё'], ...Object.keys(CATS).map(k=>[k, CAT_SINGULAR[k]])];
+  document.getElementById('addCatChips').innerHTML = defs.map(([k,l])=>
+    `<button type="button" class="omni-chip ${addSearchCat===k?'active':''}" onclick="setAddSearchCat('${k}')">${l}</button>`).join('');
+}
+function setAddSearchCat(c){
+  addSearchCat = c;
+  renderAddChips();
+  // выбранный чип — это и категория будущей записи для «Заполнить вручную»
+  if(c!=='all'){ document.getElementById('fCategory').value = c; renderExtraFields(); }
+  const q = document.getElementById('fSearchQuery').value.trim();
+  if(q.length >= 2){ document.getElementById('searchResults').innerHTML = `<div class="sr-status">ищу...</div>`; runSearch(q); }
+}
 function onSearchInput(){
   clearTimeout(searchTimer);
   const q = document.getElementById('fSearchQuery').value.trim();
   const box = document.getElementById('searchResults');
-  if(q.length < 2){ box.classList.remove('show'); box.innerHTML=''; return; }
-  box.classList.add('show');
+  if(q.length < 2){ box.innerHTML=''; addSearchToken++; return; }
   box.innerHTML = `<div class="sr-status">ищу...</div>`;
   searchTimer = setTimeout(()=>runSearch(q), 400);
 }
 function clearSearch(){
   document.getElementById('fSearchQuery').value = '';
-  const box = document.getElementById('searchResults');
-  box.classList.remove('show'); box.innerHTML='';
+  document.getElementById('searchResults').innerHTML = '';
+  addSearchToken++;
 }
 function onCategoryChange(){
   renderExtraFields();
-  clearSearch();
   pendingImportMeta = null;
 }
 async function runSearch(q){
-  const cat = document.getElementById('fCategory').value;
   const box = document.getElementById('searchResults');
+  const token = ++addSearchToken;
   try{
-    const results = await searchCategory(cat, q); // общий реестр источников (js/search.js)
-    if(!results.length){ box.innerHTML = `<div class="sr-status">ничего не найдено — заполни вручную</div>`; return; }
-    box.innerHTML = results.map((r,i)=>`
-      <div class="sr-item" onclick='applyResult(${i})'>
-        <img class="sr-thumb" src="${r.cover||''}" onerror="this.style.visibility='hidden'">
-        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source ? ` <span class="sr-badge">${escapeHtml(r.source)}</span>` : ''}</div><div class="sr-year">${[r.year, r.sub].filter(Boolean).map(v=>escapeHtml(String(v))).join(' · ')}</div></div>
-      </div>`).join('');
+    const cats = addSearchCat==='all' ? Object.keys(CATS) : [addSearchCat];
+    const settled = await Promise.allSettled(cats.map(c=>searchCategory(c, q))); // общий реестр (js/search.js)
+    if(token !== addSearchToken) return; // пришёл устаревший ответ
+    let results;
+    if(addSearchCat==='all'){
+      // перемешиваем по одному из каждой категории, чтобы никого не заслонять
+      const perCat = settled.map(s=>s.status==='fulfilled' ? s.value : []);
+      results = [];
+      for(let i=0; i<6 && results.length<12; i++){
+        perCat.forEach(list=>{ if(list[i] && results.length<12) results.push(list[i]); });
+      }
+    } else {
+      results = settled[0].status==='fulfilled' ? settled[0].value.slice(0,8) : [];
+    }
+    if(!results.length){ box.innerHTML = `<div class="sr-status">ничего не найдено — «Заполнить вручную →» ниже</div>`; return; }
     window.__searchCache = results;
+    box.innerHTML = results.map((r,i)=>{
+      const initials = (r.title||'').slice(0,2).toUpperCase();
+      const meta = [(CAT_SINGULAR[r.category]||'').toUpperCase(), r.year, r.sub].filter(Boolean).map(v=>escapeHtml(String(v))).join(' · ');
+      return `<div class="add-result" onclick="applyResult(${i})">
+        <div class="add-thumb" style="background:${catGradient(r.category)}">${r.cover ? `<img src="${escapeHtml(r.cover)}" loading="lazy" onerror="this.style.display='none'">` : `<span>${initials}</span>`}</div>
+        <div class="add-info">
+          <div class="add-title">${escapeHtml(r.title)}</div>
+          <div class="add-meta">${meta}</div>
+        </div>
+        ${r.source ? `<span class="add-badge">${escapeHtml(r.source)}</span>` : ''}
+      </div>`;
+    }).join('');
   }catch(e){
-    box.innerHTML = `<div class="sr-status">не удалось подключиться к базе — заполни вручную</div>`;
+    if(token === addSearchToken) box.innerHTML = `<div class="sr-status">не удалось подключиться к базе — заполни вручную</div>`;
   }
 }
-function applyResult(i){ fillFormFromResult(window.__searchCache[i]); }
+function applyResult(i){
+  const r = window.__searchCache[i];
+  if(r.category){ document.getElementById('fCategory').value = r.category; renderExtraFields(); }
+  fillFormFromResult(r);
+  goAddStep(2);
+}
 function fillFormFromResult(r){
   document.getElementById('fTitle').value = r.title || '';
   document.getElementById('fYear').value = r.year || '';
@@ -595,6 +645,7 @@ function openModal(id){
     renderExtraFields(e.data||{});
     document.getElementById('deleteBtn').style.display = 'block';
     document.getElementById('saveMoreBtn').style.display = 'none';
+    goAddStep(2); // при редактировании поиск не нужен — сразу детали
   } else {
     document.getElementById('modalTitle').textContent = 'Новая запись';
     ['fTitle','fYear','fCountry','fDescription','fNotes','fCover','fWatchDate','fTimesWatched'].forEach(fid=>document.getElementById(fid).value='');
@@ -606,10 +657,12 @@ function openModal(id){
     renderExtraFields();
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('saveMoreBtn').style.display = 'inline-block';
+    addSearchCat = (activeCat!=='all' && CATS[activeCat]) ? activeCat : 'all';
+    goAddStep(1);
   }
+  renderAddChips();
   document.getElementById('overlay').classList.add('show');
   populateCountryList();
-  setTimeout(()=>document.getElementById('fSearchQuery').focus(), 50);
 }
 function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
 
@@ -800,7 +853,7 @@ async function saveEntry(keepOpen){
     document.getElementById('coverPreview').textContent = 'нет обложки';
     renderExtraFields();
     clearSearch();
-    document.getElementById('fSearchQuery').focus();
+    goAddStep(1); // «добавить ещё» начинается снова с поиска
   } else {
     closeModal();
   }
@@ -2227,11 +2280,6 @@ wireDropzone('malDropzone', handleMalFile);
 document.getElementById('importOverlay').addEventListener('click', e=>{ if(e.target.id==='importOverlay') closeImportModal(); });
 document.getElementById('pickOverlay').addEventListener('click', e=>{ if(e.target.id==='pickOverlay') closePickModal(); });
 document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.search-wrap')){
-    document.getElementById('searchResults').classList.remove('show');
-  }
-});
 
 // Промис первичной загрузки: облачная синхронизация (js/auth.js) ждёт его,
 // чтобы не сливать пустой список с облаком до чтения localStorage.
