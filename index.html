@@ -22,7 +22,10 @@
   <div id="homeScreen" class="screen">
     <div id="heroArea"></div>
     <div class="home-search-row">
-      <input class="home-search" id="searchInput" placeholder="Поиск в коллекции…" oninput="renderHomeContent()">
+      <div class="omni-wrap">
+        <input class="home-search" id="searchInput" placeholder="Поиск везде: фильмы, сериалы, книги, игры…  ( / )" oninput="onHomeSearchInput()" autocomplete="off">
+        <div class="omni-results" id="omniResults"></div>
+      </div>
       <div id="statusChips"></div>
       <button class="nav-icon-btn" onclick="toggleFiltersPanel()">⚙ Фильтры</button>
     </div>
@@ -380,6 +383,7 @@
 <script src="js/config.js"></script>
 <script src="js/worldmap.js"></script>
 <script src="js/app.js"></script>
+<script src="js/search.js"></script>
 <script src="js/auth.js"></script>
 </body>
 </html>

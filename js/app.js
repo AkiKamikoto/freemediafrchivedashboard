@@ -386,49 +386,24 @@ function onCategoryChange(){
   clearSearch();
   pendingImportMeta = null;
 }
-function searchRetroAchievements(q){
-  const needle = q.toLowerCase();
-  const list = raGamesDb.games || [];
-  return list.filter(g=>g.title && g.title.toLowerCase().includes(needle)).slice(0,6).map(g=>({
-    title: g.title,
-    year: '',
-    cover: g.imageIcon ? `https://retroachievements.org${g.imageIcon}` : '',
-    description: '',
-    source: 'RA',
-    meta: { platform: 'RetroAchievements', raGameId: g.id, consoleName: g.consoleName || '' }
-  }));
-}
 async function runSearch(q){
   const cat = document.getElementById('fCategory').value;
   const box = document.getElementById('searchResults');
   try{
-    let results = [];
-    if(cat==='movies') results = uiPrefs.tmdbApiKey ? await searchTMDB(q,'movie') : await searchITunes(q,'movie');
-    else if(cat==='series') results = uiPrefs.tmdbApiKey ? await searchTMDB(q,'tv') : await searchTVmaze(q);
-    else if(cat==='anime') results = await searchJikan(q,'anime');
-    else if(cat==='manga') results = await searchJikan(q,'manga');
-    else if(cat==='books') results = await searchOpenLibrary(q);
-    else if(cat==='games'){
-      const ra = searchRetroAchievements(q);
-      let store = [];
-      // RAWG (с ключом) знает игры всех платформ с обложками; CheapShark — запасной без ключа
-      try{ store = uiPrefs.rawgApiKey ? await searchRAWG(q) : await searchCheapShark(q); }catch(e){ /* RA-результаты всё равно покажем */ }
-      results = [...ra, ...store].slice(0, 8);
-    }
-
+    const results = await searchCategory(cat, q); // общий реестр источников (js/search.js)
     if(!results.length){ box.innerHTML = `<div class="sr-status">ничего не найдено — заполни вручную</div>`; return; }
     box.innerHTML = results.map((r,i)=>`
       <div class="sr-item" onclick='applyResult(${i})'>
         <img class="sr-thumb" src="${r.cover||''}" onerror="this.style.visibility='hidden'">
-        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source==='RA' ? ' <span class="sr-badge">RA</span>' : ''}</div><div class="sr-year">${r.year||''}</div></div>
+        <div class="sr-info"><div class="sr-title">${escapeHtml(r.title)}${r.source ? ` <span class="sr-badge">${escapeHtml(r.source)}</span>` : ''}</div><div class="sr-year">${[r.year, r.sub].filter(Boolean).map(v=>escapeHtml(String(v))).join(' · ')}</div></div>
       </div>`).join('');
     window.__searchCache = results;
   }catch(e){
     box.innerHTML = `<div class="sr-status">не удалось подключиться к базе — заполни вручную</div>`;
   }
 }
-function applyResult(i){
-  const r = window.__searchCache[i];
+function applyResult(i){ fillFormFromResult(window.__searchCache[i]); }
+function fillFormFromResult(r){
   document.getElementById('fTitle').value = r.title || '';
   document.getElementById('fYear').value = r.year || '';
   document.getElementById('fCover').value = r.cover || '';
@@ -444,118 +419,6 @@ function applyResult(i){
   showToast('Данные подставлены');
   // TMDB отдаёт режиссёра/каст/страну отдельным запросом деталей — дозаполняем асинхронно
   if(r.tmdbId) fillTmdbDetails(r);
-}
-
-async function searchITunes(q, media){
-  const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=${media}&limit=6`);
-  const data = await res.json();
-  return (data.results||[]).map(x=>({
-    title: x.trackName,
-    year: x.releaseDate ? x.releaseDate.slice(0,4) : '',
-    cover: x.artworkUrl100 ? x.artworkUrl100.replace('100x100','600x600') : '',
-    extra:{}
-  }));
-}
-async function searchTVmaze(q){
-  const res = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
-  const data = await res.json();
-  return (data||[]).slice(0,6).map(x=>({
-    title: x.show.name,
-    year: x.show.premiered ? x.show.premiered.slice(0,4) : '',
-    cover: x.show.image ? x.show.image.medium : '',
-    description: x.show.summary ? x.show.summary.replace(/<[^>]+>/g,'').slice(0,500) : '',
-    extra:{ creator: (x.show.network&&x.show.network.name)||(x.show.webChannel&&x.show.webChannel.name)||'' }
-  }));
-}
-async function searchJikan(q, type){
-  const res = await fetch(`https://api.jikan.moe/v4/${type}?q=${encodeURIComponent(q)}&limit=6`);
-  const data = await res.json();
-  return (data.data||[]).map(x=>{
-    const extra = {};
-    if(type==='anime'){
-      extra.studio = x.studios && x.studios[0] ? x.studios[0].name : '';
-      extra.totalEp = x.episodes || '';
-    } else {
-      extra.author = x.authors && x.authors[0] ? x.authors[0].name : '';
-      extra.totalCh = x.chapters || '';
-    }
-    return {
-      title: x.title,
-      year: x.year || (x.published && x.published.from ? x.published.from.slice(0,4) : ''),
-      cover: x.images && x.images.jpg ? x.images.jpg.image_url : '',
-      extra
-    };
-  });
-}
-async function searchOpenLibrary(q){
-  const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=6`);
-  const data = await res.json();
-  return (data.docs||[]).map(x=>({
-    title: x.title,
-    year: x.first_publish_year || '',
-    cover: x.cover_i ? `https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg` : '',
-    extra:{ author: x.author_name ? x.author_name[0] : '', totalPages: x.number_of_pages_median || '' }
-  }));
-}
-async function searchCheapShark(q){
-  const res = await fetch(`https://www.cheapshark.com/api/1.0/games?title=${encodeURIComponent(q)}&limit=6`);
-  const data = await res.json();
-  return (data||[]).slice(0,6).map(x=>({
-    title: x.external,
-    year: '',
-    cover: x.thumb || '',
-    extra:{}
-  }));
-}
-
-/* ---------- TMDB (фильмы и сериалы, нужен бесплатный ключ) ---------- */
-function tmdbUrl(path, params){
-  const qs = new URLSearchParams({api_key: uiPrefs.tmdbApiKey, language: 'ru-RU', ...params});
-  return `https://api.themoviedb.org/3/${path}?${qs.toString()}`;
-}
-async function searchTMDB(q, type){
-  const res = await fetch(tmdbUrl(`search/${type}`, {query: q, include_adult: 'false'}));
-  const data = await res.json();
-  return (data.results||[]).slice(0,6).map(x=>({
-    title: x.title || x.name,
-    year: (x.release_date || x.first_air_date || '').slice(0,4),
-    cover: x.poster_path ? `https://image.tmdb.org/t/p/w500${x.poster_path}` : '',
-    description: (x.overview||'').slice(0,500),
-    tmdbId: x.id, tmdbType: type,
-    extra:{}
-  }));
-}
-async function fillTmdbDetails(r){
-  if(!uiPrefs.tmdbApiKey) return;
-  try{
-    const res = await fetch(tmdbUrl(`${r.tmdbType}/${r.tmdbId}`, {append_to_response:'credits'}));
-    const d = await res.json();
-    const setIf = (id, v)=>{ const el = document.getElementById(id); if(el && !el.value && v) el.value = v; };
-    const cast = (d.credits && d.credits.cast || []).slice(0,5).map(c=>c.name).join(', ');
-    if(r.tmdbType==='movie'){
-      setIf('ex_director', (d.credits && d.credits.crew || []).filter(c=>c.job==='Director').map(c=>c.name).join(', '));
-      setIf('ex_runtime', d.runtime || '');
-    } else {
-      setIf('ex_creator', (d.created_by||[]).map(c=>c.name).join(', '));
-      setIf('ex_totalEp', d.number_of_episodes || '');
-    }
-    setIf('ex_cast', cast);
-    // Английское название страны — так же его понимает карта мира в статистике
-    setIf('fCountry', (d.production_countries && d.production_countries[0] && d.production_countries[0].name) || '');
-    setIf('fDescription', (d.overview||'').slice(0,500));
-  }catch(e){ /* базовые поля уже подставлены из поиска */ }
-}
-
-/* ---------- RAWG (игры всех платформ, нужен бесплатный ключ) ---------- */
-async function searchRAWG(q){
-  const res = await fetch(`https://api.rawg.io/api/games?key=${encodeURIComponent(uiPrefs.rawgApiKey)}&search=${encodeURIComponent(q)}&page_size=6`);
-  const data = await res.json();
-  return (data.results||[]).map(x=>({
-    title: x.name,
-    year: x.released ? x.released.slice(0,4) : '',
-    cover: x.background_image || '',
-    extra:{ genre: (x.genres||[]).map(g=>g.name).join(', ') }
-  }));
 }
 
 function populateCountryList(){
