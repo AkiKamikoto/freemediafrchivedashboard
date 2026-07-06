@@ -366,6 +366,7 @@ function omniCardClick(cat, i){
   document.getElementById('fCategory').value = cat;
   renderExtraFields();
   fillFormFromResult(r);
+  goAddStep(2);
 }
 
 async function omniQuickAdd(cat, i){
