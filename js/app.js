@@ -118,7 +118,34 @@ function saveRawgApiKey(v){
 }
 
 function goHome(){ screen='home'; detailId=null; render(); }
-function goStats(){ screen='stats'; render(); }
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function goStats(){
+  if (typeof WORLD_MAP_SVG === 'undefined') {
+    const statsBtn = document.getElementById('statsBtn');
+    const oldText = statsBtn.textContent;
+    statsBtn.textContent = 'ЗАГРУЗКА...';
+    try {
+      await loadScript('js/worldmap.js');
+    } catch(e) {
+      console.error('Failed to load worldmap', e);
+      showToast('Не удалось загрузить карту мира');
+      statsBtn.textContent = oldText;
+      return;
+    }
+    statsBtn.textContent = oldText;
+  }
+  screen='stats';
+  render();
+}
 function openDetail(id){ screen='detail'; detailId=id; render(); }
 function setCat(c){ activeCat = c; screen='home'; detailId=null; render(); }
 
@@ -1507,8 +1534,9 @@ async function importShikimori(type){
 function newId(){ return 'e'+Date.now()+Math.random().toString(36).slice(2,7); }
 // Совпадение для слияния: та же категория + то же название (+ год, если известен у обоих)
 function findEntryByTitle(category, title, year){
+  if(!title) return null;
   const t = title.trim().toLowerCase();
-  return entries.find(e=>e.category===category && e.title.trim().toLowerCase()===t && (!year || !e.year || e.year===year));
+  return entries.find(e=>e.category===category && e.title && e.title.trim().toLowerCase()===t && (!year || !e.year || e.year===year));
 }
 
 /* ---------- КИНО: Letterboxd / IMDb ---------- */
