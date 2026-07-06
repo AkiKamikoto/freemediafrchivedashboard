@@ -24,6 +24,7 @@ const CATS = {
   games:{label:'Игры', color:'var(--c-games)', hex:'#3F8E8E',
     fields:[{k:'developer',l:'Разработчик'},{k:'platform',l:'Платформа',ph:'Xbox Series S'},{k:'consoleName',l:'Консоль'},{k:'hours',l:'Часов наиграно',type:'number'},{k:'genre',l:'Жанр'}]},
 };
+const COMMON_PLATFORMS = ['Steam','Xbox Series S','Xbox Series X','Xbox One','PlayStation 5','PlayStation 4','Nintendo Switch','PC','RetroAchievements'];
 const STATUS_LABEL = {planning:'план',progress:'смотрю',completed:'завершено',hold:'отложено',dropped:'брошено'};
 const PROGRESS_LABEL_BY_CAT = {books:'читаю',manga:'читаю',games:'играю'};
 const STATUS_CLASS = {planning:'st-planning',progress:'st-progress',completed:'st-completed',hold:'st-hold',dropped:'st-dropped'};
@@ -137,7 +138,14 @@ function renderNav(){
 function toggleFiltersPanel(){
   const p = document.getElementById('filtersPanel');
   p.style.display = p.style.display==='none' ? '' : 'none';
-  if(p.style.display!=='none') populateCountryFilter();
+  if(p.style.display!=='none'){ populateCountryFilter(); populatePlatformFilter(); }
+}
+function populatePlatformFilter(){
+  const sel = document.getElementById('fltPlatform');
+  const current = sel.value;
+  const plats = Array.from(new Set(entries.filter(e=>e.category==='games').map(gamePlatform))).sort();
+  sel.innerHTML = `<option value="">Все платформы</option>` + plats.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+  sel.value = current;
 }
 function populateCountryFilter(){
   const sel = document.getElementById('fltCountry');
@@ -149,6 +157,7 @@ function populateCountryFilter(){
 function resetFilters(){
   ['fltYearFrom','fltYearTo','fltRatingFrom','fltRatingTo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fltCountry').value = '';
+  document.getElementById('fltPlatform').value = '';
   renderHomeContent();
 }
 
@@ -166,6 +175,7 @@ function getFiltered(){
   const rFrom = document.getElementById('fltRatingFrom').value!=='' ? parseFloat(document.getElementById('fltRatingFrom').value) : null;
   const rTo = document.getElementById('fltRatingTo').value!=='' ? parseFloat(document.getElementById('fltRatingTo').value) : null;
   const country = document.getElementById('fltCountry').value;
+  const platform = document.getElementById('fltPlatform').value;
 
   let list = entries.filter(e=>{
     if(activeCat!=='all' && e.category!==activeCat) return false;
@@ -176,6 +186,7 @@ function getFiltered(){
     if(rFrom!==null && (!e.rating || e.rating<rFrom)) return false;
     if(rTo!==null && (!e.rating || e.rating>rTo)) return false;
     if(country && e.country!==country) return false;
+    if(platform && (e.category!=='games' || gamePlatform(e)!==platform)) return false;
     return true;
   });
   if(sortBy==='title') list.sort((a,b)=>a.title.localeCompare(b.title));
@@ -214,6 +225,15 @@ async function startPicked(){
   const e = entries.find(x=>x.id===window.__pickedId);
   if(e){ e.status='progress'; e.updated=Date.now(); await persist(); render(); showToast('Отмечено «в процессе»'); }
   closePickModal();
+}
+
+// Платформа игры для фильтра и статистики: явное поле, RA-записи без него —
+// «RetroAchievements», остальное — «не указана»
+function gamePlatform(e){
+  const d = e.data || {};
+  if(d.platform) return d.platform;
+  if(d.raGameId || d.consoleName) return 'RetroAchievements';
+  return 'не указана';
 }
 
 function subLine(e){
@@ -518,7 +538,9 @@ function renderExtraFields(prefill){
   document.getElementById('extraFields').innerHTML = fields.map(f=>{
     const isText = !f.type || f.type==='text';
     const dlId = `dl_${f.k}`;
-    const hist = isText ? fieldHistory(f.k) : [];
+    let hist = isText ? fieldHistory(f.k) : [];
+    // платформы подсказываем сразу, не дожидаясь собственной истории
+    if(f.k==='platform') hist = Array.from(new Set([...COMMON_PLATFORMS, ...hist]));
     const dl = hist.length ? `<datalist id="${dlId}">${hist.map(v=>`<option value="${escapeHtml(v)}">`).join('')}</datalist>` : '';
     return `<div class="field">
       <label>${f.l}</label>
@@ -1009,6 +1031,17 @@ function renderStats(){
   list.forEach(e=>{ if(e.country) countryCounts[e.country] = (countryCounts[e.country]||0)+1; });
   const countryList = Object.entries(countryCounts).sort((a,b)=>b[1]-a[1]);
 
+  // игры по платформам (Steam / Xbox Series S / RetroAchievements / ...)
+  const platCounts = {};
+  list.filter(e=>e.category==='games').forEach(e=>{
+    const p = gamePlatform(e);
+    if(!platCounts[p]) platCounts[p] = {n:0, hours:0};
+    platCounts[p].n++;
+    platCounts[p].hours += (e.data && parseFloat(e.data.hours)) || 0;
+  });
+  const platList = Object.entries(platCounts).sort((a,b)=>b[1].n-a[1].n);
+  const maxPlat = Math.max(1, ...platList.map(x=>x[1].n));
+
   // status donut
   const statusOrder = ['completed','progress','hold','planning','dropped'];
   let cum = 0;
@@ -1133,6 +1166,18 @@ function renderStats(){
             </div>`).join('') : `<div class="import-hint" style="margin-top:0;">Пока нет оценённых записей</div>`}
         </div>
       </div>
+
+      ${platList.length ? `
+      <div class="stats-card" style="margin-top:18px;">
+        <h3 style="margin-bottom:14px;">Игры по платформам</h3>
+        ${platList.map(([p,v])=>`
+          <div class="cat-bar-row">
+            <span class="cat-bar-label" style="width:140px;">${escapeHtml(p)}</span>
+            <div class="cat-bar-track"><div class="cat-bar-fill" style="background:${CATS.games.hex};width:${Math.round(v.n/maxPlat*100)}%;"></div></div>
+            <span style="width:24px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;">${v.n}</span>
+            <span style="width:56px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted-dim);">${v.hours ? Math.round(v.hours)+' ч' : ''}</span>
+          </div>`).join('')}
+      </div>` : ''}
 
       <div style="margin-top:18px;">
         <h3 style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:600;margin:0 0 14px;">Активность (по дням)</h3>
