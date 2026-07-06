@@ -1395,13 +1395,59 @@ function parseCSV(text){
 function handleFile(file){
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = (e)=>{
+  reader.onload = async (e)=>{
     const text = e.target.result;
     if(file.name.endsWith('.json')){
       try{
         const data = JSON.parse(text);
         const arr = Array.isArray(data) ? data : (data.games||data.items||data.list||[]);
         if(!arr.length){ showToast('Пустой или нераспознанный JSON'); return; }
+        
+        // Проверяем, является ли это нативным бэкапом приложения с категориями
+        const isNativeBackup = arr[0] && arr[0].title !== undefined && arr[0].category !== undefined;
+        if(isNativeBackup){
+          let added = 0;
+          let updated = 0;
+          arr.forEach(item => {
+            const dup = entries.find(x => x.id === item.id || (x.title.toLowerCase() === item.title.toLowerCase() && x.category === item.category));
+            if(!dup){
+              entries.push({
+                id: item.id || ('e'+Date.now()+Math.random().toString(36).slice(2,7)),
+                title: item.title,
+                category: item.category,
+                status: item.status || 'planning',
+                rating: item.rating !== undefined ? item.rating : null,
+                year: item.year !== undefined ? item.year : null,
+                country: item.country || '',
+                watchDate: item.watchDate || null,
+                cover: item.cover || '',
+                description: item.description || '',
+                notes: item.notes || '',
+                data: item.data || {},
+                updated: item.updated || Date.now()
+              });
+              added++;
+            } else {
+              if(!dup.description && item.description) dup.description = item.description;
+              if(!dup.notes && item.notes) dup.notes = item.notes;
+              if(!dup.year && item.year) dup.year = item.year;
+              if(!dup.country && item.country) dup.country = item.country;
+              if(dup.rating === null && item.rating !== null) dup.rating = item.rating;
+              if(!dup.watchDate && item.watchDate) dup.watchDate = item.watchDate;
+              if(!dup.cover && item.cover) dup.cover = item.cover;
+              if(dup.status === 'planning' && item.status !== 'planning') dup.status = item.status;
+              if(item.data) dup.data = {...dup.data, ...item.data};
+              dup.updated = Date.now();
+              updated++;
+            }
+          });
+          await persist();
+          closeImportModal();
+          render();
+          showToast(`Бэкап импортирован: добавлено ${added}, обновлено ${updated}`);
+          return;
+        }
+
         importHeaders = Object.keys(arr[0]);
         importRows = arr;
       }catch(err){ showToast('Не удалось прочитать JSON'); return; }
