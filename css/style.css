@@ -78,6 +78,8 @@ body{min-height:100vh;}
 .poster-grid .poster{width:auto;}
 .poster-grid .poster-art{width:100%;height:auto;aspect-ratio:150/214;}
 
+.shelf-more-row{display:flex;justify-content:center;padding:2px 40px 18px;}
+.shelf-more-row .btn-ghost{min-width:min(280px,100%);}
 .more-tile{flex-direction:column;gap:6px;background:var(--surface) !important;border:1.5px dashed var(--line-strong);}
 .more-tile-num{font-family:'Unbounded',sans-serif;font-size:26px;font-weight:600;color:var(--brass);}
 .more-tile-lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
