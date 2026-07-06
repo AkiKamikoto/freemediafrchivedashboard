@@ -27,10 +27,16 @@ const CATS = {
 const STATUS_LABEL = {planning:'план',progress:'смотрю',completed:'завершено',hold:'отложено',dropped:'брошено'};
 const PROGRESS_LABEL_BY_CAT = {books:'читаю',manga:'читаю',games:'играю'};
 const STATUS_CLASS = {planning:'st-planning',progress:'st-progress',completed:'st-completed',hold:'st-hold',dropped:'st-dropped'};
-function statusLabel(e){
-  if(e.status==='progress') return PROGRESS_LABEL_BY_CAT[e.category] || STATUS_LABEL.progress;
-  return STATUS_LABEL[e.status];
+// Подпись статуса с учётом типа контента: у игр «играю», у книг/манги «читаю»;
+// cat=null (общий вид «Всё») — нейтральное «в процессе».
+function statusLabelFor(cat, status){
+  if(status==='progress'){
+    if(!cat) return 'в процессе';
+    return PROGRESS_LABEL_BY_CAT[cat] || STATUS_LABEL.progress;
+  }
+  return STATUS_LABEL[status];
 }
+function statusLabel(e){ return statusLabelFor(e.category, e.status); }
 
 let entries = [];
 // Тумбстоуны удалённых записей {id: timestamp} — нужны облачной синхронизации,
@@ -266,10 +272,16 @@ function posterHtml(e){
 }
 
 const SHELF_LIMIT = 14;
+const GRID_PAGE = 28; // раскрытая полка растёт порциями, а не вываливает всю коллекцию
 let expandedShelves = new Set();
+let shelfShown = {};
 function toggleShelf(key){
-  if(expandedShelves.has(key)) expandedShelves.delete(key);
-  else expandedShelves.add(key);
+  if(expandedShelves.has(key)){ expandedShelves.delete(key); delete shelfShown[key]; }
+  else { expandedShelves.add(key); shelfShown[key] = GRID_PAGE; }
+  renderHomeContent();
+}
+function showMoreShelf(key, total){
+  shelfShown[key] = Math.min((shelfShown[key]||GRID_PAGE) + GRID_PAGE, total);
   renderHomeContent();
 }
 function scrollShelf(btn, dir){
@@ -286,7 +298,14 @@ function shelfHtml(key, name, items){
       ${items.length > SHELF_LIMIT ? `<button class="shelf-toggle" onclick="toggleShelf('${key}')">${expanded ? 'Свернуть ↑' : 'Показать все →'}</button>` : ''}
     </div>`;
   if(expanded){
-    return `<section class="shelf">${head}<div class="poster-grid">${items.map(posterHtml).join('')}</div></section>`;
+    const shown = Math.min(shelfShown[key]||GRID_PAGE, items.length);
+    const rest = items.length - shown;
+    return `<section class="shelf">${head}
+      <div class="poster-grid">${items.slice(0, shown).map(posterHtml).join('')}</div>
+      ${rest>0 ? `<div class="shelf-more-row">
+        <button class="btn-ghost" onclick="showMoreShelf('${key}',${items.length})">Показать ещё ${Math.min(GRID_PAGE,rest)} (осталось ${rest})</button>
+      </div>` : ''}
+    </section>`;
   }
   const visible = items.slice(0, SHELF_LIMIT);
   const restCount = items.length - visible.length;
@@ -306,8 +325,8 @@ function shelfHtml(key, name, items){
 function renderHomeContent(){
   const list = getFiltered();
 
-  // status chips
-  const chipDefs = Object.keys(STATUS_LABEL).map(k=>[k, STATUS_LABEL[k]]);
+  // status chips — подпись «в процессе» подстраивается под открытую категорию
+  const chipDefs = Object.keys(STATUS_LABEL).map(k=>[k, statusLabelFor(activeCat==='all' ? null : activeCat, k)]);
   document.getElementById('statusChips').innerHTML = chipDefs.map(([k,l])=>
     `<button class="status-chip ${homeStatusFilter===k?'active':''}" onclick="setHomeStatusFilter('${k}')">${l}</button>`).join('');
 
@@ -599,7 +618,7 @@ function renderDetail(){
     .join('');
 
   const statusPillsHtml = Object.keys(STATUS_LABEL).map(k=>
-    `<button class="status-pill ${e.status===k?'active':''}" style="${e.status===k?`border-color:${statusColor(k)};color:${statusColor(k)};`:''}" onclick="setDetailStatus('${e.id}','${k}')">${STATUS_LABEL[k]}</button>`
+    `<button class="status-pill ${e.status===k?'active':''}" style="${e.status===k?`border-color:${statusColor(k)};color:${statusColor(k)};`:''}" onclick="setDetailStatus('${e.id}','${k}')">${statusLabelFor(e.category, k)}</button>`
   ).join('');
 
   const extraMeta = [e.country, e.timesWatched>1?'×'+e.timesWatched:'', e.watchDate?formatDate(e.watchDate):''].filter(Boolean).join(' · ');
