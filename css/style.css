@@ -64,6 +64,7 @@ body{min-height:100vh;}
 .shelf-head{display:flex;align-items:baseline;gap:12px;padding:0 40px;margin-bottom:14px;}
 .shelf-head h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:600;margin:0;color:var(--text);}
 .shelf-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.shelf-count-total{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted-dim);margin-left:-4px;}
 .shelf-toggle{margin-left:auto;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.5px;padding:0;transition:.15s;}
 .shelf-toggle:hover{color:var(--brass);}
 .shelf-wrap{position:relative;}

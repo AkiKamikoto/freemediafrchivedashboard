@@ -336,12 +336,17 @@ function scrollShelf(btn, dir){
   row.scrollBy({left: dir * row.clientWidth * 0.85, behavior:'smooth'});
 }
 
-function shelfHtml(key, name, items){
+function shelfHtml(key, name, items, total){
   const expanded = expandedShelves.has(key);
+  // total (если передан и больше показанного) — сколько всего в категории:
+  // часть записей могла уехать в полку «Продолжаю», счётчик это честно отражает
+  const countHtml = total && total > items.length
+    ? `<span class="shelf-count">${items.length}</span><span class="shelf-count-total">из ${total}</span>`
+    : `<span class="shelf-count">${items.length}</span>`;
   const head = `
     <div class="shelf-head">
       <h2>${escapeHtml(name)}</h2>
-      <span class="shelf-count">${items.length}</span>
+      ${countHtml}
       ${items.length > SHELF_LIMIT ? `<button class="shelf-toggle" onclick="toggleShelf('${key}')">${expanded ? 'Свернуть ↑' : 'Показать все →'}</button>` : ''}
     </div>`;
   if(expanded){
@@ -413,17 +418,19 @@ function renderHomeContent(){
   }
   const shelves = [];
   const progress = list.filter(e=>e.status==='progress');
-  if(progress.length) shelves.push(['progress', 'Продолжаю', progress]);
+  if(progress.length) shelves.push(['progress', 'Продолжаю', progress]); // total не нужен — своя полка
+  // total категории = все её записи в выборке, включая ушедшие в «Продолжаю»
   if(activeCat==='all'){
     Object.keys(CATS).forEach(k=>{
-      const g = list.filter(e=>e.category===k && e.status!=='progress');
-      if(g.length) shelves.push([k, CATS[k].label, g]);
+      const catAll = list.filter(e=>e.category===k);
+      const g = catAll.filter(e=>e.status!=='progress');
+      if(g.length) shelves.push([k, CATS[k].label, g, catAll.length]);
     });
   } else {
     const rest = list.filter(e=>e.status!=='progress');
-    if(rest.length) shelves.push([activeCat, CATS[activeCat].label, rest]);
+    if(rest.length) shelves.push([activeCat, CATS[activeCat].label, rest, list.length]);
   }
-  shelvesArea.innerHTML = shelves.map(([key, name, items])=>shelfHtml(key, name, items)).join('');
+  shelvesArea.innerHTML = shelves.map(([key, name, items, total])=>shelfHtml(key, name, items, total)).join('');
 }
 
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -2062,23 +2069,38 @@ function parseSteamGames(raw){
   })).filter(g=>g.name);
 }
 
+// Статус игры по активности Steam: не наиграно → «план», запускал недавно →
+// «играю», давно/неизвестно когда → «отложено». Иначе любая игра, куда когда-то
+// заходил, попадала в «играю» и заваливала полку «Продолжаю».
+const STEAM_ACTIVE_DAYS = 60;
+function steamStatusFromActivity(hours, lastPlayed){
+  if(!(hours>0)) return 'planning';
+  if(!lastPlayed) return 'hold';
+  const days = (Date.now() - new Date(lastPlayed).getTime()) / 86400000;
+  return days <= STEAM_ACTIVE_DAYS ? 'progress' : 'hold';
+}
+// Авто-состояния импорта — их можно пересчитывать; completed/dropped выбраны
+// пользователем вручную, их не трогаем.
+const STEAM_AUTO_STATES = ['planning','progress','hold'];
+
 async function commitSteamGames(games, statusEl){
   let added = 0, updated = 0;
   games.forEach(g=>{
     const hours = g.hours ? Math.round(g.hours*10)/10 : '';
+    const autoStatus = steamStatusFromActivity(g.hours, g.lastPlayed);
     const existing = entries.find(x=>x.category==='games' && x.data && x.data.platform==='Steam' && x.title.toLowerCase()===g.name.toLowerCase());
     if(existing){
       if(g.logo) existing.cover = g.logo;
       existing.data = {...existing.data, hours, appid: g.appid};
       if(g.lastPlayed) existing.watchDate = g.lastPlayed;
-      if(g.hours>0 && existing.status==='planning') existing.status = 'progress';
+      if(STEAM_AUTO_STATES.includes(existing.status)) existing.status = autoStatus;
       existing.updated = Date.now();
       updated++;
     } else {
       entries.push({
         id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
         title: g.name, category: 'games',
-        status: g.hours>0 ? 'progress' : 'planning',
+        status: autoStatus,
         rating: null, year: null, cover: g.logo||'', notes:'',
         watchDate: g.lastPlayed || null,
         data:{ hours, platform:'Steam', appid: g.appid },
@@ -2092,6 +2114,26 @@ async function commitSteamGames(games, statusEl){
   const msg = added && updated ? `Готово — добавлено ${added}, обновлено ${updated}`
     : updated ? `Готово — обновлено ${updated} игр`
     : `Готово — импортировано ${added} игр`;
+  statusEl.textContent = msg;
+  showToast(msg);
+}
+
+// Одноразовая чистка: Steam-игры, помеченные «играю», но без запуска 2+ месяца
+// (или вообще без даты), переводятся в «отложено» — разгребает «Продолжаю»
+// после старого импорта, ставившего «играю» всему с наигранным временем.
+async function reshelveStaleSteamGames(statusEl){
+  const cutoff = Date.now() - STEAM_ACTIVE_DAYS*86400000;
+  let moved = 0;
+  entries.forEach(e=>{
+    if(e.category!=='games' || e.status!=='progress') return;
+    if(!e.data || e.data.platform!=='Steam') return;
+    const lp = e.watchDate ? new Date(e.watchDate).getTime() : 0;
+    if(!lp || lp < cutoff){ e.status = 'hold'; e.updated = Date.now(); moved++; }
+  });
+  if(!moved){ statusEl.textContent = 'Нечего переносить — активных игр без запуска 2+ месяца не найдено'; return; }
+  await persist();
+  render();
+  const msg = `Перенесено в «Отложено»: ${moved}`;
   statusEl.textContent = msg;
   showToast(msg);
 }
