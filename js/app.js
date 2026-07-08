@@ -1783,6 +1783,25 @@ async function enrichCinemaEntries(statusEl){
   showToast(`Постеры: ${done}`);
 }
 
+// Считает попытку обогащения одной записи в общую и категорийную статистику.
+// reason: 'ok' | 'no_key' | 'not_found'
+function tallyEnrich(stats, category, reason){
+  if(!stats[category]) stats[category] = {done:0, noKey:0, notFound:0};
+  if(reason==='ok') stats[category].done++;
+  else if(reason==='no_key') stats[category].noKey++;
+  else stats[category].notFound++;
+}
+function formatEnrichReport(stats){
+  const labels = {movies:'фильмы', series:'сериалы', anime:'аниме', manga:'манга', books:'книги', games:'игры'};
+  return Object.entries(stats).map(([cat,s])=>{
+    const total = s.done+s.noKey+s.notFound;
+    let line = `${labels[cat]||cat}: ${s.done}/${total}`;
+    if(s.noKey) line += ` (нет ключа — ${s.noKey})`;
+    if(s.notFound) line += ` (не найдено — ${s.notFound})`;
+    return line;
+  }).join(' · ');
+}
+
 async function enrichAllEntries(statusEl){
   const targets = entries.filter(e=>{
     const hasBasic = e.cover && e.description;
@@ -1790,15 +1809,15 @@ async function enrichAllEntries(statusEl){
     return !hasBasic || !hasData;
   });
   if(!targets.length){ statusEl.textContent = 'Все записи уже имеют обложки и описание!'; return; }
-  
-  let done=0, missed=0;
+
+  const stats = {};
   for(let i=0;i<targets.length;i++){
     const e = targets[i];
     statusEl.textContent = `Обогащение базы: ${i+1}/${targets.length} ("${e.title}")...`;
-    
+
     try{
       if(e.category==='movies' || e.category==='series'){
-        if(!uiPrefs.tmdbApiKey) { missed++; continue; }
+        if(!uiPrefs.tmdbApiKey) { tallyEnrich(stats, e.category, 'no_key'); continue; }
         const type = e.category==='movies' ? 'movie' : 'tv';
         const yearParam = e.year ? (type==='movie' ? {primary_release_year:e.year} : {first_air_date_year:e.year}) : {};
         const sRes = await fetch(tmdbUrl(`search/${type}`, {query:e.title, include_adult:'false', ...yearParam}));
@@ -1828,18 +1847,25 @@ async function enrichAllEntries(statusEl){
           if(!e.country && d.production_countries && d.production_countries[0]){
             e.country = d.production_countries[0].name;
           }
-          e.updated = Date.now(); done++;
-        } else missed++;
+          e.updated = Date.now(); tallyEnrich(stats, e.category, 'ok');
+        } else tallyEnrich(stats, e.category, 'not_found');
       }
       else if(e.category==='games'){
-        if(!uiPrefs.rawgApiKey) { missed++; continue; }
+        // Steam-игры обогащаются через Steam Store API (бесплатно, appid уже
+        // известен из импорта) — RAWG нужен только тем играм, что не со Steam.
+        if(e.data && e.data.platform==='Steam' && e.data.appid){
+          const res = await enrichOneSteamGame(e);
+          tallyEnrich(stats, 'games', res.ok ? 'ok' : 'not_found');
+          continue;
+        }
+        if(!uiPrefs.rawgApiKey) { tallyEnrich(stats, 'games', 'no_key'); continue; }
         const sRes = await fetch(`https://api.rawg.io/api/games?key=${encodeURIComponent(uiPrefs.rawgApiKey)}&search=${encodeURIComponent(e.title)}&page_size=1`);
         const sData = await sRes.json();
         const hit = (sData.results||[])[0];
         if(hit){
           if(!e.cover) e.cover = hit.background_image || '';
           if(!e.year && hit.released) e.year = parseInt(hit.released.slice(0,4))||null;
-          
+
           // Детали
           const dRes = await fetch(`https://api.rawg.io/api/games/${hit.id}?key=${encodeURIComponent(uiPrefs.rawgApiKey)}`);
           const d = await dRes.json();
@@ -1849,8 +1875,8 @@ async function enrichAllEntries(statusEl){
           }
           if(d.developers && d.developers.length) e.data.developer = d.developers.map(dev=>dev.name).join(', ');
           if(d.genres && d.genres.length && !e.data.genre) e.data.genre = d.genres.map(g=>g.name).join(', ');
-          e.updated = Date.now(); done++;
-        } else missed++;
+          e.updated = Date.now(); tallyEnrich(stats, 'games', 'ok');
+        } else tallyEnrich(stats, 'games', 'not_found');
       }
       else if(e.category==='anime' || e.category==='manga'){
         const kind = e.category==='anime' ? 'animes' : 'mangas';
@@ -1875,8 +1901,8 @@ async function enrichAllEntries(statusEl){
             if(d.authors && d.authors.length) e.data.author = d.authors.map(a=>a.name).join(', ');
             if(d.chapters && !e.data.totalCh) e.data.totalCh = d.chapters;
           }
-          e.updated = Date.now(); done++;
-        } else missed++;
+          e.updated = Date.now(); tallyEnrich(stats, e.category, 'ok');
+        } else tallyEnrich(stats, e.category, 'not_found');
       }
       else if(e.category==='books'){
         const sRes = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(e.title)}&maxResults=1&langRestrict=ru`);
@@ -1895,17 +1921,18 @@ async function enrichAllEntries(statusEl){
           if(!e.data) e.data = {};
           if(v.authors && !e.data.author) e.data.author = v.authors.join(', ');
           if(v.pageCount && !e.data.totalPages) e.data.totalPages = v.pageCount;
-          e.updated = Date.now(); done++;
-        } else missed++;
+          e.updated = Date.now(); tallyEnrich(stats, 'books', 'ok');
+        } else tallyEnrich(stats, 'books', 'not_found');
       }
-    }catch(err){ missed++; }
-    
+    }catch(err){ tallyEnrich(stats, e.category, 'not_found'); }
+
     await new Promise(r=>setTimeout(r, 150));
   }
-  
+
   await persist(); render();
-  statusEl.textContent = `Готово — обогащено записей: ${done}${missed?`, пропущено/не найдено: ${missed}`:''}`;
-  showToast(`Обогащено: ${done}`);
+  const totalDone = Object.values(stats).reduce((s,c)=>s+c.done,0);
+  statusEl.textContent = `Готово — ${formatEnrichReport(stats)}`;
+  showToast(`Обогащено: ${totalDone}`);
 }
 
 /* ---------- КНИГИ: Goodreads ---------- */
@@ -2191,6 +2218,23 @@ function backfillSteamDetFromEntry(e){
   };
 }
 
+// Общий шаг обогащения одной Steam-игры (appid уже известен из импорта, эндпоинт
+// appdetails бесплатный) — используется и кнопкой «Обогатить» в Steam-вкладке,
+// и общим «Обогатить всю базу», чтобы играм не требовался платный RAWG-ключ.
+async function enrichOneSteamGame(entry){
+  const appid = entry.data.appid;
+  let det = steamGamesDb[appid];
+  const fromCache = !!det;
+  if(!det){
+    const raw = await fetchViaProxies(`https://store.steampowered.com/api/appdetails?appids=${appid}&l=russian`, STEAM_PROXIES);
+    if(raw){ try{ det = parseAppDetails(appid, raw); }catch(e){ det = null; } }
+    if(det) steamGamesDb[appid] = det;
+    await new Promise(r=>setTimeout(r, 400));
+  }
+  if(det) applyGameDetails(entry, det);
+  return {ok: !!det, fromCache};
+}
+
 async function enrichSteamGames(statusEl){
   // Восстанавливаем уже обогащённые локально записи, которых ещё нет в offline-базе
   // (например, обогащённые до того, как появилась сама база).
@@ -2206,27 +2250,10 @@ async function enrichSteamGames(statusEl){
   let fromCache = 0, fetched = 0, failed = 0;
   for(let i=0;i<targets.length;i++){
     const entry = targets[i];
-    const appid = entry.data.appid;
     statusEl.textContent = `Обогащение метаданных: ${i+1}/${targets.length}...`;
-
-    let det = steamGamesDb[appid];
-    if(det){
-      fromCache++;
-    } else {
-      const url = `https://store.steampowered.com/api/appdetails?appids=${appid}&l=russian`;
-      const raw = await fetchViaProxies(url, STEAM_PROXIES);
-      if(raw){
-        try{ det = parseAppDetails(appid, raw); }catch(e){ det = null; }
-      }
-      if(det){
-        steamGamesDb[appid] = det;
-        fetched++;
-      } else {
-        failed++;
-      }
-      await new Promise(r=>setTimeout(r, 400));
-    }
-    if(det) applyGameDetails(entry, det);
+    const res = await enrichOneSteamGame(entry);
+    if(res.ok){ if(res.fromCache) fromCache++; else fetched++; }
+    else failed++;
   }
 
   await persist();
