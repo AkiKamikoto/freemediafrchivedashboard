@@ -259,6 +259,10 @@
       <div id="steamStatus" class="import-hint"></div>
       <div class="import-hint">Нужно, чтобы «Сведения об играх» были Public (Настройки приватности Steam).</div>
 
+      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="reshelveStaleSteamGames(document.getElementById('steamReshelfStatus'))">🧹 Убрать неактивные из «Продолжаю»</button>
+      <div id="steamReshelfStatus" class="import-hint"></div>
+      <div class="import-hint">Игры «играю», в которые не заходил 2+ месяца, переедут в «Отложено» — полка «Продолжаю» останется только с текущими.</div>
+
       <div class="subhead">Метаданные (офлайн-база)</div>
       <div class="import-hint" style="margin-top:0;">Разработчик, жанр, описание — тянутся из Steam Store API, кешируются в <code>data/steam-games-db.json</code>.</div>
       <div class="modal-actions">
